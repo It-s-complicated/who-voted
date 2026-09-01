@@ -1,0 +1,281 @@
+---
+import { readFileSync } from 'node:fs';
+import { sankey, sankeyLeft, sankeyLinkHorizontal } from 'd3-sankey';
+import type { SankeyLink, SankeyNode } from 'd3-sankey';
+
+type ElectionData = typeof import('../../public/data/2023.json');
+type DiagramNode = {
+  id: string;
+  label: string;
+  value: number;
+  color: string;
+  order: number;
+  callout?: boolean;
+};
+type DiagramLink = { source: string; target: string; value: number };
+type LayoutNode = SankeyNode<DiagramNode, DiagramLink> &
+  Required<Pick<SankeyNode<DiagramNode, DiagramLink>, 'x0' | 'x1' | 'y0' | 'y1'>>;
+type LayoutLink = SankeyLink<DiagramNode, DiagramLink> & {
+  source: LayoutNode;
+  target: LayoutNode;
+  width: number;
+};
+
+const data = JSON.parse(readFileSync('public/data/2023.json', 'utf8')) as ElectionData;
+const format = new Intl.NumberFormat('de-DE');
+function percentage(value: number): string {
+  return `${(value / data.population.residents * 100).toFixed(1).replace('.', ',')} %`;
+}
+function sourceUrl(id: string): string {
+  const source = data.sources.find((candidate) => candidate.id === id);
+  if (!source) throw new Error(`Missing source: ${id}`);
+  return source.url;
+}
+const threshold = 0.05;
+const partyColors: Record<string, string> = {
+  CDU: '#202831',
+  SPD: '#e54040',
+  GRÜNE: '#30a84b',
+  'DIE LINKE': '#bd4598',
+  AfD: '#2996cc',
+  FDP: '#f3d330',
+};
+const displayedParties = data.secondVotes.parties.filter(
+  (party) => party.name === 'FDP' || party.votes / data.secondVotes.valid >= threshold,
+);
+if (
+  !displayedParties.some((party) => party.name === 'FDP') ||
+  displayedParties.some((party, index) => index > 0 && party.votes > displayedParties[index - 1].votes)
+) {
+  throw new Error('Displayed parties must include FDP and be sorted by votes');
+}
+const otherVotes = data.secondVotes.valid - displayedParties.reduce((sum, party) => sum + party.votes, 0);
+
+const nodes: DiagramNode[] = [
+  { id: 'residents', label: 'Einwohner:innen', value: data.population.residents, color: '#2a3861', order: 0 },
+  { id: 'eligible', label: 'Wahlberechtigt', value: data.eligibility.eligible, color: '#5b84bb', order: 0 },
+  { id: 'notEligible', label: 'Nicht wahlberechtigt', value: data.eligibility.notEligible, color: '#918e8e', order: 1 },
+  { id: 'voters', label: 'Wähler:innen', value: data.turnout.voters, color: '#7c9dc9', order: 0 },
+  { id: 'nonVoters', label: 'Nicht gewählt', value: data.turnout.nonVoters, color: '#b5b4b4', order: 1 },
+  { id: 'underAge', label: 'Unter 18', value: data.eligibility.estimatedBreakdown.underVotingAge, color: '#aaa8a8', order: 2 },
+  { id: 'nonGerman', label: 'Nichtdeutsch, 18+', value: data.eligibility.estimatedBreakdown.nonGermanVotingAgeOrOlder, color: '#c8c6c7', order: 3 },
+  { id: 'eligibilityResidual', label: 'Sonstige Differenz*', value: data.eligibility.estimatedBreakdown.otherOrTimingDifference, color: '#dad9d9', order: 4, callout: true },
+  { id: 'valid', label: 'Gültige Zweitstimmen', value: data.secondVotes.valid, color: '#cad4ed', order: 0 },
+  { id: 'noValid', label: 'Keine gültige Zweitstimme', value: data.secondVotes.noValidSecondVote, color: '#8caada', order: 1, callout: true },
+  ...displayedParties.map((party, order) => ({
+    id: `party-${party.name}`,
+    label: party.name,
+    value: party.votes,
+    color: partyColors[party.name],
+    order,
+  })),
+  { id: 'party-Other', label: 'Sonstige', value: otherVotes, color: '#b2b2b2', order: displayedParties.length },
+];
+
+const links: DiagramLink[] = [
+  { source: 'residents', target: 'eligible', value: data.eligibility.eligible },
+  { source: 'residents', target: 'notEligible', value: data.eligibility.notEligible },
+  { source: 'eligible', target: 'voters', value: data.turnout.voters },
+  { source: 'eligible', target: 'nonVoters', value: data.turnout.nonVoters },
+  { source: 'notEligible', target: 'underAge', value: data.eligibility.estimatedBreakdown.underVotingAge },
+  { source: 'notEligible', target: 'nonGerman', value: data.eligibility.estimatedBreakdown.nonGermanVotingAgeOrOlder },
+  { source: 'notEligible', target: 'eligibilityResidual', value: data.eligibility.estimatedBreakdown.otherOrTimingDifference },
+  { source: 'voters', target: 'valid', value: data.secondVotes.valid },
+  { source: 'voters', target: 'noValid', value: data.secondVotes.noValidSecondVote },
+  ...displayedParties.map((party) => ({ source: 'valid', target: `party-${party.name}`, value: party.votes })),
+  { source: 'valid', target: 'party-Other', value: otherVotes },
+];
+
+const graph = sankey<DiagramNode, DiagramLink>()
+  .nodeId((node) => node.id)
+  .nodeAlign(sankeyLeft)
+  .nodeSort((a, b) => a.order - b.order)
+  .nodeWidth(14)
+  .nodePadding(18)
+  .extent([[66, 24], [850, 696]])({
+    nodes: nodes.map((node) => ({ ...node })),
+    links: links.map((link) => ({ ...link })),
+  }) as { nodes: LayoutNode[]; links: LayoutLink[] };
+const path = sankeyLinkHorizontal<DiagramNode, DiagramLink>();
+const tableRows = [
+  ...nodes.filter((node) => !node.id.startsWith('party-')),
+  ...displayedParties.map((party) => ({ label: party.name, value: party.votes })),
+  { label: 'Sonstige Parteien', value: otherVotes },
+];
+---
+
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content="Wie Berlin bei der Abgeordnetenhauswahl 2023 gewählt hat." />
+    <title>Wer hat gewählt? Berlin 2023</title>
+  </head>
+  <body>
+    <main>
+      <header>
+        <div>
+          <p class="eyebrow">Abgeordnetenhauswahl · Zweitstimme</p>
+          <h1>Wer hat in Berlin gewählt?</h1>
+          <p class="intro">
+            Von allen gemeldeten Einwohner:innen bis zu den gültigen Zweitstimmen bei der
+            Wiederholungswahl am 12. Februar 2023.
+          </p>
+        </div>
+        <label>
+          Wahljahr
+          <select aria-label="Wahljahr auswählen">
+            <option value="2023" selected>2023</option>
+          </select>
+        </label>
+      </header>
+
+      <section class="status" aria-label="Datenstatus">
+        <strong>Endgültiges Ergebnis</strong>
+        <span>Bevölkerungsstand: 31. Dezember 2022</span>
+      </section>
+
+      <figure>
+        <div class="diagram-scroll">
+          <svg viewBox="0 0 720 940" role="img" aria-labelledby="diagram-title diagram-description">
+            <title id="diagram-title">Wahlbeteiligung und Zweitstimmen in Berlin 2023</title>
+            <desc id="diagram-description">
+              Sankey-Diagramm von 3.850.809 Einwohnerinnen und Einwohnern über Wahlberechtigung,
+              Wahlbeteiligung und gültige Zweitstimmen bis zu den Parteien CDU, SPD, GRÜNE,
+              DIE LINKE, AfD und FDP sowie Sonstige.
+            </desc>
+
+            <g transform="matrix(0 1 1 0 0 0)" class="links">
+              {graph.links.map((link) => (
+                <path d={path(link)} stroke={link.target.color} stroke-width={Math.max(1, link.width)}>
+                  <title>{link.source.label} → {link.target.label}: {format.format(link.value)}</title>
+                </path>
+              ))}
+            </g>
+
+            <g transform="matrix(0 1 1 0 0 0)" class="nodes">
+              {graph.nodes.map((node) => (
+                <rect
+                  x={node.x0}
+                  y={node.y0}
+                  width={node.x1 - node.x0}
+                  height={Math.max(1, node.y1 - node.y0)}
+                  fill={node.color}
+                >
+                  <title>{node.label}: {format.format(node.value)} ({percentage(node.value)})</title>
+                </rect>
+              ))}
+            </g>
+
+            <g class="labels" aria-hidden="true">
+              {graph.nodes.filter((node) => !node.callout && !node.id.startsWith('party-')).map((node) => (
+                <text x={node.y0 + 3} y={node.x0 - 24}>
+                  <tspan x={node.y0 + 3}>{node.label}</tspan>
+                  <tspan x={node.y0 + 3} dy="15">{format.format(node.value)} · {percentage(node.value)}</tspan>
+                </text>
+              ))}
+              {graph.nodes.filter((node) => node.id.startsWith('party-')).map((node) => (
+                <text
+                  x={node.y0 + 3}
+                  y={node.x1 + 18}
+                  transform={`rotate(35 ${node.y0 + 3} ${node.x1 + 18})`}
+                >
+                  <tspan x={node.y0 + 3}>{node.label}</tspan>
+                  <tspan x={node.y0 + 3} dy="15">{format.format(node.value)} · {percentage(node.value)}</tspan>
+                </text>
+              ))}
+              {graph.nodes.filter((node) => node.callout).map((node, index) => (
+                <g>
+                  <line x1={(node.y0 + node.y1) / 2} y1={node.x0} x2="690" y2={node.x0 + 34 + index * 8} />
+                  <text x="690" y={node.x0 + 30 + index * 8} text-anchor="end">
+                    <tspan x="690">{node.label}</tspan>
+                    <tspan x="690" dy="17">{format.format(node.value)} · {percentage(node.value)}</tspan>
+                  </text>
+                </g>
+              ))}
+            </g>
+          </svg>
+        </div>
+        <figcaption>
+          * Die Aufteilung der nicht Wahlberechtigten ist eine Schätzung. Melderegister und
+          Wählerverzeichnis haben unterschiedliche Stichtage; Mindestwohndauer und
+          Wahlrechtsausschlüsse sind nicht vollständig abbildbar. Parteien unter 5 % außer der
+          FDP sind als „Sonstige“ zusammengefasst.
+        </figcaption>
+      </figure>
+
+      <details>
+        <summary>Daten als Tabelle</summary>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr><th>Gruppe</th><th>Anzahl</th><th>Anteil an Einwohner:innen</th></tr>
+            </thead>
+            <tbody>
+              {tableRows.map((row) => (
+                <tr><th scope="row">{row.label}</th><td>{format.format(row.value)}</td><td>{percentage(row.value)}</td></tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </details>
+
+      <footer>
+        <p>
+          Quellen: Amt für Statistik Berlin-Brandenburg,
+          <a href={sourceUrl('population')}>Einwohnerregister 31.12.2022</a>,
+          <a href={sourceUrl('structure')}>Strukturdaten 2023</a> und
+          <a href={sourceUrl('results')}>endgültiges Wahlergebnis 2023</a>.
+        </p>
+        <p>
+          Keine gültige Zweitstimme: {format.format(data.secondVotes.invalid)} ungültig und
+          {format.format(data.secondVotes.noSecondVote)} ohne abgegebene Zweitstimme.
+        </p>
+      </footer>
+    </main>
+  </body>
+</html>
+
+<style>
+  :global(*) { box-sizing: border-box; }
+  :global(body) {
+    margin: 0;
+    color: #17202b;
+    background: #f4f1ea;
+    font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  }
+  main { width: min(100% - 2rem, 72rem); margin: 0 auto; padding: 3rem 0 4rem; }
+  header { display: flex; justify-content: space-between; align-items: end; gap: 2rem; }
+  h1 { max-width: 14ch; margin: .2rem 0 .75rem; font-size: clamp(2.5rem, 7vw, 5.8rem); line-height: .92; letter-spacing: -.06em; }
+  .eyebrow { margin: 0; color: #526279; font-size: .78rem; font-weight: 750; letter-spacing: .12em; text-transform: uppercase; }
+  .intro { max-width: 43rem; margin: 0; color: #4a5565; font-size: 1.08rem; line-height: 1.6; }
+  label { display: grid; gap: .4rem; min-width: 8rem; font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
+  select { width: 100%; padding: .7rem .8rem; color: inherit; background: #fff; border: 1px solid #aeb4bb; border-radius: .35rem; font: inherit; }
+  .status { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .75rem; margin: 2rem 0 1rem; padding: .85rem 1rem; color: #fff; background: #2a3861; border-radius: .45rem; }
+  figure { margin: 0; background: #fff; border: 1px solid #d9d5cc; border-radius: .65rem; overflow: hidden; }
+  .diagram-scroll { overflow-x: auto; }
+  svg { display: block; width: 100%; min-width: 38rem; height: auto; background: #fff; }
+  .links path { fill: none; stroke-opacity: .62; }
+  .nodes rect { stroke: #fff; stroke-width: 2; }
+  .labels text { fill: #17202b; font-size: 12px; font-weight: 720; }
+  .labels tspan + tspan { fill: #526070; font-size: 10px; font-weight: 520; }
+  .labels line { stroke: #647184; stroke-width: 1; }
+  figcaption { padding: 1rem 1.2rem 1.2rem; color: #5e6670; border-top: 1px solid #ece9e2; font-size: .82rem; line-height: 1.55; }
+  details { margin-top: 1rem; background: #fff; border: 1px solid #d9d5cc; border-radius: .5rem; }
+  summary { padding: 1rem 1.2rem; cursor: pointer; font-weight: 700; }
+  .table-scroll { overflow-x: auto; padding: 0 1.2rem 1.2rem; }
+  table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+  th, td { padding: .65rem; border-bottom: 1px solid #e5e1da; text-align: right; }
+  th:first-child { text-align: left; }
+  thead th { color: #526070; font-size: .75rem; text-transform: uppercase; letter-spacing: .05em; }
+  footer { display: grid; gap: .35rem; margin-top: 1.25rem; color: #5e6670; font-size: .82rem; line-height: 1.5; }
+  footer p { margin: 0; }
+  a { color: #274e8e; text-underline-offset: .15em; }
+  @media (max-width: 42rem) {
+    main { width: min(100% - 1rem, 72rem); padding-top: 1.5rem; }
+    header { display: grid; align-items: start; }
+    header label { width: 9rem; }
+    .status { font-size: .84rem; }
+  }
+</style>
