@@ -16,6 +16,7 @@
     "test": "pnpm data:build && pnpm check && astro build"
   },
   "dependencies": {
+    "@fontsource-variable/fraunces": "^5.3.0",
     "astro": "^7.2.10",
     "d3-sankey": "^0.12.3"
   },
