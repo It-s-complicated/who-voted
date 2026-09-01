@@ -213,7 +213,12 @@ const callouts = graph.nodes
         anchor: "start" as const,
         x: node.y1 + 12,
         y: node.x0 + 7,
-        line: { x1: node.y1, y1: node.x0 + 3, x2: node.y1 + 8, y2: node.x0 + 3 },
+        line: {
+          x1: node.y1,
+          y1: node.x0 + 3,
+          x2: node.y1 + 8,
+          y2: node.x0 + 3,
+        },
       };
     }
     return {
@@ -235,7 +240,12 @@ const tableRows = [
     label: party.name,
     value: party.votes,
   })),
-  { label: "Sonstige Parteien", value: otherVotes },
+  { label: "Sonstige Parteien", value: otherVotes, subtotal: true },
+  ...data.secondVotes.parties
+    .filter(
+      (party) => !displayedParties.some((shown) => shown.name === party.name),
+    )
+    .map((party) => ({ label: party.name, value: party.votes, minor: true })),
 ];
 ---
 
@@ -367,10 +377,15 @@ const tableRows = [
                       x2={callout.line.x2}
                       y2={callout.line.y2}
                     />
-                    <text x={callout.x} y={callout.y} text-anchor={callout.anchor}>
+                    <text
+                      x={callout.x}
+                      y={callout.y}
+                      text-anchor={callout.anchor}
+                    >
                       <tspan x={callout.x}>{callout.node.label}</tspan>
                       <tspan x={callout.x} dy="17">
-                        {format.format(callout.node.value)} · {percentage(callout.node.value)}
+                        {format.format(callout.node.value)} ·{" "}
+                        {percentage(callout.node.value)}
                       </tspan>
                     </text>
                   </g>
@@ -401,7 +416,15 @@ const tableRows = [
             <tbody>
               {
                 tableRows.map((row) => (
-                  <tr>
+                  <tr
+                    class={
+                      "minor" in row
+                        ? "minor"
+                        : "subtotal" in row
+                          ? "subtotal"
+                          : undefined
+                    }
+                  >
                     <>
                       <th scope="row">{row.label}</th>
                       <td>{format.format(row.value)}</td>
@@ -417,7 +440,7 @@ const tableRows = [
 
       <footer>
         <p>
-          Quellen: Amt für Statistik Berlin-Brandenburg,
+          Quellen: Amt für Statistik Berlin-Brandenburg,{" "}
           <a href={sourceUrl("population")}>Einwohnerregister 31.12.2022</a>,{
             " "
           }
@@ -426,7 +449,7 @@ const tableRows = [
         </p>
         <p>
           Keine gültige Zweitstimme: {format.format(data.secondVotes.invalid)} ungültig
-          und
+          und{" "}
           {format.format(data.secondVotes.noSecondVote)} ohne abgegebene Zweitstimme.
         </p>
       </footer>
@@ -599,6 +622,22 @@ const tableRows = [
     padding: 0.55rem 0.65rem;
     border-bottom: 1px solid #e4e1db;
     text-align: right;
+  }
+  tr.minor th,
+  tr.minor td {
+    color: #6b6760;
+    font-weight: 400;
+    font-size: 0.92em;
+  }
+  tr.minor th {
+    padding-left: 2rem;
+  }
+  tr.subtotal th,
+  tr.subtotal td {
+    font-weight: 650;
+  }
+  tr.subtotal td {
+    border-bottom: 1px solid #1c1b1a;
   }
   th:first-child {
     text-align: left;
