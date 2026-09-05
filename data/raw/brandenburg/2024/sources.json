@@ -1,0 +1,29 @@
+{
+  "retrievedAt": "2026-09-05T21:35:53.462Z",
+  "sources": [
+    {
+      "id": "results",
+      "url": "https://wahlen.brandenburg.de/sixcms/media.php/9/1.%20Landesergebnis%20gesamt_Internet.pdf",
+      "file": "data/raw/brandenburg/2024/results.pdf",
+      "publisher": "Landeswahlleiter Brandenburg",
+      "location": "PDF-Seite 1, Land Brandenburg, Zweitstimmen",
+      "sha256": "736e85de5af12e8cb0c8e0103667b81c77b01bbc503bc83c05c4090834b55deb"
+    },
+    {
+      "id": "population",
+      "file": "data/raw/population/monitor-2024.pdf",
+      "url": "https://www.statistischebibliothek.de/mir/servlets/MCRFileNodeServlet/NIAusgabe_derivate_00000439/Niedersachsen-Monitor-2024_pdfa.pdf",
+      "publisher": "Landesamt für Statistik Niedersachsen",
+      "location": "PDF-Seite 17, Tabelle 1: Bevölkerungsstand und -dichte",
+      "sha256": "fb857cd74ef0e2c6fa545d22a0fb159cebe734c22dbdbad3a28afc54174dd623"
+    },
+    {
+      "id": "breakdown",
+      "url": "https://genesis.destatis.de/genesis/api/rest/tables/12411-0014/download/ffcsv/de",
+      "file": "data/raw/population/genesis-12411-0014-flat.zip",
+      "publisher": "Statistisches Bundesamt (Destatis)",
+      "location": "Tabelle 12411-0014, Bevölkerung nach Altersjahren und Nationalität, Stichtag 31.12.",
+      "sha256": "890d1386cbf9c19e97d750792c6c068c00c7141d8cd4c286f633ec0a8dbc736c"
+    }
+  ]
+}

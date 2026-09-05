@@ -1,0 +1,152 @@
+{
+  "id": "mecklenburg-vorpommern-ltw-2021",
+  "year": 2021,
+  "title": "Landtagswahl in Mecklenburg-Vorpommern",
+  "electionDate": "2021-09-26",
+  "resultStatus": "final",
+  "votingAge": 18,
+  "eyebrow": "Landtagswahl · Zweitstimmen",
+  "intro": "Von der Bevölkerung über die Wahlbeteiligung bis zu den gültigen Zweitstimmen bei der Landtagswahl am 26. September 2021.",
+  "population": {
+    "residents": 1610774,
+    "referenceDate": "2020-12-31",
+    "basis": "Bevölkerungsfortschreibung auf Basis des Zensus 2011"
+  },
+  "eligibility": {
+    "eligible": 1312471,
+    "notEligible": 298303,
+    "estimatedBreakdown": null,
+    "note": "Die nicht wahlberechtigte Bevölkerung wird als Gesamtgruppe gezeigt. Eine verifizierte Aufteilung nach Alter und Staatsangehörigkeit liegt in diesem Datensatz nicht vor. Bevölkerungsstand und Wählerverzeichnis haben unterschiedliche Stichtage."
+  },
+  "turnout": {
+    "voters": 928807,
+    "nonVoters": 383664
+  },
+  "secondVotes": {
+    "label": "Gültige Zweitstimmen",
+    "valid": 913863,
+    "votesPerVoter": 1,
+    "noValidSecondVote": 14944,
+    "invalid": 14944,
+    "noSecondVote": 0,
+    "noValidLabel": "Keine gültige Zweitstimme",
+    "parties": [
+      {
+        "name": "SPD",
+        "votes": 361769
+      },
+      {
+        "name": "AfD",
+        "votes": 152775
+      },
+      {
+        "name": "CDU",
+        "votes": 121583
+      },
+      {
+        "name": "DIE LINKE",
+        "votes": 90881
+      },
+      {
+        "name": "GRÜNE",
+        "votes": 57554
+      },
+      {
+        "name": "FDP",
+        "votes": 52963
+      },
+      {
+        "name": "dieBasis",
+        "votes": 15221
+      },
+      {
+        "name": "Tierschutzpartei",
+        "votes": 15212
+      },
+      {
+        "name": "FREIE WÄHLER",
+        "votes": 10075
+      },
+      {
+        "name": "NPD",
+        "votes": 7063
+      },
+      {
+        "name": "Die PARTEI",
+        "votes": 7023
+      },
+      {
+        "name": "TIERSCHUTZ hier!",
+        "votes": 3883
+      },
+      {
+        "name": "PIRATEN",
+        "votes": 3706
+      },
+      {
+        "name": "FREiER HORIZONT",
+        "votes": 3348
+      },
+      {
+        "name": "UNABHÄNGIGE",
+        "votes": 2331
+      },
+      {
+        "name": "Gesundheitsforschung",
+        "votes": 2030
+      },
+      {
+        "name": "Team Todenhöfer",
+        "votes": 1631
+      },
+      {
+        "name": "Die Humanisten",
+        "votes": 1105
+      },
+      {
+        "name": "ÖDP",
+        "votes": 936
+      },
+      {
+        "name": "Bündnis C",
+        "votes": 827
+      },
+      {
+        "name": "DKP",
+        "votes": 727
+      },
+      {
+        "name": "DiB",
+        "votes": 563
+      },
+      {
+        "name": "FPA",
+        "votes": 436
+      },
+      {
+        "name": "LKR",
+        "votes": 221
+      }
+    ]
+  },
+  "sources": [
+    {
+      "id": "results",
+      "url": "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-13.html",
+      "file": "data/raw/mecklenburg-vorpommern/2021/results.html",
+      "publisher": "Die Bundeswahlleiterin",
+      "location": "Ergebnis der letzten Landtagswahl, Landesergebnis",
+      "sha256": "b5d44d4abd0e13a80b6393d5fc529ba473475da87a8aae9fc9e0e83c2ddd026a",
+      "retrievedAt": "2026-09-05T21:35:53.696Z"
+    },
+    {
+      "id": "population",
+      "file": "data/raw/population/monitor-2022.pdf",
+      "url": "https://www.statistik.niedersachsen.de/download/190492/Niedersachsen-Monitor_Ausgabe_2022_barrierearm_-_Der_systematische_Bund-Laender-Vergleich_zur_Positionsbestimmung_des_Landes_Niedersachsen..pdf",
+      "publisher": "Landesamt für Statistik Niedersachsen",
+      "location": "PDF-Seite 16, Tabelle 1: Bevölkerungsstand und Dichte",
+      "sha256": "3f9742245be837d7bcbd22e2689a0ed426d237c1888a43b080aa16b016e33f20",
+      "retrievedAt": "2026-09-05T21:35:53.696Z"
+    }
+  ]
+}

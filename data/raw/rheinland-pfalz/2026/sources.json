@@ -1,0 +1,29 @@
+{
+  "retrievedAt": "2026-09-05T21:35:54.268Z",
+  "sources": [
+    {
+      "id": "results",
+      "url": "https://www.wahlen.rlp.de/fileadmin/wahlen.rlp.de/dokumente-wahlen/ltw/Ergebnisdateien/2026/Endgueltiges_Ergebnis_LW_2026_Wahlkreise.xlsx",
+      "file": "data/raw/rheinland-pfalz/2026/results.xlsx",
+      "publisher": "Landeswahlleiter Rheinland-Pfalz",
+      "location": "LW_2026_WK, Summe der 52 Wahlkreise (KZ G), Landesstimmen",
+      "sha256": "1b715439a37538650e4d1bdac9d904380b7579eb3af19c9658b1163fcd81c7bf"
+    },
+    {
+      "id": "population",
+      "file": "data/raw/population/2025.html",
+      "url": "https://www.statistikportal.de/de/bevoelkerung/flaeche-und-bevoelkerung",
+      "publisher": "Statistische Ämter des Bundes und der Länder",
+      "location": "Bevölkerung – Bundesländer, 2025, Gesamt",
+      "sha256": "b282ab4036bbab8a1488c0a0814269eeb3e16cc8a4a32bfc5a520f0e432176b0"
+    },
+    {
+      "id": "breakdown",
+      "url": "https://genesis.destatis.de/genesis/api/rest/tables/12411-0014/download/ffcsv/de",
+      "file": "data/raw/population/genesis-12411-0014-flat.zip",
+      "publisher": "Statistisches Bundesamt (Destatis)",
+      "location": "Tabelle 12411-0014, Bevölkerung nach Altersjahren und Nationalität, Stichtag 31.12.",
+      "sha256": "890d1386cbf9c19e97d750792c6c068c00c7141d8cd4c286f633ec0a8dbc736c"
+    }
+  ]
+}

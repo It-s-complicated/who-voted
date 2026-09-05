@@ -1,0 +1,112 @@
+{
+  "id": "niedersachsen-ltw-2022",
+  "year": 2022,
+  "title": "Landtagswahl in Niedersachsen",
+  "electionDate": "2022-10-09",
+  "resultStatus": "final",
+  "votingAge": 18,
+  "eyebrow": "Landtagswahl · Zweitstimmen",
+  "intro": "Von der Bevölkerung über die Wahlbeteiligung bis zu den gültigen Zweitstimmen bei der Landtagswahl am 9. Oktober 2022.",
+  "population": {
+    "residents": 8027031,
+    "referenceDate": "2021-12-31",
+    "basis": "Bevölkerungsfortschreibung auf Basis des Zensus 2011"
+  },
+  "eligibility": {
+    "eligible": 6064738,
+    "notEligible": 1962293,
+    "estimatedBreakdown": null,
+    "note": "Die nicht wahlberechtigte Bevölkerung wird als Gesamtgruppe gezeigt. Eine verifizierte Aufteilung nach Alter und Staatsangehörigkeit liegt in diesem Datensatz nicht vor. Bevölkerungsstand und Wählerverzeichnis haben unterschiedliche Stichtage."
+  },
+  "turnout": {
+    "voters": 3657967,
+    "nonVoters": 2406771
+  },
+  "secondVotes": {
+    "label": "Gültige Zweitstimmen",
+    "valid": 3623886,
+    "votesPerVoter": 1,
+    "noValidSecondVote": 34081,
+    "invalid": 34081,
+    "noSecondVote": 0,
+    "noValidLabel": "Keine gültige Zweitstimme",
+    "parties": [
+      {
+        "name": "SPD",
+        "votes": 1211447
+      },
+      {
+        "name": "CDU",
+        "votes": 1017304
+      },
+      {
+        "name": "GRÜNE",
+        "votes": 526940
+      },
+      {
+        "name": "AfD",
+        "votes": 396844
+      },
+      {
+        "name": "FDP",
+        "votes": 170303
+      },
+      {
+        "name": "DIE LINKE.",
+        "votes": 98586
+      },
+      {
+        "name": "Tierschutzpartei",
+        "votes": 53140
+      },
+      {
+        "name": "dieBasis",
+        "votes": 36599
+      },
+      {
+        "name": "Die PARTEI",
+        "votes": 34160
+      },
+      {
+        "name": "FREIE WÄHLER",
+        "votes": 30457
+      },
+      {
+        "name": "Volt",
+        "votes": 16663
+      },
+      {
+        "name": "PIRATEN",
+        "votes": 14242
+      },
+      {
+        "name": "Gesundheitsforschung",
+        "votes": 10673
+      },
+      {
+        "name": "Die Humanisten Niedersachsen",
+        "votes": 6528
+      }
+    ]
+  },
+  "sources": [
+    {
+      "id": "results",
+      "url": "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-3.html",
+      "file": "data/raw/niedersachsen/2022/results.html",
+      "publisher": "Die Bundeswahlleiterin",
+      "location": "Ergebnis der letzten Landtagswahl, Landesergebnis",
+      "sha256": "7b27c47f6f2a24cef5af77e574b26a9c384310b70522dc64f4ac7736c37045ab",
+      "retrievedAt": "2026-09-05T21:35:54.199Z"
+    },
+    {
+      "id": "population",
+      "file": "data/raw/population/monitor-2022.pdf",
+      "url": "https://www.statistik.niedersachsen.de/download/190492/Niedersachsen-Monitor_Ausgabe_2022_barrierearm_-_Der_systematische_Bund-Laender-Vergleich_zur_Positionsbestimmung_des_Landes_Niedersachsen..pdf",
+      "publisher": "Landesamt für Statistik Niedersachsen",
+      "location": "PDF-Seite 16, Tabelle 1: Bevölkerungsstand und Dichte",
+      "sha256": "3f9742245be837d7bcbd22e2689a0ed426d237c1888a43b080aa16b016e33f20",
+      "retrievedAt": "2026-09-05T21:35:54.199Z"
+    }
+  ]
+}

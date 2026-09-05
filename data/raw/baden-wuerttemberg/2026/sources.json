@@ -1,0 +1,29 @@
+{
+  "retrievedAt": "2026-09-05T21:35:41.132Z",
+  "sources": [
+    {
+      "id": "results",
+      "url": "https://wahlen.statistik-bw.de/ltw26/",
+      "file": "data/raw/baden-wuerttemberg/2026/state-results.html",
+      "publisher": "Statistisches Landesamt Baden-Württemberg",
+      "location": "Ergebnistabelle, Land Baden-Württemberg, Zweitstimmen",
+      "sha256": "01b9d7edac2461e1790b03cb3392f14b5441c908686643182a48cae4be45ce48"
+    },
+    {
+      "id": "population",
+      "file": "data/raw/population/2025.html",
+      "url": "https://www.statistikportal.de/de/bevoelkerung/flaeche-und-bevoelkerung",
+      "publisher": "Statistische Ämter des Bundes und der Länder",
+      "location": "Bevölkerung – Bundesländer, 2025, Gesamt",
+      "sha256": "b282ab4036bbab8a1488c0a0814269eeb3e16cc8a4a32bfc5a520f0e432176b0"
+    },
+    {
+      "id": "breakdown",
+      "url": "https://genesis.destatis.de/genesis/api/rest/tables/12411-0014/download/ffcsv/de",
+      "file": "data/raw/population/genesis-12411-0014-flat.zip",
+      "publisher": "Statistisches Bundesamt (Destatis)",
+      "location": "Tabelle 12411-0014, Bevölkerung nach Altersjahren und Nationalität, Stichtag 31.12.",
+      "sha256": "890d1386cbf9c19e97d750792c6c068c00c7141d8cd4c286f633ec0a8dbc736c"
+    }
+  ]
+}

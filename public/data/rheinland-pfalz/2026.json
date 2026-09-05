@@ -1,0 +1,104 @@
+{
+  "id": "rheinland-pfalz-ltw-2026",
+  "year": 2026,
+  "title": "Landtagswahl in Rheinland-Pfalz",
+  "electionDate": "2026-03-22",
+  "resultStatus": "final",
+  "votingAge": 18,
+  "eyebrow": "Landtagswahl · Landesstimmen",
+  "intro": "Von der Bevölkerung über die Wahlbeteiligung bis zu den gültigen Landesstimmen bei der Landtagswahl am 22. März 2026.",
+  "population": {
+    "residents": 4123022,
+    "referenceDate": "2025-12-31",
+    "basis": "Bevölkerungsfortschreibung auf Basis des Zensus 2022"
+  },
+  "eligibility": {
+    "eligible": 2990064,
+    "notEligible": 1132958,
+    "estimatedBreakdown": null,
+    "note": "Die nicht wahlberechtigte Bevölkerung wird als Gesamtgruppe gezeigt. Eine verifizierte Aufteilung nach Alter und Staatsangehörigkeit liegt in diesem Datensatz nicht vor. Bevölkerungsstand und Wählerverzeichnis haben unterschiedliche Stichtage."
+  },
+  "turnout": {
+    "voters": 2046542,
+    "nonVoters": 943522
+  },
+  "secondVotes": {
+    "label": "Gültige Landesstimmen",
+    "valid": 2028230,
+    "votesPerVoter": 1,
+    "noValidSecondVote": 18312,
+    "invalid": 18312,
+    "noSecondVote": 0,
+    "noValidLabel": "Keine gültige Landesstimme",
+    "parties": [
+      {
+        "name": "CDU",
+        "votes": 627954
+      },
+      {
+        "name": "SPD",
+        "votes": 525807
+      },
+      {
+        "name": "AfD",
+        "votes": 394756
+      },
+      {
+        "name": "GRÜNE",
+        "votes": 160073
+      },
+      {
+        "name": "Die Linke",
+        "votes": 88983
+      },
+      {
+        "name": "FREIE WÄHLER",
+        "votes": 84972
+      },
+      {
+        "name": "FDP",
+        "votes": 42063
+      },
+      {
+        "name": "BSW",
+        "votes": 37804
+      },
+      {
+        "name": "Tierschutzpartei",
+        "votes": 32733
+      },
+      {
+        "name": "Volt",
+        "votes": 22099
+      },
+      {
+        "name": "ÖDP",
+        "votes": 9173
+      },
+      {
+        "name": "PdH",
+        "votes": 1813
+      }
+    ]
+  },
+  "sources": [
+    {
+      "id": "results",
+      "url": "https://www.wahlen.rlp.de/fileadmin/wahlen.rlp.de/dokumente-wahlen/ltw/Ergebnisdateien/2026/Endgueltiges_Ergebnis_LW_2026_Wahlkreise.xlsx",
+      "file": "data/raw/rheinland-pfalz/2026/results.xlsx",
+      "publisher": "Landeswahlleiter Rheinland-Pfalz",
+      "location": "LW_2026_WK, Summe der 52 Wahlkreise (KZ G), Landesstimmen",
+      "sha256": "1b715439a37538650e4d1bdac9d904380b7579eb3af19c9658b1163fcd81c7bf",
+      "retrievedAt": "2026-09-05T21:35:54.268Z"
+    },
+    {
+      "id": "population",
+      "file": "data/raw/population/2025.html",
+      "url": "https://www.statistikportal.de/de/bevoelkerung/flaeche-und-bevoelkerung",
+      "publisher": "Statistische Ämter des Bundes und der Länder",
+      "location": "Bevölkerung – Bundesländer, 2025, Gesamt",
+      "sha256": "b282ab4036bbab8a1488c0a0814269eeb3e16cc8a4a32bfc5a520f0e432176b0",
+      "retrievedAt": "2026-09-05T21:35:54.268Z"
+    }
+  ]
+}

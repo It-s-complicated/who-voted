@@ -1,0 +1,120 @@
+{
+  "id": "schleswig-holstein-ltw-2022",
+  "year": 2022,
+  "title": "Landtagswahl in Schleswig-Holstein",
+  "electionDate": "2022-05-08",
+  "resultStatus": "final",
+  "votingAge": 16,
+  "eyebrow": "Landtagswahl · Zweitstimmen",
+  "intro": "Von der Bevölkerung über die Wahlbeteiligung bis zu den gültigen Zweitstimmen bei der Landtagswahl am 8. Mai 2022.",
+  "population": {
+    "residents": 2922005,
+    "referenceDate": "2021-12-31",
+    "basis": "Bevölkerungsfortschreibung auf Basis des Zensus 2011"
+  },
+  "eligibility": {
+    "eligible": 2314417,
+    "notEligible": 607588,
+    "estimatedBreakdown": null,
+    "note": "Die nicht wahlberechtigte Bevölkerung wird als Gesamtgruppe gezeigt. Eine verifizierte Aufteilung nach Alter und Staatsangehörigkeit liegt in diesem Datensatz nicht vor. Bevölkerungsstand und Wählerverzeichnis haben unterschiedliche Stichtage."
+  },
+  "turnout": {
+    "voters": 1396747,
+    "nonVoters": 917670
+  },
+  "secondVotes": {
+    "label": "Gültige Zweitstimmen",
+    "valid": 1387398,
+    "votesPerVoter": 1,
+    "noValidSecondVote": 9349,
+    "invalid": 9349,
+    "noSecondVote": 0,
+    "noValidLabel": "Keine gültige Zweitstimme",
+    "parties": [
+      {
+        "name": "CDU",
+        "votes": 601964
+      },
+      {
+        "name": "GRÜNE",
+        "votes": 254158
+      },
+      {
+        "name": "SPD",
+        "votes": 221496
+      },
+      {
+        "name": "FDP",
+        "votes": 88593
+      },
+      {
+        "name": "SSW",
+        "votes": 79301
+      },
+      {
+        "name": "AfD",
+        "votes": 61141
+      },
+      {
+        "name": "DIE LINKE",
+        "votes": 23054
+      },
+      {
+        "name": "dieBasis",
+        "votes": 15400
+      },
+      {
+        "name": "Die PARTEI",
+        "votes": 10292
+      },
+      {
+        "name": "Tierschutzpartei",
+        "votes": 10227
+      },
+      {
+        "name": "FREIE WÄHLER",
+        "votes": 8190
+      },
+      {
+        "name": "PIRATEN",
+        "votes": 4753
+      },
+      {
+        "name": "Volt",
+        "votes": 4215
+      },
+      {
+        "name": "Z.",
+        "votes": 1692
+      },
+      {
+        "name": "Die Humanisten",
+        "votes": 1603
+      },
+      {
+        "name": "Gesundheitsforschung",
+        "votes": 1319
+      }
+    ]
+  },
+  "sources": [
+    {
+      "id": "results",
+      "url": "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-1.html",
+      "file": "data/raw/schleswig-holstein/2022/results.html",
+      "publisher": "Die Bundeswahlleiterin",
+      "location": "Ergebnis der letzten Landtagswahl, Landesergebnis",
+      "sha256": "45381f5e845fb3831fc51a3cb8c9588b64e0861a3afda3961d1bd3d1f5161d15",
+      "retrievedAt": "2026-09-05T21:35:54.530Z"
+    },
+    {
+      "id": "population",
+      "file": "data/raw/population/monitor-2022.pdf",
+      "url": "https://www.statistik.niedersachsen.de/download/190492/Niedersachsen-Monitor_Ausgabe_2022_barrierearm_-_Der_systematische_Bund-Laender-Vergleich_zur_Positionsbestimmung_des_Landes_Niedersachsen..pdf",
+      "publisher": "Landesamt für Statistik Niedersachsen",
+      "location": "PDF-Seite 16, Tabelle 1: Bevölkerungsstand und Dichte",
+      "sha256": "3f9742245be837d7bcbd22e2689a0ed426d237c1888a43b080aa16b016e33f20",
+      "retrievedAt": "2026-09-05T21:35:54.530Z"
+    }
+  ]
+}

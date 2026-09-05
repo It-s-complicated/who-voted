@@ -1,6 +1,6 @@
 # Who voted?
 
-Static Astro proof of concept for Berlin's 2023 Abgeordnetenhaus second-vote flow.
+Static Astro site for German state elections and population-based voting flows.
 
 ```sh
 pnpm install
@@ -14,18 +14,28 @@ files; without arguments it downloads every state. The data step requires Node.j
 24+, Poppler's `pdftotext`, and `unzip`; the Netlify build only runs `pnpm build`.
 
 Berlin uses single Zweitstimmen; Hamburg and Bremen use five votes per voter
-(Landesstimmen/Stimmen). Their party bands count votes, not people, and the
-pages annotate this — see each dataset's `unitNote`.
+(Landesstimmen), Bayern two (Erst- und Zweitstimmen). Their party bands count
+votes, not people, and the pages annotate this — see each dataset's `unitNote`.
 
 Election URLs use `/:state/:year/`, with lowercase state slugs. Berlin is available
 at `/berlin/2023/`. `/` lists the states, and `/:state/` lists available election
-years. States without datasets show a preparation message. The old `/2023/`
-route is removed.
+years. The old `/2023/` route is removed.
 
-`src/data/states.ts` registers Berlin, Hamburg, and Bremen. Available pages:
-`/berlin/2023/`, `/hamburg/2025/`, and `/bremen/2023/`. `/` lists the states, and
-`/:state/` lists available election years.
-Store processed data at `public/data/<state>/<year>.json` and source files at
-`data/raw/<state>/<year>/`. The current download/build scripts and visualization
-are Berlin-specific. Before enabling Hamburg or Bremen, add their data parser
-and adapt the visualization to their voting system, labels, and sources.
+`src/data/states.ts` lists all 16 states with their latest completed election date
+and official result link, verified against the Bundeswahlleiterin on 5 September
+2026. Upcoming elections are excluded. Update this catalog after an election;
+`years` lists only elections with local diagram datasets.
+
+Every state has a diagram for its latest election: population → voting age →
+eligibility → turnout → party results. Berlin, Hamburg, Bremen, Bayern, Hessen,
+Sachsen and Thüringen additionally split the non-voters into "Unter <Wahlalter>",
+"Nichtdeutsche" and a small "Sonstige Differenzen" remainder, estimated from
+Destatis table 12411-0014 (Bevölkerung nach Altersjahren und Nationalität,
+Stichtag 31.12.). Where the age-and-nationality arithmetic cannot stay
+nonnegative (the birthday cohort between reference date and election day
+outgrows the not-eligible group, e.g. NRW), the split is omitted and replaced
+with a note. See `NONVOTER_BREAKDOWN.md` for the method and the per-state
+status. Store processed data at `public/data/<state>/<year>.json` and
+source files at `data/raw/<state>/<year>/`; `pnpm data:download <state>/<year>`
+fetches new sources and `pnpm data:build` validates and converts them.
+Add verified sources and a parser before enabling another diagram year.
