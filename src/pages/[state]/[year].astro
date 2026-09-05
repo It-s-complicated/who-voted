@@ -59,14 +59,13 @@ function sourceUrl(id: string): string {
 }
 const threshold = 0.05;
 const partyColors: Record<string, string> = {
-  CDU: "#202831",
-  SPD: "#e54040",
-  GRÜNE: "#30a84b",
-  "DIE LINKE": "#bd4598",
-  "Die Linke": "#bd4598",
-  AfD: "#2996cc",
-  FDP: "#f3d330",
-  BIW: "#7f9c3a",
+  cdu: "#202831",
+  spd: "#e54040",
+  "grüne": "#30a84b",
+  "die linke": "#bd4598",
+  afd: "#2996cc",
+  fdp: "#f3d330",
+  biw: "#7f9c3a",
 };
 const displayedParties = data.secondVotes.parties.filter(
   (party) =>
@@ -217,7 +216,7 @@ const nodes: DiagramNode[] = [
     label: party.name,
     value: party.votes,
     voteUnit: true,
-    color: partyColors[party.name],
+    color: partyColors[party.name.toLowerCase()],
     order,
   })),
   {
