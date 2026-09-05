@@ -41,7 +41,10 @@ type LayoutLink = SankeyLink<DiagramNode, DiagramLink> & {
 };
 
 const data = JSON.parse(
-  readFileSync(`public/data/${Astro.params.state}/${Astro.params.year}.json`, "utf8"),
+  readFileSync(
+    `public/data/${Astro.params.state}/${Astro.params.year}.json`,
+    "utf8",
+  ),
 ) as ElectionData;
 const format = new Intl.NumberFormat("de-DE");
 function percentage(value: number): string {
@@ -85,7 +88,9 @@ const otherVotes =
   displayedParties.reduce((sum, party) => sum + party.votes, 0);
 const ballots = data.ballots;
 const votesPerVoter = data.secondVotes.votesPerVoter;
-const unusedVotes = ballots ? ballots.valid * votesPerVoter - data.secondVotes.valid : 0;
+const unusedVotes = ballots
+  ? ballots.valid * votesPerVoter - data.secondVotes.valid
+  : 0;
 const resultStatusLabels: Record<string, string> = {
   final: "Endgültiges Ergebnis",
   preliminary: "Vorläufiges Ergebnis",
@@ -202,15 +207,19 @@ const nodes: DiagramNode[] = [
           callout: true,
         },
       ]),
-  ...(unusedVotes > 0 ? [{
-    id: "unusedVotes",
-    label: "Nicht ausgeschöpfte Stimmen",
-    value: unusedVotes,
-    voteUnit: true,
-    color: "#e4ecf8",
-    order: 1,
-    callout: true,
-  }] : []),
+  ...(unusedVotes > 0
+    ? [
+        {
+          id: "unusedVotes",
+          label: "Nicht ausgeschöpfte Stimmen",
+          value: unusedVotes,
+          voteUnit: true,
+          color: "#e4ecf8",
+          order: 1,
+          callout: true,
+        },
+      ]
+    : []),
   ...displayedParties.map((party, order) => ({
     id: `party-${party.name}`,
     label: party.name,
@@ -283,7 +292,9 @@ const links: DiagramLink[] = [
           value: data.secondVotes.noValidSecondVote,
         },
       ]),
-  ...(unusedVotes > 0 ? [{ source: "ballotsValid", target: "unusedVotes", value: unusedVotes }] : []),
+  ...(unusedVotes > 0
+    ? [{ source: "ballotsValid", target: "unusedVotes", value: unusedVotes }]
+    : []),
   ...displayedParties.map((party) => ({
     source: "valid",
     target: `party-${party.name}`,
@@ -304,11 +315,20 @@ const graph = sankey<DiagramNode, DiagramLink>()
     [850, 696],
   ])({
   // Vote capacity shares keep all stages on the population scale; these are not person counts.
-  nodes: nodes.map((node) => ({ ...node, value: node.value / (node.voteUnit ? votesPerVoter : 1) })),
-  links: links.filter((link) => link.value > 0).map((link) => ({
-    ...link,
-    value: link.value / (nodes.find((node) => node.id === link.target)?.voteUnit ? votesPerVoter : 1),
+  nodes: nodes.map((node) => ({
+    ...node,
+    value: node.value / (node.voteUnit ? votesPerVoter : 1),
   })),
+  links: links
+    .filter((link) => link.value > 0)
+    .map((link) => ({
+      ...link,
+      value:
+        link.value /
+        (nodes.find((node) => node.id === link.target)?.voteUnit
+          ? votesPerVoter
+          : 1),
+    })),
 }) as { nodes: LayoutNode[]; links: LayoutLink[] };
 const path = sankeyLinkHorizontal<DiagramNode, DiagramLink>();
 // ponytail: 210px is a rough label-width estimate for "fits right of the node";
@@ -377,12 +397,22 @@ const tableRows = [
     value: party.votes,
     voteUnit: true,
   })),
-  { label: "Sonstige Parteien", value: otherVotes, voteUnit: true, subtotal: true },
+  {
+    label: "Sonstige Parteien",
+    value: otherVotes,
+    voteUnit: true,
+    subtotal: true,
+  },
   ...data.secondVotes.parties
     .filter(
       (party) => !displayedParties.some((shown) => shown.name === party.name),
     )
-    .map((party) => ({ label: party.name, value: party.votes, voteUnit: true, minor: true })),
+    .map((party) => ({
+      label: party.name,
+      value: party.votes,
+      voteUnit: true,
+      minor: true,
+    })),
 ];
 ---
 
@@ -415,14 +445,18 @@ const tableRows = [
         <label>
           Wahljahr
           <select aria-label="Wahljahr auswählen">
-            {state.years.toSorted((a, b) => b - a).map((year) => (
-              <option
-                value={String(year)}
-                selected={String(year) === Astro.params.year}
-              >
-                {year}
-              </option>
-            ))}
+            {
+              state.years
+                .toSorted((a, b) => b - a)
+                .map((year) => (
+                  <option
+                    value={String(year)}
+                    selected={String(year) === Astro.params.year}
+                  >
+                    {year}
+                  </option>
+                ))
+            }
           </select>
         </label>
       </header>
@@ -440,10 +474,14 @@ const tableRows = [
             aria-labelledby="diagram-title diagram-description"
           >
             <title id="diagram-title">
-              {`Wahlbeteiligung und ${data.secondVotes.label.toLowerCase()} in ${state.name} ${Astro.params.year}`}
+              {
+                `Wahlbeteiligung und ${data.secondVotes.label.toLowerCase()} in ${state.name} ${Astro.params.year}`
+              }
             </title>
             <desc id="diagram-description">
-              {`Sankey-Diagramm von ${format.format(data.population.residents)} Einwohner:innen über Wahlberechtigung, Wahlbeteiligung und ${data.secondVotes.label.toLowerCase()} bis zu den Parteien ${topParties} sowie Sonstige.`}
+              {
+                `Sankey-Diagramm von ${format.format(data.population.residents)} Einwohner:innen über Wahlberechtigung, Wahlbeteiligung und ${data.secondVotes.label.toLowerCase()} bis zu den Parteien ${topParties} sowie Sonstige.`
+              }
             </desc>
 
             <g transform="matrix(0 1 1 0 0 0)" class="links">
@@ -549,12 +587,27 @@ const tableRows = [
           </svg>
         </div>
         <figcaption>
-          <p>* Die Aufteilung der nicht Wahlberechtigten ist eine Schätzung.
-          Melderegister und Wählerverzeichnis haben unterschiedliche Stichtage;
-          Mindestwohndauer und Wahlrechtsausschlüsse sind nicht vollständig
-          abbildbar.</p>
-          <p>Parteien unter 5 % außer der FDP sind als „Sonstige“ zusammengefasst.</p>
-          {ballots && <p>** Pro Stimmzettel sind bis zu {votesPerVoter} Stimmen möglich. Ab „{data.secondVotes.label}“ zeigen die Prozentwerte Stimmen ÷ ({votesPerVoter} × Einwohnerzahl) × 100, keine Personenanteile. Nicht ausgeschöpfte Stimmen sind die Differenz zwischen möglichen und gültigen Stimmen auf gültigen Stimmzetteln.</p>}
+          <p>
+            * Die Aufteilung der nicht Wahlberechtigten ist eine Schätzung.
+            Melderegister und Wählerverzeichnis haben unterschiedliche
+            Stichtage; Mindestwohndauer und Wahlrechtsausschlüsse sind nicht
+            vollständig abbildbar.
+          </p>
+          <p>
+            Parteien unter 5 % außer der FDP sind als „Sonstige“
+            zusammengefasst.
+          </p>
+          {
+            ballots && (
+              <p>
+                ** Pro Stimmzettel sind bis zu {votesPerVoter} Stimmen möglich.
+                Ab „{data.secondVotes.label}“ zeigen die Prozentwerte Stimmen ÷
+                ({votesPerVoter} × Einwohnerzahl) × 100, keine Personenanteile.
+                Nicht ausgeschöpfte Stimmen sind die Differenz zwischen
+                möglichen und gültigen Stimmen auf gültigen Stimmzetteln.
+              </p>
+            )
+          }
         </figcaption>
       </figure>
 
@@ -564,7 +617,12 @@ const tableRows = [
           <table>
             <thead>
               <tr
-                ><th>Gruppe</th><th>Anzahl</th><th>{ballots ? "Anteil an Einwohner:innen / Stimmenpotenzial" : "Anteil an Einwohner:innen"}</th
+                ><th>Gruppe</th><th>Anzahl</th><th
+                  >{
+                    ballots
+                      ? "Anteil an Einwohner:innen / Stimmenpotenzial"
+                      : "Anteil an Einwohner:innen"
+                  }</th
                 ></tr
               >
             </thead>
@@ -582,8 +640,15 @@ const tableRows = [
                   >
                     <>
                       <th scope="row">{row.label}</th>
-                      <td>{format.format(row.value)}{row.voteUnit && ballots ? " Stimmen" : ""}</td>
-                      <td>{percentage(row.value / (row.voteUnit ? votesPerVoter : 1))}</td>
+                      <td>
+                        {format.format(row.value)}
+                        {row.voteUnit && ballots ? " Stimmen" : ""}
+                      </td>
+                      <td>
+                        {percentage(
+                          row.value / (row.voteUnit ? votesPerVoter : 1),
+                        )}
+                      </td>
                     </>
                   </tr>
                 ))
@@ -596,23 +661,27 @@ const tableRows = [
       <footer>
         <p>
           Quellen: {publisher},{" "}
-          {sourceLinks.map((link, index) => (
-            <>
-              {index > 0 &&
-                (index === sourceLinks.length - 1 ? " und " : ", ")}
-              <a href={link.href}>{link.label}</a>
-            </>
-          ))}
+          {
+            sourceLinks.map((link, index) => (
+              <>
+                {index > 0 &&
+                  (index === sourceLinks.length - 1 ? " und " : ", ")}
+                <a href={link.href}>{link.label}</a>
+              </>
+            ))
+          }
           .
         </p>
         <p>
-          {data.ballots
-            ? `${format.format(data.ballots.invalid)} ungültige Stimmzettel${
-                data.ballots.none > 0
-                  ? `, ${format.format(data.ballots.none)} Wähler:innen ohne Stimmzettel`
-                  : ""
-              }.`
-            : `Keine gültige Zweitstimme: ${format.format(data.secondVotes.invalid)} ungültig und ${format.format(data.secondVotes.noSecondVote)} ohne abgegebene Zweitstimme.`}
+          {
+            data.ballots
+              ? `${format.format(data.ballots.invalid)} ungültige Stimmzettel${
+                  data.ballots.none > 0
+                    ? `, ${format.format(data.ballots.none)} Wähler:innen ohne Stimmzettel`
+                    : ""
+                }.`
+              : `Keine gültige Zweitstimme: ${format.format(data.secondVotes.invalid)} ungültig und ${format.format(data.secondVotes.noSecondVote)} ohne abgegebene Zweitstimme.`
+          }
         </p>
       </footer>
     </main>
