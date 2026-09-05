@@ -1,0 +1,128 @@
+{
+  "id": "saarland-ltw-2022",
+  "year": 2022,
+  "title": "Landtagswahl in Saarland",
+  "electionDate": "2022-03-27",
+  "resultStatus": "final",
+  "votingAge": 18,
+  "eyebrow": "Landtagswahl · Stimmen",
+  "intro": "Von der Bevölkerung über die Wahlbeteiligung bis zu den gültigen Stimmen bei der Landtagswahl am 27. März 2022.",
+  "population": {
+    "residents": 982348,
+    "referenceDate": "2021-12-31",
+    "basis": "Bevölkerungsfortschreibung auf Basis des Zensus 2011"
+  },
+  "eligibility": {
+    "eligible": 746307,
+    "notEligible": 236041,
+    "estimatedBreakdown": null,
+    "note": "Die nicht wahlberechtigte Bevölkerung wird als Gesamtgruppe gezeigt. Eine verifizierte Aufteilung nach Alter und Staatsangehörigkeit liegt in diesem Datensatz nicht vor. Bevölkerungsstand und Wählerverzeichnis haben unterschiedliche Stichtage."
+  },
+  "turnout": {
+    "voters": 458113,
+    "nonVoters": 288194
+  },
+  "secondVotes": {
+    "label": "Gültige Stimmen",
+    "valid": 452411,
+    "votesPerVoter": 1,
+    "noValidSecondVote": 5702,
+    "invalid": 5702,
+    "noSecondVote": 0,
+    "noValidLabel": "Keine gültige Stimme",
+    "parties": [
+      {
+        "name": "SPD",
+        "votes": 196801
+      },
+      {
+        "name": "CDU",
+        "votes": 129154
+      },
+      {
+        "name": "AfD",
+        "votes": 25719
+      },
+      {
+        "name": "GRÜNE",
+        "votes": 22598
+      },
+      {
+        "name": "FDP",
+        "votes": 21618
+      },
+      {
+        "name": "DIE LINKE",
+        "votes": 11689
+      },
+      {
+        "name": "Tierschutzpartei",
+        "votes": 10391
+      },
+      {
+        "name": "FREIE WÄHLER",
+        "votes": 7636
+      },
+      {
+        "name": "dieBasis",
+        "votes": 6448
+      },
+      {
+        "name": "bunt.saar",
+        "votes": 6216
+      },
+      {
+        "name": "Die PARTEI",
+        "votes": 4716
+      },
+      {
+        "name": "FAMILIE",
+        "votes": 3836
+      },
+      {
+        "name": "Volt",
+        "votes": 2645
+      },
+      {
+        "name": "PIRATEN",
+        "votes": 1318
+      },
+      {
+        "name": "ÖPD",
+        "votes": 613
+      },
+      {
+        "name": "SGV",
+        "votes": 412
+      },
+      {
+        "name": "Gesundheitsforschung",
+        "votes": 368
+      },
+      {
+        "name": "Die Humanistien",
+        "votes": 233
+      }
+    ]
+  },
+  "sources": [
+    {
+      "id": "results",
+      "url": "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-10.html",
+      "file": "data/raw/saarland/2022/results.html",
+      "publisher": "Die Bundeswahlleiterin",
+      "location": "Ergebnis der letzten Landtagswahl, Landesergebnis",
+      "sha256": "3238a89a316ac37e58fb7a03b6a2a6a6c38003f60b77fee13f963a014c18bc38",
+      "retrievedAt": "2026-09-05T21:35:54.415Z"
+    },
+    {
+      "id": "population",
+      "file": "data/raw/population/monitor-2022.pdf",
+      "url": "https://www.statistik.niedersachsen.de/download/190492/Niedersachsen-Monitor_Ausgabe_2022_barrierearm_-_Der_systematische_Bund-Laender-Vergleich_zur_Positionsbestimmung_des_Landes_Niedersachsen..pdf",
+      "publisher": "Landesamt für Statistik Niedersachsen",
+      "location": "PDF-Seite 16, Tabelle 1: Bevölkerungsstand und Dichte",
+      "sha256": "3f9742245be837d7bcbd22e2689a0ed426d237c1888a43b080aa16b016e33f20",
+      "retrievedAt": "2026-09-05T21:35:54.415Z"
+    }
+  ]
+}

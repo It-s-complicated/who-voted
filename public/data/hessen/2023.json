@@ -1,0 +1,152 @@
+{
+  "id": "hessen-ltw-2023",
+  "year": 2023,
+  "title": "Landtagswahl in Hessen",
+  "electionDate": "2023-10-08",
+  "resultStatus": "final",
+  "votingAge": 18,
+  "eyebrow": "Landtagswahl · Landesstimmen",
+  "intro": "Von der Bevölkerung über die Wahlbeteiligung bis zu den gültigen Landesstimmen bei der Landtagswahl am 8. Oktober 2023.",
+  "population": {
+    "residents": 6391360,
+    "referenceDate": "2022-12-31",
+    "basis": "Bevölkerungsfortschreibung auf Basis des Zensus 2011"
+  },
+  "eligibility": {
+    "eligible": 4332235,
+    "notEligible": 2059125,
+    "estimatedBreakdown": {
+      "underVotingAge": 1059549,
+      "nonGermanVotingAgeOrOlder": 904347,
+      "otherOrTimingDifference": 95229
+    }
+  },
+  "turnout": {
+    "voters": 2858313,
+    "nonVoters": 1473922
+  },
+  "secondVotes": {
+    "label": "Gültige Landesstimmen",
+    "valid": 2813313,
+    "votesPerVoter": 1,
+    "noValidSecondVote": 45000,
+    "invalid": 45000,
+    "noSecondVote": 0,
+    "noValidLabel": "Keine gültige Landesstimme",
+    "parties": [
+      {
+        "name": "CDU",
+        "votes": 972876
+      },
+      {
+        "name": "AfD",
+        "votes": 518763
+      },
+      {
+        "name": "SPD",
+        "votes": 424587
+      },
+      {
+        "name": "GRÜNE",
+        "votes": 416035
+      },
+      {
+        "name": "FDP",
+        "votes": 141644
+      },
+      {
+        "name": "FREIE WÄHLER",
+        "votes": 98283
+      },
+      {
+        "name": "DIE LINKE",
+        "votes": 86842
+      },
+      {
+        "name": "Tierschutzpartei",
+        "votes": 43341
+      },
+      {
+        "name": "Volt",
+        "votes": 27612
+      },
+      {
+        "name": "Die PARTEI",
+        "votes": 23678
+      },
+      {
+        "name": "dieBasis",
+        "votes": 13707
+      },
+      {
+        "name": "V-Partei³",
+        "votes": 9472
+      },
+      {
+        "name": "PIRATEN",
+        "votes": 8618
+      },
+      {
+        "name": "KLIMALISTE WÄHLERLISTE",
+        "votes": 6212
+      },
+      {
+        "name": "ÖDP",
+        "votes": 5906
+      },
+      {
+        "name": "ABG",
+        "votes": 4442
+      },
+      {
+        "name": "PdH",
+        "votes": 4262
+      },
+      {
+        "name": "DKP",
+        "votes": 2229
+      },
+      {
+        "name": "APPD",
+        "votes": 1929
+      },
+      {
+        "name": "Verjüngungsforschung",
+        "votes": 1506
+      },
+      {
+        "name": "DIE NEUE MITTE",
+        "votes": 1369
+      }
+    ]
+  },
+  "sources": [
+    {
+      "id": "results",
+      "url": "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-6.html",
+      "file": "data/raw/hessen/2023/results.html",
+      "publisher": "Die Bundeswahlleiterin",
+      "location": "Ergebnis der letzten Landtagswahl, Landesergebnis",
+      "sha256": "c7b5f1d6af968626032d38a8a00e069e93b4f3d7092d4e84cd22b99894759df7",
+      "retrievedAt": "2026-09-05T21:35:53.655Z"
+    },
+    {
+      "id": "population",
+      "file": "data/raw/population/monitor-2024.pdf",
+      "url": "https://www.statistischebibliothek.de/mir/servlets/MCRFileNodeServlet/NIAusgabe_derivate_00000439/Niedersachsen-Monitor-2024_pdfa.pdf",
+      "publisher": "Landesamt für Statistik Niedersachsen",
+      "location": "PDF-Seite 17, Tabelle 1: Bevölkerungsstand und -dichte",
+      "sha256": "fb857cd74ef0e2c6fa545d22a0fb159cebe734c22dbdbad3a28afc54174dd623",
+      "retrievedAt": "2026-09-05T21:35:53.655Z"
+    },
+    {
+      "id": "breakdown",
+      "url": "https://genesis.destatis.de/genesis/api/rest/tables/12411-0014/download/ffcsv/de",
+      "file": "data/raw/population/genesis-12411-0014-flat.zip",
+      "publisher": "Statistisches Bundesamt (Destatis)",
+      "location": "Tabelle 12411-0014, Bevölkerung nach Altersjahren und Nationalität, Stichtag 31.12.",
+      "sha256": "890d1386cbf9c19e97d750792c6c068c00c7141d8cd4c286f633ec0a8dbc736c",
+      "retrievedAt": "2026-09-05T21:35:53.655Z"
+    }
+  ]
+}

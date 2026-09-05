@@ -1,0 +1,144 @@
+{
+  "id": "sachsen-ltw-2024",
+  "year": 2024,
+  "title": "Landtagswahl in Sachsen",
+  "electionDate": "2024-09-01",
+  "resultStatus": "final",
+  "votingAge": 18,
+  "eyebrow": "Landtagswahl · Zweitstimmen",
+  "intro": "Von der Bevölkerung über die Wahlbeteiligung bis zu den gültigen Zweitstimmen bei der Landtagswahl am 1. September 2024.",
+  "population": {
+    "residents": 4089467,
+    "referenceDate": "2023-12-31",
+    "basis": "Bevölkerungsfortschreibung auf Basis des Zensus 2011"
+  },
+  "eligibility": {
+    "eligible": 3182683,
+    "notEligible": 906784,
+    "estimatedBreakdown": {
+      "underVotingAge": 653015,
+      "nonGermanVotingAgeOrOlder": 246495,
+      "otherOrTimingDifference": 7274
+    }
+  },
+  "turnout": {
+    "voters": 2367607,
+    "nonVoters": 815076
+  },
+  "secondVotes": {
+    "label": "Gültige Zweitstimmen",
+    "valid": 2347973,
+    "votesPerVoter": 1,
+    "noValidSecondVote": 19634,
+    "invalid": 19634,
+    "noSecondVote": 0,
+    "noValidLabel": "Keine gültige Zweitstimme",
+    "parties": [
+      {
+        "name": "CDU",
+        "votes": 749114
+      },
+      {
+        "name": "AfD",
+        "votes": 719279
+      },
+      {
+        "name": "BSW",
+        "votes": 277568
+      },
+      {
+        "name": "SPD",
+        "votes": 172021
+      },
+      {
+        "name": "GRÜNE",
+        "votes": 119980
+      },
+      {
+        "name": "DIE LINKE",
+        "votes": 104891
+      },
+      {
+        "name": "FREIE WÄHLER",
+        "votes": 53027
+      },
+      {
+        "name": "FREIE SACHSEN",
+        "votes": 52100
+      },
+      {
+        "name": "TIERSCHUTZ hier!",
+        "votes": 23606
+      },
+      {
+        "name": "FDP",
+        "votes": 20995
+      },
+      {
+        "name": "Die PARTEI",
+        "votes": 19752
+      },
+      {
+        "name": "PIRATEN",
+        "votes": 6772
+      },
+      {
+        "name": "BÜNDNIS DEUTSCHLAND",
+        "votes": 6718
+      },
+      {
+        "name": "WU",
+        "votes": 6474
+      },
+      {
+        "name": "dieBasis",
+        "votes": 4486
+      },
+      {
+        "name": "Bündnis C",
+        "votes": 4370
+      },
+      {
+        "name": "V-Partei³",
+        "votes": 3283
+      },
+      {
+        "name": "ÖDP",
+        "votes": 1955
+      },
+      {
+        "name": "BüSo",
+        "votes": 1582
+      }
+    ]
+  },
+  "sources": [
+    {
+      "id": "results",
+      "url": "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-14.html",
+      "file": "data/raw/sachsen/2024/results.html",
+      "publisher": "Die Bundeswahlleiterin",
+      "location": "Ergebnis der letzten Landtagswahl, Landesergebnis",
+      "sha256": "b784db77b94e575c4e5c6f6f7f5146e3dcd24547c06f81599e194969536a4672",
+      "retrievedAt": "2026-09-05T21:35:54.454Z"
+    },
+    {
+      "id": "population",
+      "file": "data/raw/population/monitor-2024.pdf",
+      "url": "https://www.statistischebibliothek.de/mir/servlets/MCRFileNodeServlet/NIAusgabe_derivate_00000439/Niedersachsen-Monitor-2024_pdfa.pdf",
+      "publisher": "Landesamt für Statistik Niedersachsen",
+      "location": "PDF-Seite 17, Tabelle 1: Bevölkerungsstand und -dichte",
+      "sha256": "fb857cd74ef0e2c6fa545d22a0fb159cebe734c22dbdbad3a28afc54174dd623",
+      "retrievedAt": "2026-09-05T21:35:54.454Z"
+    },
+    {
+      "id": "breakdown",
+      "url": "https://genesis.destatis.de/genesis/api/rest/tables/12411-0014/download/ffcsv/de",
+      "file": "data/raw/population/genesis-12411-0014-flat.zip",
+      "publisher": "Statistisches Bundesamt (Destatis)",
+      "location": "Tabelle 12411-0014, Bevölkerung nach Altersjahren und Nationalität, Stichtag 31.12.",
+      "sha256": "890d1386cbf9c19e97d750792c6c068c00c7141d8cd4c286f633ec0a8dbc736c",
+      "retrievedAt": "2026-09-05T21:35:54.454Z"
+    }
+  ]
+}

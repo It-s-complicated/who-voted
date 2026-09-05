@@ -1,0 +1,112 @@
+{
+  "id": "brandenburg-ltw-2024",
+  "year": 2024,
+  "title": "Landtagswahl in Brandenburg",
+  "electionDate": "2024-09-22",
+  "resultStatus": "final",
+  "votingAge": 16,
+  "eyebrow": "Landtagswahl · Zweitstimmen",
+  "intro": "Von der Bevölkerung über die Wahlbeteiligung bis zu den gültigen Zweitstimmen bei der Landtagswahl am 22. September 2024.",
+  "population": {
+    "residents": 2581667,
+    "referenceDate": "2023-12-31",
+    "basis": "Bevölkerungsfortschreibung auf Basis des Zensus 2011"
+  },
+  "eligibility": {
+    "eligible": 2076920,
+    "notEligible": 504747,
+    "estimatedBreakdown": null,
+    "note": "Die nicht wahlberechtigte Bevölkerung wird als Gesamtgruppe gezeigt. Eine verifizierte Aufteilung nach Alter und Staatsangehörigkeit liegt in diesem Datensatz nicht vor. Bevölkerungsstand und Wählerverzeichnis haben unterschiedliche Stichtage."
+  },
+  "turnout": {
+    "voters": 1513975,
+    "nonVoters": 562945
+  },
+  "secondVotes": {
+    "label": "Gültige Zweitstimmen",
+    "valid": 1501619,
+    "votesPerVoter": 1,
+    "noValidSecondVote": 12356,
+    "invalid": 12356,
+    "noSecondVote": 0,
+    "noValidLabel": "Keine gültige Zweitstimme",
+    "parties": [
+      {
+        "name": "SPD",
+        "votes": 463800
+      },
+      {
+        "name": "AfD",
+        "votes": 438904
+      },
+      {
+        "name": "BSW",
+        "votes": 202421
+      },
+      {
+        "name": "CDU",
+        "votes": 181716
+      },
+      {
+        "name": "GRÜNE",
+        "votes": 62057
+      },
+      {
+        "name": "DIE LINKE",
+        "votes": 44706
+      },
+      {
+        "name": "BVB / FREIE WÄHLER",
+        "votes": 38573
+      },
+      {
+        "name": "Tierschutzpartei",
+        "votes": 30041
+      },
+      {
+        "name": "Plus",
+        "votes": 13584
+      },
+      {
+        "name": "FDP",
+        "votes": 12475
+      },
+      {
+        "name": "DLW",
+        "votes": 6633
+      },
+      {
+        "name": "WU",
+        "votes": 3878
+      },
+      {
+        "name": "III. Weg",
+        "votes": 1810
+      },
+      {
+        "name": "DKP",
+        "votes": 1021
+      }
+    ]
+  },
+  "sources": [
+    {
+      "id": "results",
+      "url": "https://wahlen.brandenburg.de/sixcms/media.php/9/1.%20Landesergebnis%20gesamt_Internet.pdf",
+      "file": "data/raw/brandenburg/2024/results.pdf",
+      "publisher": "Landeswahlleiter Brandenburg",
+      "location": "PDF-Seite 1, Land Brandenburg, Zweitstimmen",
+      "sha256": "736e85de5af12e8cb0c8e0103667b81c77b01bbc503bc83c05c4090834b55deb",
+      "retrievedAt": "2026-09-05T21:35:53.462Z"
+    },
+    {
+      "id": "population",
+      "file": "data/raw/population/monitor-2024.pdf",
+      "url": "https://www.statistischebibliothek.de/mir/servlets/MCRFileNodeServlet/NIAusgabe_derivate_00000439/Niedersachsen-Monitor-2024_pdfa.pdf",
+      "publisher": "Landesamt für Statistik Niedersachsen",
+      "location": "PDF-Seite 17, Tabelle 1: Bevölkerungsstand und -dichte",
+      "sha256": "fb857cd74ef0e2c6fa545d22a0fb159cebe734c22dbdbad3a28afc54174dd623",
+      "retrievedAt": "2026-09-05T21:35:53.462Z"
+    }
+  ]
+}

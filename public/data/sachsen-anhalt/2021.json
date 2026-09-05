@@ -1,0 +1,144 @@
+{
+  "id": "sachsen-anhalt-ltw-2021",
+  "year": 2021,
+  "title": "Landtagswahl in Sachsen-Anhalt",
+  "electionDate": "2021-06-06",
+  "resultStatus": "final",
+  "votingAge": 18,
+  "eyebrow": "Landtagswahl · Zweitstimmen",
+  "intro": "Von der Bevölkerung über die Wahlbeteiligung bis zu den gültigen Zweitstimmen bei der Landtagswahl am 6. Juni 2021.",
+  "population": {
+    "residents": 2180684,
+    "referenceDate": "2020-12-31",
+    "basis": "Bevölkerungsfortschreibung auf Basis des Zensus 2011"
+  },
+  "eligibility": {
+    "eligible": 1788930,
+    "notEligible": 391754,
+    "estimatedBreakdown": null,
+    "note": "Die nicht wahlberechtigte Bevölkerung wird als Gesamtgruppe gezeigt. Eine verifizierte Aufteilung nach Alter und Staatsangehörigkeit liegt in diesem Datensatz nicht vor. Bevölkerungsstand und Wählerverzeichnis haben unterschiedliche Stichtage."
+  },
+  "turnout": {
+    "voters": 1079045,
+    "nonVoters": 709885
+  },
+  "secondVotes": {
+    "label": "Gültige Zweitstimmen",
+    "valid": 1063697,
+    "votesPerVoter": 1,
+    "noValidSecondVote": 15348,
+    "invalid": 15348,
+    "noSecondVote": 0,
+    "noValidLabel": "Keine gültige Zweitstimme",
+    "parties": [
+      {
+        "name": "CDU",
+        "votes": 394810
+      },
+      {
+        "name": "AfD",
+        "votes": 221487
+      },
+      {
+        "name": "DIE LINKE",
+        "votes": 116927
+      },
+      {
+        "name": "SPD",
+        "votes": 89475
+      },
+      {
+        "name": "FDP",
+        "votes": 68277
+      },
+      {
+        "name": "GRÜNE",
+        "votes": 63145
+      },
+      {
+        "name": "FREIE WÄHLER",
+        "votes": 33291
+      },
+      {
+        "name": "dieBasis",
+        "votes": 15623
+      },
+      {
+        "name": "Tierschutzpartei",
+        "votes": 15279
+      },
+      {
+        "name": "Gartenpartei",
+        "votes": 8583
+      },
+      {
+        "name": "Die PARTEI",
+        "votes": 7768
+      },
+      {
+        "name": "Tierschutz hier!",
+        "votes": 6238
+      },
+      {
+        "name": "Tierschutzallianz",
+        "votes": 5109
+      },
+      {
+        "name": "Gesundheitsforschung",
+        "votes": 3951
+      },
+      {
+        "name": "PIRATEN",
+        "votes": 3815
+      },
+      {
+        "name": "NPD",
+        "votes": 2888
+      },
+      {
+        "name": "WiR2020",
+        "votes": 1649
+      },
+      {
+        "name": "FBM",
+        "votes": 1613
+      },
+      {
+        "name": "Die Humanisten",
+        "votes": 1405
+      },
+      {
+        "name": "ÖDP",
+        "votes": 1062
+      },
+      {
+        "name": "Klimaliste ST",
+        "votes": 827
+      },
+      {
+        "name": "LKR",
+        "votes": 475
+      }
+    ]
+  },
+  "sources": [
+    {
+      "id": "results",
+      "url": "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-15.html",
+      "file": "data/raw/sachsen-anhalt/2021/results.html",
+      "publisher": "Die Bundeswahlleiterin",
+      "location": "Ergebnis der letzten Landtagswahl, Landesergebnis",
+      "sha256": "604a6c8c10bf14b60ddab1c2b1baf38c49835f31978655df702d0dacd2ea31e8",
+      "retrievedAt": "2026-09-05T21:35:54.495Z"
+    },
+    {
+      "id": "population",
+      "file": "data/raw/population/monitor-2022.pdf",
+      "url": "https://www.statistik.niedersachsen.de/download/190492/Niedersachsen-Monitor_Ausgabe_2022_barrierearm_-_Der_systematische_Bund-Laender-Vergleich_zur_Positionsbestimmung_des_Landes_Niedersachsen..pdf",
+      "publisher": "Landesamt für Statistik Niedersachsen",
+      "location": "PDF-Seite 16, Tabelle 1: Bevölkerungsstand und Dichte",
+      "sha256": "3f9742245be837d7bcbd22e2689a0ed426d237c1888a43b080aa16b016e33f20",
+      "retrievedAt": "2026-09-05T21:35:54.495Z"
+    }
+  ]
+}

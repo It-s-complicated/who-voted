@@ -3,6 +3,7 @@ import "@fontsource-variable/fraunces";
 import "../../styles/global.css";
 import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import { states } from "../../data/states";
+import type { ElectionData } from "../../data/election";
 import { readFileSync } from "node:fs";
 import { sankey, sankeyLeft, sankeyLinkHorizontal } from "d3-sankey";
 import type { SankeyLink, SankeyNode } from "d3-sankey";
@@ -16,10 +17,6 @@ export function getStaticPaths() {
 const state = states[Astro.params.state ?? ""];
 if (!state) throw new Error(`Unknown state: ${Astro.params.state}`);
 
-type ElectionData = typeof import("../../../public/data/berlin/2023.json") & {
-  ballots?: { total: number; valid: number; invalid: number; none: number };
-  unitNote?: string;
-};
 type DiagramNode = {
   id: string;
   label: string;
@@ -55,14 +52,13 @@ function nodeValue(node: DiagramNode, value = node.value): string {
     ? percentage(value)
     : `${format.format(value)} · ${percentage(value)}`;
 }
-function sourceUrl(id: string): string {
-  const source = data.sources.find((candidate) => candidate.id === id);
-  if (!source) throw new Error(`Missing source: ${id}`);
-  return source.url;
-}
 const threshold = 0.05;
 const partyColors: Record<string, string> = {
   cdu: "#202831",
+  csu: "#202831",
+  bsw: "#792351",
+  "freie wähler": "#d88023",
+  ssw: "#246895",
   spd: "#e54040",
   grüne: "#30a84b",
   "die linke": "#bd4598",
@@ -75,19 +71,21 @@ const displayedParties = data.secondVotes.parties.filter(
     party.name === "FDP" || party.votes / data.secondVotes.valid >= threshold,
 );
 if (
-  !displayedParties.some((party) => party.name === "FDP") ||
   displayedParties.some(
     (party, index) =>
       index > 0 && party.votes > displayedParties[index - 1].votes,
   )
 ) {
-  throw new Error("Displayed parties must include FDP and be sorted by votes");
+  throw new Error("Displayed parties must be sorted by votes");
 }
 const otherVotes =
   data.secondVotes.valid -
   displayedParties.reduce((sum, party) => sum + party.votes, 0);
 const ballots = data.ballots;
 const votesPerVoter = data.secondVotes.votesPerVoter;
+const multiVote = votesPerVoter > 1;
+const breakdown = data.eligibility.estimatedBreakdown;
+const noValidLabel = data.secondVotes.noValidLabel ?? "Keine gültige Zweitstimme";
 const unusedVotes = ballots
   ? ballots.valid * votesPerVoter - data.secondVotes.valid
   : 0;
@@ -141,31 +139,33 @@ const nodes: DiagramNode[] = [
     color: "#b5b4b4",
     order: 1,
   },
+  ...(breakdown ? [
   {
     id: "underAge",
     label: `Unter ${data.votingAge}`,
-    value: data.eligibility.estimatedBreakdown.underVotingAge,
+    value: breakdown.underVotingAge,
     color: "#aaa8a8",
     order: 2,
   },
   {
     id: "nonGerman",
     label: `Nichtdeutsch, ${data.votingAge}+`,
-    value: data.eligibility.estimatedBreakdown.nonGermanVotingAgeOrOlder,
+    value: breakdown.nonGermanVotingAgeOrOlder,
     color: "#c8c6c7",
     order: 3,
   },
   {
     id: "eligibilityResidual",
     label: "Sonstige Differenz*",
-    value: data.eligibility.estimatedBreakdown.otherOrTimingDifference,
+    value: breakdown.otherOrTimingDifference,
     color: "#dad9d9",
     order: 4,
     callout: true,
   },
+  ] : []),
   {
     id: "valid",
-    label: `${data.secondVotes.label}${ballots ? "**" : ""}`,
+    label: `${data.secondVotes.label}${multiVote ? "**" : ""}`,
     value: data.secondVotes.valid,
     voteUnit: true,
     color: "#cad4ed",
@@ -200,8 +200,9 @@ const nodes: DiagramNode[] = [
     : [
         {
           id: "noValid",
-          label: "Keine gültige Zweitstimme",
-          value: data.secondVotes.noValidSecondVote,
+          label: noValidLabel,
+          value: data.secondVotes.noValidSecondVote ?? 0,
+          voteUnit: true,
           color: "#d8e2f3",
           order: 1,
           callout: true,
@@ -225,7 +226,7 @@ const nodes: DiagramNode[] = [
     label: party.name,
     value: party.votes,
     voteUnit: true,
-    color: partyColors[party.name.toLowerCase()],
+    color: partyColors[party.name.toLowerCase()] ?? "#76716b",
     order,
   })),
   {
@@ -247,21 +248,23 @@ const links: DiagramLink[] = [
   },
   { source: "eligible", target: "voters", value: data.turnout.voters },
   { source: "eligible", target: "nonVoters", value: data.turnout.nonVoters },
+  ...(breakdown ? [
   {
     source: "notEligible",
     target: "underAge",
-    value: data.eligibility.estimatedBreakdown.underVotingAge,
+    value: breakdown.underVotingAge,
   },
   {
     source: "notEligible",
     target: "nonGerman",
-    value: data.eligibility.estimatedBreakdown.nonGermanVotingAgeOrOlder,
+    value: breakdown.nonGermanVotingAgeOrOlder,
   },
   {
     source: "notEligible",
     target: "eligibilityResidual",
-    value: data.eligibility.estimatedBreakdown.otherOrTimingDifference,
+    value: breakdown.otherOrTimingDifference,
   },
+  ] : []),
   {
     source: "voters",
     target: ballots ? "ballotsValid" : "valid",
@@ -289,7 +292,7 @@ const links: DiagramLink[] = [
         {
           source: "voters",
           target: "noValid",
-          value: data.secondVotes.noValidSecondVote,
+          value: data.secondVotes.noValidSecondVote ?? 0,
         },
       ]),
   ...(unusedVotes > 0
@@ -381,14 +384,14 @@ const callouts = [
 const sourceLabels: Record<string, string> = {
   results: "endgültiges Wahlergebnis",
   population: "Bevölkerungsstand",
+  breakdown: "Bevölkerung nach Altersjahren und Nationalität",
   structure: "Strukturdaten",
   register: "Melderegister-Auszählung",
   foreign: "ausländische Bevölkerung",
 };
-const publisher = data.sources[0]?.publisher ?? "";
 const sourceLinks = data.sources.map((source) => ({
   href: source.url,
-  label: sourceLabels[source.id] ?? source.id,
+  label: `${source.publisher}: ${sourceLabels[source.id] ?? source.id}`,
 }));
 const tableRows = [
   ...nodes.filter((node) => !node.id.startsWith("party-")),
@@ -587,16 +590,17 @@ const tableRows = [
           </svg>
         </div>
         <figcaption>
-          <p>
-            * Die Aufteilung der nicht Wahlberechtigten ist eine Schätzung.
-            Melderegister und Wählerverzeichnis haben unterschiedliche
-            Stichtage; Mindestwohndauer und Wahlrechtsausschlüsse sind nicht
-            vollständig abbildbar.
-          </p>
+          {breakdown ? (
+            <p>* Die Aufteilung der nicht Wahlberechtigten ist eine Schätzung.
+              Melderegister und Wählerverzeichnis haben unterschiedliche Stichtage und Revisionsstände;
+              Mindestwohndauer und Wahlrechtsausschlüsse sind nicht vollständig abbildbar.</p>
+          ) : <p>{data.eligibility.note}</p>}
+          {data.population.basis && <p>Bevölkerungsgrundlage: {data.population.basis}, Stand {populationDate}.</p>}
           <p>
             Parteien unter 5 % außer der FDP sind als „Sonstige“
             zusammengefasst.
           </p>
+          {multiVote && !ballots && <p>** {data.unitNote} Die Prozentwerte entsprechen Stimmen ÷ ({votesPerVoter} × Einwohnerzahl) × 100, keinen Personenanteilen.</p>}
           {
             ballots && (
               <p>
@@ -619,7 +623,7 @@ const tableRows = [
               <tr
                 ><th>Gruppe</th><th>Anzahl</th><th
                   >{
-                    ballots
+                    multiVote
                       ? "Anteil an Einwohner:innen / Stimmenpotenzial"
                       : "Anteil an Einwohner:innen"
                   }</th
@@ -642,7 +646,7 @@ const tableRows = [
                       <th scope="row">{row.label}</th>
                       <td>
                         {format.format(row.value)}
-                        {row.voteUnit && ballots ? " Stimmen" : ""}
+                        {row.voteUnit && multiVote ? " Stimmen" : ""}
                       </td>
                       <td>
                         {percentage(
@@ -660,7 +664,7 @@ const tableRows = [
 
       <footer>
         <p>
-          Quellen: {publisher},{" "}
+          Quellen:{" "}
           {
             sourceLinks.map((link, index) => (
               <>
@@ -680,7 +684,7 @@ const tableRows = [
                     ? `, ${format.format(data.ballots.none)} Wähler:innen ohne Stimmzettel`
                     : ""
                 }.`
-              : `Keine gültige Zweitstimme: ${format.format(data.secondVotes.invalid)} ungültig und ${format.format(data.secondVotes.noSecondVote)} ohne abgegebene Zweitstimme.`
+              : `${noValidLabel}: ${format.format(data.secondVotes.invalid ?? 0)} ungültig und ${format.format(data.secondVotes.noSecondVote ?? 0)} nicht abgegeben.`
           }
         </p>
       </footer>
@@ -697,6 +701,7 @@ const tableRows = [
   }
   h1 {
     max-width: 15ch;
+    overflow-wrap: anywhere;
     margin-top: 0.3rem;
   }
   .eyebrow {

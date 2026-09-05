@@ -1,5 +1,7 @@
 import { createHash } from 'node:crypto';
 import { mkdir, writeFile } from 'node:fs/promises';
+import { dirname } from 'node:path';
+import { stateSources } from './state-sources.mjs';
 
 const sources = {
   'berlin/2023': {
@@ -28,7 +30,15 @@ const sources = {
   },
 };
 
+for (const [route, entries] of Object.entries(stateSources)) {
+  sources[route] = Object.fromEntries(Object.entries(entries).map(([id, source]) => [id, source]));
+}
+
 const requested = process.argv.slice(2);
+for (const route of requested) {
+  if (!sources[route]) throw new Error(`Unknown election: ${route}`);
+}
+const downloaded = new Map();
 for (const [directory, files] of Object.entries(sources)) {
   if (requested.length && !requested.includes(directory)) continue;
 
@@ -36,25 +46,42 @@ for (const [directory, files] of Object.entries(sources)) {
   await mkdir(rawDirectory, { recursive: true });
   const manifest = { retrievedAt: new Date().toISOString(), sources: [] };
 
-  for (const [name, url] of Object.entries(files)) {
-    const response = await fetch(url);
-    if (!response.ok) throw new Error(`${url}: ${response.status} ${response.statusText}`);
-
-    const bytes = new Uint8Array(await response.arrayBuffer());
-    const head = new TextDecoder().decode(bytes.subarray(0, 20));
-    if (name.endsWith('.csv') ? !head.replace('\uFEFF', '').startsWith('Tabelle:') : !head.startsWith('%PDF-') && !head.startsWith('PK')) {
-      throw new Error(`${url}: unexpected file type`);
+  const pending = [];
+  for (const [name, entry] of Object.entries(files)) {
+    const source = typeof entry === 'string'
+      ? { id: name.replace(/\.\w+$/, ''), url: entry, file: `${rawDirectory}/${name}` }
+      : { id: name, ...entry };
+    const { page, method, body, ...metadata } = source;
+    const dedupeKey = body ? `${source.url}\n${JSON.stringify(body)}` : source.url;
+    let bytes = downloaded.get(dedupeKey);
+    if (!bytes) {
+      const response = await fetch(source.url, body
+        ? {
+          method: 'POST',
+          headers: {
+            'content-type': 'application/json',
+            origin: 'https://genesis.destatis.de',
+            referer: 'https://genesis.destatis.de/',
+          },
+          body: JSON.stringify(body),
+        }
+        : undefined);
+      if (!response.ok) throw new Error(`${source.url}: ${response.status} ${response.statusText}`);
+      bytes = new Uint8Array(await response.arrayBuffer());
+      const head = new TextDecoder().decode(bytes.subarray(0, 500)).trimStart();
+      const valid = source.file.endsWith('.csv') ? head.replace('\uFEFF', '').startsWith('Tabelle:')
+        : source.file.endsWith('.html') ? /<!doctype html|<html/i.test(head)
+        : source.file.endsWith('.pdf') ? head.startsWith('%PDF-') : head.startsWith('PK');
+      if (!valid) throw new Error(`${source.url}: unexpected file type`);
+      downloaded.set(dedupeKey, bytes);
     }
-
-    const file = `${rawDirectory}/${name}`;
+    pending.push({ file: source.file, bytes });
+    manifest.sources.push({ ...metadata, sha256: createHash('sha256').update(bytes).digest('hex') });
+  }
+  for (const { file, bytes } of pending) {
+    await mkdir(dirname(file), { recursive: true });
     await writeFile(file, bytes);
-    manifest.sources.push({
-      id: name.replace(/\.\w+$/, ''),
-      url,
-      file,
-      sha256: createHash('sha256').update(bytes).digest('hex'),
-    });
-    console.log(`Downloaded ${directory}/${name}`);
+    console.log(`Downloaded ${file}`);
   }
 
   await writeFile(`${rawDirectory}/sources.json`, `${JSON.stringify(manifest, null, 2)}\n`);

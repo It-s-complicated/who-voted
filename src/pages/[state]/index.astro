@@ -9,15 +9,19 @@ export function getStaticPaths() {
   }));
 }
 
-const { name, years } = Astro.props;
+const { name, years, latestElection } = Astro.props;
+const electionDate = new Intl.DateTimeFormat("de-DE", { dateStyle: "long" }).format(new Date(latestElection));
 ---
 
 <RouteIndex
   title={name}
-  description={`Wahlbeteiligung in ${name}. Wähle ein Wahljahr aus.`}
+  description={`Letzte Wahl: ${electionDate}. Wähle ein Wahljahr für die Wahlbeteiligung aus.`}
   breadcrumbs={[{ label: "Startseite", href: "/", home: true }, { label: name }]}
-  links={years.toSorted((a, b) => b - a).map((year) => ({
-    href: `/${Astro.params.state}/${year}/`,
-    label: String(year),
-  }))}
+  links={[
+    ...years.toSorted((a, b) => b - a).map((year) => ({
+      href: `/${Astro.params.state}/${year}/`,
+      label: String(year),
+      note: "Wahlbeteiligung als Diagramm",
+    })),
+  ]}
 />

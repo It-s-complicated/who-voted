@@ -1,0 +1,29 @@
+{
+  "retrievedAt": "2026-09-05T21:35:54.567Z",
+  "sources": [
+    {
+      "id": "results",
+      "url": "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-16.html",
+      "file": "data/raw/thueringen/2024/results.html",
+      "publisher": "Die Bundeswahlleiterin",
+      "location": "Ergebnis der letzten Landtagswahl, Landesergebnis",
+      "sha256": "d799ea53aca530fd67907988894053ae7f22853d85e667ad5a63de4458278de5"
+    },
+    {
+      "id": "population",
+      "file": "data/raw/population/monitor-2024.pdf",
+      "url": "https://www.statistischebibliothek.de/mir/servlets/MCRFileNodeServlet/NIAusgabe_derivate_00000439/Niedersachsen-Monitor-2024_pdfa.pdf",
+      "publisher": "Landesamt für Statistik Niedersachsen",
+      "location": "PDF-Seite 17, Tabelle 1: Bevölkerungsstand und -dichte",
+      "sha256": "fb857cd74ef0e2c6fa545d22a0fb159cebe734c22dbdbad3a28afc54174dd623"
+    },
+    {
+      "id": "breakdown",
+      "url": "https://genesis.destatis.de/genesis/api/rest/tables/12411-0014/download/ffcsv/de",
+      "file": "data/raw/population/genesis-12411-0014-flat.zip",
+      "publisher": "Statistisches Bundesamt (Destatis)",
+      "location": "Tabelle 12411-0014, Bevölkerung nach Altersjahren und Nationalität, Stichtag 31.12.",
+      "sha256": "890d1386cbf9c19e97d750792c6c068c00c7141d8cd4c286f633ec0a8dbc736c"
+    }
+  ]
+}

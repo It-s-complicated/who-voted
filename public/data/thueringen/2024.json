@@ -1,0 +1,128 @@
+{
+  "id": "thueringen-ltw-2024",
+  "year": 2024,
+  "title": "Landtagswahl in Thüringen",
+  "electionDate": "2024-09-01",
+  "resultStatus": "final",
+  "votingAge": 18,
+  "eyebrow": "Landtagswahl · Zweitstimmen",
+  "intro": "Von der Bevölkerung über die Wahlbeteiligung bis zu den gültigen Zweitstimmen bei der Landtagswahl am 1. September 2024.",
+  "population": {
+    "residents": 2122335,
+    "referenceDate": "2023-12-31",
+    "basis": "Bevölkerungsfortschreibung auf Basis des Zensus 2011"
+  },
+  "eligibility": {
+    "eligible": 1655670,
+    "notEligible": 466665,
+    "estimatedBreakdown": {
+      "underVotingAge": 326406,
+      "nonGermanVotingAgeOrOlder": 131081,
+      "otherOrTimingDifference": 9178
+    }
+  },
+  "turnout": {
+    "voters": 1218089,
+    "nonVoters": 437581
+  },
+  "secondVotes": {
+    "label": "Gültige Zweitstimmen",
+    "valid": 1207883,
+    "votesPerVoter": 1,
+    "noValidSecondVote": 10206,
+    "invalid": 10206,
+    "noSecondVote": 0,
+    "noValidLabel": "Keine gültige Zweitstimme",
+    "parties": [
+      {
+        "name": "AfD",
+        "votes": 396711
+      },
+      {
+        "name": "CDU",
+        "votes": 285097
+      },
+      {
+        "name": "BSW",
+        "votes": 190664
+      },
+      {
+        "name": "DIE LINKE",
+        "votes": 157689
+      },
+      {
+        "name": "SPD",
+        "votes": 73126
+      },
+      {
+        "name": "GRÜNE",
+        "votes": 38275
+      },
+      {
+        "name": "FREIE WÄHLER",
+        "votes": 15385
+      },
+      {
+        "name": "FDP",
+        "votes": 13591
+      },
+      {
+        "name": "TIERSCHUTZ hier!",
+        "votes": 12112
+      },
+      {
+        "name": "WU",
+        "votes": 6778
+      },
+      {
+        "name": "FAMILIE",
+        "votes": 5709
+      },
+      {
+        "name": "BÜNDNIS DEUTSCHLAND",
+        "votes": 5309
+      },
+      {
+        "name": "PIRATEN",
+        "votes": 3721
+      },
+      {
+        "name": "ÖDP / Familie ..",
+        "votes": 2389
+      },
+      {
+        "name": "MLPD",
+        "votes": 1327
+      }
+    ]
+  },
+  "sources": [
+    {
+      "id": "results",
+      "url": "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-16.html",
+      "file": "data/raw/thueringen/2024/results.html",
+      "publisher": "Die Bundeswahlleiterin",
+      "location": "Ergebnis der letzten Landtagswahl, Landesergebnis",
+      "sha256": "d799ea53aca530fd67907988894053ae7f22853d85e667ad5a63de4458278de5",
+      "retrievedAt": "2026-09-05T21:35:54.567Z"
+    },
+    {
+      "id": "population",
+      "file": "data/raw/population/monitor-2024.pdf",
+      "url": "https://www.statistischebibliothek.de/mir/servlets/MCRFileNodeServlet/NIAusgabe_derivate_00000439/Niedersachsen-Monitor-2024_pdfa.pdf",
+      "publisher": "Landesamt für Statistik Niedersachsen",
+      "location": "PDF-Seite 17, Tabelle 1: Bevölkerungsstand und -dichte",
+      "sha256": "fb857cd74ef0e2c6fa545d22a0fb159cebe734c22dbdbad3a28afc54174dd623",
+      "retrievedAt": "2026-09-05T21:35:54.567Z"
+    },
+    {
+      "id": "breakdown",
+      "url": "https://genesis.destatis.de/genesis/api/rest/tables/12411-0014/download/ffcsv/de",
+      "file": "data/raw/population/genesis-12411-0014-flat.zip",
+      "publisher": "Statistisches Bundesamt (Destatis)",
+      "location": "Tabelle 12411-0014, Bevölkerung nach Altersjahren und Nationalität, Stichtag 31.12.",
+      "sha256": "890d1386cbf9c19e97d750792c6c068c00c7141d8cd4c286f633ec0a8dbc736c",
+      "retrievedAt": "2026-09-05T21:35:54.567Z"
+    }
+  ]
+}

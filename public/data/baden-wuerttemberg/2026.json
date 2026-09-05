@@ -1,0 +1,140 @@
+{
+  "id": "baden-wuerttemberg-ltw-2026",
+  "year": 2026,
+  "title": "Landtagswahl in Baden-Württemberg",
+  "electionDate": "2026-03-08",
+  "resultStatus": "final",
+  "votingAge": 16,
+  "eyebrow": "Landtagswahl · Zweitstimmen",
+  "intro": "Von der Bevölkerung über die Wahlbeteiligung bis zu den gültigen Zweitstimmen bei der Landtagswahl am 8. März 2026.",
+  "population": {
+    "residents": 11238761,
+    "referenceDate": "2025-12-31",
+    "basis": "Bevölkerungsfortschreibung auf Basis des Zensus 2022"
+  },
+  "eligibility": {
+    "eligible": 7764858,
+    "notEligible": 3473903,
+    "estimatedBreakdown": null,
+    "note": "Die nicht wahlberechtigte Bevölkerung wird als Gesamtgruppe gezeigt. Eine verifizierte Aufteilung nach Alter und Staatsangehörigkeit liegt in diesem Datensatz nicht vor. Bevölkerungsstand und Wählerverzeichnis haben unterschiedliche Stichtage."
+  },
+  "turnout": {
+    "voters": 5406737,
+    "nonVoters": 2358121
+  },
+  "secondVotes": {
+    "label": "Gültige Zweitstimmen",
+    "valid": 5375109,
+    "votesPerVoter": 1,
+    "noValidSecondVote": 31628,
+    "invalid": 31628,
+    "noSecondVote": 0,
+    "noValidLabel": "Keine gültige Zweitstimme",
+    "parties": [
+      {
+        "name": "GRÜNE",
+        "votes": 1623208
+      },
+      {
+        "name": "CDU",
+        "votes": 1595929
+      },
+      {
+        "name": "AfD",
+        "votes": 1010574
+      },
+      {
+        "name": "SPD",
+        "votes": 298297
+      },
+      {
+        "name": "Die Linke",
+        "votes": 236975
+      },
+      {
+        "name": "FDP",
+        "votes": 235598
+      },
+      {
+        "name": "FREIE WÄHLER",
+        "votes": 102716
+      },
+      {
+        "name": "BSW",
+        "votes": 76439
+      },
+      {
+        "name": "Tierschutzpartei",
+        "votes": 49827
+      },
+      {
+        "name": "Volt",
+        "votes": 45842
+      },
+      {
+        "name": "Die PARTEI",
+        "votes": 22765
+      },
+      {
+        "name": "dieBasis",
+        "votes": 15126
+      },
+      {
+        "name": "Bündnis C",
+        "votes": 12533
+      },
+      {
+        "name": "WerteUnion",
+        "votes": 11323
+      },
+      {
+        "name": "ÖDP",
+        "votes": 9339
+      },
+      {
+        "name": "PDR",
+        "votes": 9017
+      },
+      {
+        "name": "Die Gerechtigkeitspartei",
+        "votes": 7315
+      },
+      {
+        "name": "PdF",
+        "votes": 3649
+      },
+      {
+        "name": "Verjüngungsforschung",
+        "votes": 3526
+      },
+      {
+        "name": "KlimalisteBW",
+        "votes": 2764
+      },
+      {
+        "name": "PdH",
+        "votes": 2347
+      }
+    ]
+  },
+  "sources": [
+    {
+      "id": "results",
+      "url": "https://wahlen.statistik-bw.de/ltw26/",
+      "file": "data/raw/baden-wuerttemberg/2026/state-results.html",
+      "publisher": "Statistisches Landesamt Baden-Württemberg",
+      "location": "Ergebnistabelle, Land Baden-Württemberg, Zweitstimmen",
+      "sha256": "01b9d7edac2461e1790b03cb3392f14b5441c908686643182a48cae4be45ce48",
+      "retrievedAt": "2026-09-05T21:35:41.132Z"
+    },
+    {
+      "id": "population",
+      "file": "data/raw/population/2025.html",
+      "url": "https://www.statistikportal.de/de/bevoelkerung/flaeche-und-bevoelkerung",
+      "publisher": "Statistische Ämter des Bundes und der Länder",
+      "location": "Bevölkerung – Bundesländer, 2025, Gesamt",
+      "sha256": "b282ab4036bbab8a1488c0a0814269eeb3e16cc8a4a32bfc5a520f0e432176b0",
+      "retrievedAt": "2026-09-05T21:35:41.132Z"
+    }
+  ]
+}

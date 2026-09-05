@@ -1,6 +1,9 @@
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { states as stateCatalog } from '../src/data/states.ts';
+import { stateSources } from './state-sources.mjs';
+import { validateElection } from './validate-election.mjs';
 
 function pdfPage(file, firstPage, lastPage = firstPage) {
   return execFileSync(
@@ -528,6 +531,179 @@ async function bremenData() {
   };
 }
 
+// --- Other states ---
+
+// ponytail: these two retained official HTML table layouts are fixed;
+// use an HTML parser if the publishers change the markup beyond these tables.
+function htmlRows(html) {
+  return [...html.matchAll(/<tr\b[^>]*>([\s\S]*?)<\/tr>/g)].map((row) =>
+    [...row[1].matchAll(/<t[hd]\b[^>]*>([\s\S]*?)<\/t[hd]>/g)].map((cell) =>
+      cell[1].replace(/<[^>]*>/g, '').replace(/&(?:amp|nbsp|auml|ouml|uuml|Auml|Ouml|Uuml|szlig);/g,
+        (entity) => ({ '&amp;': '&', '&nbsp;': ' ', '&auml;': 'ä', '&ouml;': 'ö', '&uuml;': 'ü', '&Auml;': 'Ä', '&Ouml;': 'Ö', '&Uuml;': 'Ü', '&szlig;': 'ß' })[entity])
+        .replace(/\s+/g, ' ').trim(),
+    ),
+  );
+}
+
+function officialCount(value) {
+  if (value === '–' || value === '-') return 0;
+  if (typeof value !== 'string' || !/^\d[\d. ]*$/.test(value)) throw new Error(`Invalid official count: ${value}`);
+  return Number(value.replace(/[. ]/g, ''));
+}
+
+// ponytail: flat CSV from a fixed Destatis export layout; swap in a parser if
+// the GENESIS flat export schema ever changes (columns: 5=time, 9=Land,
+// 13=Nationalität, 17=Geschlecht, 20=Altersjahr code, 22=value)
+function genesisAgePopulation(file) {
+  const csv = execFileSync('unzip', ['-p', file, '12411-0014_de_flat.csv'], {
+    maxBuffer: 256 * 1024 * 1024,
+  }).toString('utf8');
+  const population = new Map();
+  for (const line of csv.split('\n')) {
+    const cells = line.split(';');
+    if (cells[0] !== '12411' || cells[16] !== 'Insgesamt' || cells[11] === '%TOTAL%') continue;
+    population.set(`${cells[4]}|${cells[8]}|${cells[11]}|${cells[19]}`, Number(cells[21]));
+  }
+  return population;
+}
+
+// Estimated non-voter split from official single-year age × nationality counts
+// at 31.12.; returns null when the arithmetic cannot stay nonnegative (the
+// birthday cohort between reference date and election day can outgrow the
+// not-eligible group, e.g. NRW), in which case the page keeps its overall note.
+function nonVoterBreakdown(file, land, refDate, votingAge, notEligible) {
+  const population = genesisAgePopulation(file);
+  const total = (nationality, upTo) => {
+    let sum = 0;
+    for (let age = 0; age < (upTo ?? 91); age += 1) {
+      sum += population.get(`${refDate}|${land}|${nationality}|ALT${String(age).padStart(3, '0')}`) ?? 0;
+      if (upTo == null && age === 90) sum += population.get(`${refDate}|${land}|${nationality}|ALT090UM`) ?? 0;
+    }
+    return sum;
+  };
+  const underVotingAge = total('NATD', votingAge) + total('NATA', votingAge);
+  const nonGermanVotingAgeOrOlder = total('NATA') - total('NATA', votingAge);
+  const otherOrTimingDifference = notEligible - underVotingAge - nonGermanVotingAgeOrOlder;
+  if (otherOrTimingDifference < 0) return null;
+  return { underVotingAge, nonGermanVotingAgeOrOlder, otherOrTimingDifference };
+}
+
+async function otherStateData(slug, sources) {
+  const state = stateCatalog[slug];
+  const year = Number(state.latestElection.slice(0, 4));
+  let eligible, voters, invalid, valid, parties;
+  const votesPerVoter = slug === 'bayern' ? 2 : 1;
+  const voteLabel = ({ bayern: 'Gesamtstimmen', saarland: 'Stimmen', hessen: 'Landesstimmen', 'rheinland-pfalz': 'Landesstimmen' })[slug] ?? 'Zweitstimmen';
+
+  if (slug === 'brandenburg') {
+    const text = pdfPage(sources.results.file, 1);
+    eligible = firstCount(lineStartingWith(text, 'Wahlberechtigte '));
+    voters = firstCount(lineStartingWith(text, 'Wähler / Wahlbeteiligung'));
+    const secondCount = (label) => {
+      const fields = lineStartingWith(text, label).trim().split(/\s{2,}/);
+      return officialCount(fields.at(-2));
+    };
+    invalid = secondCount('Ungültige Stimmen insgesamt');
+    valid = secondCount('Gültige Stimmen insgesamt');
+    parties = ['SPD', 'AfD', 'CDU', 'GRÜNE/B 90', 'DIE LINKE', 'BVB / FREIE WÄHLER', 'FDP', 'Tierschutzpartei', 'Plus', 'BSW', 'III. Weg', 'DKP', 'DLW', 'WU']
+      .map((name) => ({ name: name === 'GRÜNE/B 90' ? 'GRÜNE' : name, votes: secondCount(name) }));
+  } else if (slug === 'rheinland-pfalz') {
+    const { shared, sheets } = xlsxSheets(sources.results.file);
+    const rows = xlsxRows(sheets.LW_2026_WK, shared);
+    const districts = rows.filter((row) => row[1] === 'G' && /^\d \d{3}$/.test(String(row[0]).trim()));
+    assertEqual(districts.length, 52, 'Rheinland-Pfalz constituencies');
+    const row = {};
+    for (const col of ['I', 'J', 'AU', 'AW', 'AY', 'BA', 'BC', 'BE', 'BG', 'BI', 'BK', 'BM', 'BO', 'BQ', 'BS', 'BU']) {
+      row[colIndex(col)] = districts.reduce((sum, district) => {
+        const value = district[colIndex(col)];
+        if (!Number.isSafeInteger(value) || value < 0) throw new Error(`Missing Rheinland-Pfalz ${col} count`);
+        return sum + value;
+      }, 0);
+    }
+    eligible = row[colIndex('I')];
+    voters = row[colIndex('J')];
+    invalid = row[colIndex('AU')];
+    valid = row[colIndex('AW')];
+    parties = ['AY', 'BA', 'BC', 'BE', 'BG', 'BI', 'BK', 'BM', 'BO', 'BQ', 'BS', 'BU'].map((col) => ({
+      name: rows[2][colIndex(col)], votes: row[colIndex(col)],
+    }));
+
+  } else {
+    const html = await readFile(sources.results.file, 'utf8');
+    const table = html.match(/<table\b[^>]*>[\s\S]*?Wahlberechtigte[\s\S]*?<\/table>/)?.[0];
+    if (!table || !html.includes(String(year))) throw new Error(`${slug}: missing results table`);
+    const rows = htmlRows(table).filter((row) => row.length > 1);
+    const col = slug === 'baden-wuerttemberg' ? 4 : ['bayern', 'saarland'].includes(slug) ? 1 : 3;
+    const value = (label) => officialCount(rows.find((row) => row[0].startsWith(label))?.[col]);
+    eligible = value('Wahlberechtigte');
+    voters = value('Wähl');
+    invalid = value('Ungültige');
+    valid = value('Gültige');
+    const start = rows.findIndex((row) => row[0].startsWith('Gültige')) + 1;
+    parties = rows.slice(start).filter((row) => !(row[0].startsWith('Einzelbewerb') && row[col] === '')).map((row) => ({
+      name: row[0].replace(/ \(.*\)$/, ''), votes: officialCount(row[col]),
+    })).filter((party) => party.votes > 0);
+  }
+  parties.sort((a, b) => b.votes - a.votes);
+
+  const referenceDate = `${year - 1}-12-31`;
+  let residents;
+  if (year === 2026) {
+    const html = await readFile(sources.population.file, 'utf8');
+    if (!html.includes('2025')) throw new Error('Expected 2025 population');
+    residents = officialCount(htmlRows(html).find((row) => row[0] === state.name)?.[1]);
+  } else {
+    const text = pdfPage(sources.population.file, sources.population.page);
+    const cells = lineStartingWith(text, state.name).trim().split(/\s{2,}/);
+    residents = officialCount(cells[year === 2021 || year === 2023 ? 1 : 2]);
+  }
+  const votingAge = ['baden-wuerttemberg', 'brandenburg', 'schleswig-holstein'].includes(slug) ? 16 : 18;
+  const date = new Intl.DateTimeFormat('de-DE', { dateStyle: 'long' }).format(new Date(state.latestElection));
+  const notEligible = residents - eligible;
+  const breakdown = sources.breakdown
+    ? nonVoterBreakdown(sources.breakdown.file, state.name, referenceDate, votingAge, notEligible)
+    : null;
+  return {
+    data: {
+      id: `${slug}-ltw-${year}`, year,
+      title: `Landtagswahl in ${state.name}`,
+      electionDate: state.latestElection,
+      resultStatus: 'final',
+      votingAge,
+      eyebrow: `Landtagswahl · ${voteLabel}`,
+      intro: `Von der Bevölkerung über die Wahlbeteiligung bis zu den gültigen ${voteLabel} bei der Landtagswahl am ${date}.`,
+      population: {
+        residents, referenceDate,
+        basis: `Bevölkerungsfortschreibung auf Basis des Zensus ${year === 2026 ? 2022 : 2011}`,
+      },
+      eligibility: {
+        eligible,
+        notEligible,
+        ...(breakdown ? { estimatedBreakdown: breakdown } : {
+          estimatedBreakdown: null,
+          note: 'Die nicht wahlberechtigte Bevölkerung wird als Gesamtgruppe gezeigt. Eine verifizierte Aufteilung nach Alter und Staatsangehörigkeit liegt in diesem Datensatz nicht vor. Bevölkerungsstand und Wählerverzeichnis haben unterschiedliche Stichtage.',
+        }),
+      },
+      turnout: { voters, nonVoters: eligible - voters },
+      secondVotes: {
+        label: `Gültige ${voteLabel}`, valid, votesPerVoter,
+        noValidSecondVote: voters * votesPerVoter - valid,
+        invalid,
+        noSecondVote: voters * votesPerVoter - valid - invalid,
+        noValidLabel: slug === 'bayern' ? 'Ungültige / fehlende Stimmen' : `Keine gültige ${voteLabel === 'Stimmen' ? 'Stimme' : voteLabel === 'Landesstimmen' ? 'Landesstimme' : 'Zweitstimme'}`,
+        parties,
+      },
+      ...(slug === 'bayern' ? { unitNote: 'In Bayern zählen Erst- und Zweitstimmen zusammen für die Sitzverteilung. Jede Person hat zwei Stimmen. Ab den gültigen Gesamtstimmen zeigen die Bänder Stimmen geteilt durch zwei; sie lassen sich nicht einzelnen Personen zuordnen.' } : {}),
+      sources: null,
+    },
+    sourceFiles: Object.fromEntries(
+      Object.entries(sources)
+        .filter(([id]) => id !== 'breakdown' || breakdown)
+        .map(([id, source]) => [id, source.file]),
+    ),
+  };
+}
+
 // --- assembly ---
 
 const states = {
@@ -535,6 +711,10 @@ const states = {
   hamburg: hamburgData(),
   bremen: await bremenData(),
 };
+for (const [route, sources] of Object.entries(stateSources)) {
+  const slug = route.split('/')[0];
+  states[slug] = await otherStateData(slug, sources);
+}
 
 for (const [state, parsed] of Object.entries(states)) {
   const manifest = JSON.parse(
@@ -550,12 +730,13 @@ for (const [state, parsed] of Object.entries(states)) {
       return {
         ...manifestSources[id],
         retrievedAt: manifest.retrievedAt,
-        publisher: parsed.publisher,
-        license: parsed.license,
+        publisher: manifestSources[id].publisher ?? parsed.publisher,
+        license: manifestSources[id].license ?? parsed.license,
       };
     }),
   );
 
+  validateElection(parsed.data);
   const year = parsed.data.year;
   await mkdir(`public/data/${state}`, { recursive: true });
   await writeFile(
