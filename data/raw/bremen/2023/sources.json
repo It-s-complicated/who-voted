@@ -1,0 +1,17 @@
+{
+  "retrievedAt": "2026-09-05T18:21:32.338Z",
+  "sources": [
+    {
+      "id": "results",
+      "url": "https://www.statistik.bremen.de/sixcms/media.php/13/Statistische%20Mitteilungen_126_pdfa_Auflage2.pdf",
+      "file": "data/raw/bremen/2023/results.pdf",
+      "sha256": "b3c0dd75c29fd8074e96eba327b038be640a3a670bdf254b2e3763697acf377d"
+    },
+    {
+      "id": "population",
+      "url": "https://www.transparenz.bremen.de/sixcms/media.php/13/genesis-destatis-12411-0014.csv",
+      "file": "data/raw/bremen/2023/population.csv",
+      "sha256": "95557276d8e9e2ae756a40da1f0f83e576757602e9a4bd23a1dd41edaba1c1da"
+    }
+  ]
+}

@@ -1,0 +1,125 @@
+{
+  "id": "bremen-bue-2023",
+  "year": 2023,
+  "title": "Bürgerschaftswahl (Landtag) in Bremen",
+  "electionDate": "2023-05-14",
+  "resultStatus": "final",
+  "votingAge": 16,
+  "eyebrow": "Bürgerschaftswahl · Stimmen",
+  "intro": "Von allen gemeldeten Einwohner:innen bis zu den gültigen Stimmen bei der Bürgerschaftswahl am 14. Mai 2023.",
+  "population": {
+    "residents": 695758,
+    "referenceDate": "2022-12-31"
+  },
+  "eligibility": {
+    "eligible": 460778,
+    "notEligible": 234980,
+    "estimatedBreakdown": {
+      "underVotingAge": 107034,
+      "nonGermanVotingAgeOrOlder": 121617,
+      "otherOrTimingDifference": 6329
+    }
+  },
+  "turnout": {
+    "voters": 262099,
+    "nonVoters": 198679
+  },
+  "ballots": {
+    "total": 262099,
+    "valid": 255401,
+    "invalid": 6698,
+    "none": 0
+  },
+  "secondVotes": {
+    "label": "Gültige Stimmen",
+    "valid": 1263908,
+    "votesPerVoter": 5,
+    "parties": [
+      {
+        "name": "SPD",
+        "votes": 376610
+      },
+      {
+        "name": "CDU",
+        "votes": 331380
+      },
+      {
+        "name": "GRÜNE",
+        "votes": 150263
+      },
+      {
+        "name": "DIE LINKE",
+        "votes": 137676
+      },
+      {
+        "name": "BIW",
+        "votes": 118695
+      },
+      {
+        "name": "FDP",
+        "votes": 64155
+      },
+      {
+        "name": "Volt",
+        "votes": 24848
+      },
+      {
+        "name": "Tierschutzpartei",
+        "votes": 13819
+      },
+      {
+        "name": "Die PARTEI",
+        "votes": 12052
+      },
+      {
+        "name": "dieBasis",
+        "votes": 9988
+      },
+      {
+        "name": "MERA25",
+        "votes": 7912
+      },
+      {
+        "name": "ÖDP",
+        "votes": 5498
+      },
+      {
+        "name": "GFA",
+        "votes": 5351
+      },
+      {
+        "name": "PIRATEN",
+        "votes": 2184
+      },
+      {
+        "name": "MLPD",
+        "votes": 1993
+      },
+      {
+        "name": "Partei für schulmedizinische Verjüngungsforschung",
+        "votes": 1484
+      }
+    ]
+  },
+  "unitNote": "Jede Wählerin und jeder Wähler hat bis zu 5 Stimmen (Listen- und Personenstimmen) und kann sie auf mehrere Parteien verteilen. Die Parteibänder zählen Stimmen, keine Personen; aus den amtlichen Ergebnissen lässt sich nicht ableiten, wie viele Personen einer Partei zuzurechnen sind.",
+  "sources": [
+    {
+      "id": "results",
+      "url": "https://www.statistik.bremen.de/sixcms/media.php/13/Statistische%20Mitteilungen_126_pdfa_Auflage2.pdf",
+      "file": "data/raw/bremen/2023/results.pdf",
+      "sha256": "b3c0dd75c29fd8074e96eba327b038be640a3a670bdf254b2e3763697acf377d",
+      "retrievedAt": "2026-09-05T18:21:32.338Z",
+      "publisher": "Statistisches Landesamt Bremen",
+      "license": "Datenlizenz Deutschland Namensnennung 2.0"
+    },
+    {
+      "id": "population",
+      "url": "https://www.transparenz.bremen.de/sixcms/media.php/13/genesis-destatis-12411-0014.csv",
+      "file": "data/raw/bremen/2023/population.csv",
+      "sha256": "95557276d8e9e2ae756a40da1f0f83e576757602e9a4bd23a1dd41edaba1c1da",
+      "retrievedAt": "2026-09-05T18:21:32.338Z",
+      "publisher": "Statistisches Landesamt Bremen",
+      "license": "Datenlizenz Deutschland Namensnennung 2.0"
+    }
+  ]
+}

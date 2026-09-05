@@ -1,0 +1,143 @@
+{
+  "id": "hamburg-bue-2025",
+  "year": 2025,
+  "title": "Bürgerschaftswahl in Hamburg",
+  "electionDate": "2025-03-02",
+  "resultStatus": "final",
+  "votingAge": 16,
+  "eyebrow": "Bürgerschaftswahl · Landesstimmen",
+  "intro": "Von allen gemeldeten Einwohner:innen bis zu den gültigen Landesstimmen bei der Bürgerschaftswahl am 2. März 2025.",
+  "population": {
+    "residents": 1973896,
+    "referenceDate": "2024-12-31"
+  },
+  "eligibility": {
+    "eligible": 1313043,
+    "notEligible": 660853,
+    "estimatedBreakdown": {
+      "underVotingAge": 293823,
+      "nonGermanVotingAgeOrOlder": 360864,
+      "otherOrTimingDifference": 6166
+    }
+  },
+  "turnout": {
+    "voters": 887742,
+    "nonVoters": 425301
+  },
+  "ballots": {
+    "total": 887183,
+    "valid": 880140,
+    "invalid": 7043,
+    "none": 559
+  },
+  "secondVotes": {
+    "label": "Gültige Landesstimmen",
+    "valid": 4371246,
+    "votesPerVoter": 5,
+    "parties": [
+      {
+        "name": "SPD",
+        "votes": 1465023
+      },
+      {
+        "name": "CDU",
+        "votes": 865713
+      },
+      {
+        "name": "GRÜNE",
+        "votes": 806660
+      },
+      {
+        "name": "Die Linke",
+        "votes": 488463
+      },
+      {
+        "name": "AfD",
+        "votes": 329651
+      },
+      {
+        "name": "Volt",
+        "votes": 141661
+      },
+      {
+        "name": "FDP",
+        "votes": 100657
+      },
+      {
+        "name": "BSW",
+        "votes": 77110
+      },
+      {
+        "name": "DAVA-Hamburg",
+        "votes": 25250
+      },
+      {
+        "name": "Tierschutzpartei",
+        "votes": 24763
+      },
+      {
+        "name": "Die PARTEI",
+        "votes": 15632
+      },
+      {
+        "name": "FREIE WÄHLER",
+        "votes": 12213
+      },
+      {
+        "name": "DieWahl - WFG",
+        "votes": 7259
+      },
+      {
+        "name": "ÖDP",
+        "votes": 6570
+      },
+      {
+        "name": "BÜNDNIS DEUTSCHLAND",
+        "votes": 2941
+      },
+      {
+        "name": "NPD",
+        "votes": 1680
+      }
+    ]
+  },
+  "unitNote": "Jede Wählerin und jeder Wähler hat bis zu 5 Landesstimmen und kann sie auf mehrere Parteien verteilen. Die Parteibänder zählen Stimmen, keine Personen; aus den amtlichen Ergebnissen lässt sich nicht ableiten, wie viele Personen einer Partei zuzurechnen sind.",
+  "sources": [
+    {
+      "id": "results",
+      "url": "https://www.statistik-nord.de/fileadmin/Dokumente/BUE2025_e_05.pdf",
+      "file": "data/raw/hamburg/2025/results.pdf",
+      "sha256": "0a81a00701064592f95bf4a780ee0b6328119a5fdefd12afec98c7f027825afd",
+      "retrievedAt": "2026-09-05T18:20:10.703Z",
+      "publisher": "Statistisches Amt für Hamburg und Schleswig-Holstein",
+      "license": "Datenlizenz Deutschland Namensnennung 2.0"
+    },
+    {
+      "id": "population",
+      "url": "https://www.statistik-nord.de/fileadmin/Dokumente/A_I_3_j24_HH_Zensus_2022.xlsx",
+      "file": "data/raw/hamburg/2025/population.xlsx",
+      "sha256": "d05e841a2bb3231b1dde1d51866963c5db6007d531955735e679218c30f7f30f",
+      "retrievedAt": "2026-09-05T18:20:10.703Z",
+      "publisher": "Statistisches Amt für Hamburg und Schleswig-Holstein",
+      "license": "Datenlizenz Deutschland Namensnennung 2.0"
+    },
+    {
+      "id": "register",
+      "url": "https://www.statistik-nord.de/fileadmin/Dokumente/A_I_S_1_j24.xlsx",
+      "file": "data/raw/hamburg/2025/register.xlsx",
+      "sha256": "b732949b9a1a31318946e0d671b171a9265006595f1517714002e96d15cd8018",
+      "retrievedAt": "2026-09-05T18:20:10.703Z",
+      "publisher": "Statistisches Amt für Hamburg und Schleswig-Holstein",
+      "license": "Datenlizenz Deutschland Namensnennung 2.0"
+    },
+    {
+      "id": "foreign",
+      "url": "https://www.statistik-nord.de/fileadmin/Dokumente/A_I_4_j_24_HH.xlsx",
+      "file": "data/raw/hamburg/2025/foreign.xlsx",
+      "sha256": "e7adcf21d3e48c37e61b050a0d11b4b216698a9fdca7f0a4c1758273b7c9312e",
+      "retrievedAt": "2026-09-05T18:20:10.703Z",
+      "publisher": "Statistisches Amt für Hamburg und Schleswig-Holstein",
+      "license": "Datenlizenz Deutschland Namensnennung 2.0"
+    }
+  ]
+}

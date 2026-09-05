@@ -5,6 +5,8 @@
   "electionDate": "2023-02-12",
   "resultStatus": "final",
   "votingAge": 18,
+  "eyebrow": "Abgeordnetenhauswahl · Zweitstimme",
+  "intro": "Von allen gemeldeten Einwohner:innen bis zu den gültigen Zweitstimmen bei der Wiederholungswahl am 12. Februar 2023.",
   "population": {
     "residents": 3850809,
     "referenceDate": "2022-12-31",
@@ -25,7 +27,9 @@
     "nonVoters": 902218
   },
   "secondVotes": {
+    "label": "Gültige Zweitstimmen",
     "valid": 1516860,
+    "votesPerVoter": 1,
     "noValidSecondVote": 12698,
     "invalid": 11039,
     "noSecondVote": 1659,

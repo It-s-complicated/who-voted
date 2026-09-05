@@ -16,11 +16,15 @@ export function getStaticPaths() {
 const state = states[Astro.params.state ?? ""];
 if (!state) throw new Error(`Unknown state: ${Astro.params.state}`);
 
-type ElectionData = typeof import("../../../public/data/berlin/2023.json");
+type ElectionData = typeof import("../../../public/data/berlin/2023.json") & {
+  ballots?: { total: number; valid: number; invalid: number; none: number };
+  unitNote?: string;
+};
 type DiagramNode = {
   id: string;
   label: string;
   value: number;
+  voteUnit?: boolean;
   color: string;
   order: number;
   callout?: boolean;
@@ -43,6 +47,11 @@ const format = new Intl.NumberFormat("de-DE");
 function percentage(value: number): string {
   return `${((value / data.population.residents) * 100).toFixed(1).replace(".", ",")} %`;
 }
+function nodeValue(node: DiagramNode, value = node.value): string {
+  return node.voteUnit && data.secondVotes.votesPerVoter > 1
+    ? percentage(value)
+    : `${format.format(value)} · ${percentage(value)}`;
+}
 function sourceUrl(id: string): string {
   const source = data.sources.find((candidate) => candidate.id === id);
   if (!source) throw new Error(`Missing source: ${id}`);
@@ -54,8 +63,10 @@ const partyColors: Record<string, string> = {
   SPD: "#e54040",
   GRÜNE: "#30a84b",
   "DIE LINKE": "#bd4598",
+  "Die Linke": "#bd4598",
   AfD: "#2996cc",
   FDP: "#f3d330",
+  BIW: "#7f9c3a",
 };
 const displayedParties = data.secondVotes.parties.filter(
   (party) =>
@@ -73,6 +84,22 @@ if (
 const otherVotes =
   data.secondVotes.valid -
   displayedParties.reduce((sum, party) => sum + party.votes, 0);
+const ballots = data.ballots;
+const votesPerVoter = data.secondVotes.votesPerVoter;
+const unusedVotes = ballots ? ballots.valid * votesPerVoter - data.secondVotes.valid : 0;
+const resultStatusLabels: Record<string, string> = {
+  final: "Endgültiges Ergebnis",
+  preliminary: "Vorläufiges Ergebnis",
+};
+const populationDate = new Intl.DateTimeFormat("de-DE", {
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+}).format(new Date(data.population.referenceDate));
+const topParties = displayedParties
+  .slice(0, 5)
+  .map((party) => party.name)
+  .join(", ");
 
 const nodes: DiagramNode[] = [
   {
@@ -112,14 +139,14 @@ const nodes: DiagramNode[] = [
   },
   {
     id: "underAge",
-    label: "Unter 18",
+    label: `Unter ${data.votingAge}`,
     value: data.eligibility.estimatedBreakdown.underVotingAge,
     color: "#aaa8a8",
     order: 2,
   },
   {
     id: "nonGerman",
-    label: "Nichtdeutsch, 18+",
+    label: `Nichtdeutsch, ${data.votingAge}+`,
     value: data.eligibility.estimatedBreakdown.nonGermanVotingAgeOrOlder,
     color: "#c8c6c7",
     order: 3,
@@ -134,23 +161,62 @@ const nodes: DiagramNode[] = [
   },
   {
     id: "valid",
-    label: "Gültige Zweitstimmen",
+    label: `${data.secondVotes.label}${ballots ? "**" : ""}`,
     value: data.secondVotes.valid,
+    voteUnit: true,
     color: "#cad4ed",
     order: 0,
   },
-  {
-    id: "noValid",
-    label: "Keine gültige Zweitstimme",
-    value: data.secondVotes.noValidSecondVote,
-    color: "#d8e2f3",
+  ...(ballots
+    ? [
+        {
+          id: "ballotsValid",
+          label: "Gültige Stimmzettel",
+          value: ballots.valid,
+          color: "#b9cbe9",
+          order: 0,
+        },
+        {
+          id: "ballotsInvalid",
+          label: "Ungültige Stimmzettel",
+          value: ballots.invalid,
+          color: "#d8e2f3",
+          order: 1,
+          callout: true,
+        },
+        {
+          id: "ballotsNone",
+          label: "Kein Stimmzettel",
+          value: ballots.none,
+          color: "#e4ecf8",
+          order: 2,
+          callout: true,
+        },
+      ].filter((node) => node.value > 0)
+    : [
+        {
+          id: "noValid",
+          label: "Keine gültige Zweitstimme",
+          value: data.secondVotes.noValidSecondVote,
+          color: "#d8e2f3",
+          order: 1,
+          callout: true,
+        },
+      ]),
+  ...(unusedVotes > 0 ? [{
+    id: "unusedVotes",
+    label: "Nicht ausgeschöpfte Stimmen",
+    value: unusedVotes,
+    voteUnit: true,
+    color: "#e4ecf8",
     order: 1,
     callout: true,
-  },
+  }] : []),
   ...displayedParties.map((party, order) => ({
     id: `party-${party.name}`,
     label: party.name,
     value: party.votes,
+    voteUnit: true,
     color: partyColors[party.name],
     order,
   })),
@@ -158,6 +224,7 @@ const nodes: DiagramNode[] = [
     id: "party-Other",
     label: "Sonstige",
     value: otherVotes,
+    voteUnit: true,
     color: "#b2b2b2",
     order: displayedParties.length,
   },
@@ -187,12 +254,37 @@ const links: DiagramLink[] = [
     target: "eligibilityResidual",
     value: data.eligibility.estimatedBreakdown.otherOrTimingDifference,
   },
-  { source: "voters", target: "valid", value: data.secondVotes.valid },
   {
     source: "voters",
-    target: "noValid",
-    value: data.secondVotes.noValidSecondVote,
+    target: ballots ? "ballotsValid" : "valid",
+    value: ballots ? ballots.valid : data.secondVotes.valid,
   },
+  ...(ballots
+    ? [
+        {
+          source: "voters",
+          target: "ballotsInvalid",
+          value: ballots.invalid,
+        },
+        {
+          source: "voters",
+          target: "ballotsNone",
+          value: ballots.none,
+        },
+        {
+          source: "ballotsValid",
+          target: "valid",
+          value: data.secondVotes.valid,
+        },
+      ]
+    : [
+        {
+          source: "voters",
+          target: "noValid",
+          value: data.secondVotes.noValidSecondVote,
+        },
+      ]),
+  ...(unusedVotes > 0 ? [{ source: "ballotsValid", target: "unusedVotes", value: unusedVotes }] : []),
   ...displayedParties.map((party) => ({
     source: "valid",
     target: `party-${party.name}`,
@@ -201,6 +293,7 @@ const links: DiagramLink[] = [
   { source: "valid", target: "party-Other", value: otherVotes },
 ];
 
+// zero-value links (e.g. Bremen's "Kein Stimmzettel") are dropped with their nodes
 const graph = sankey<DiagramNode, DiagramLink>()
   .nodeId((node) => node.id)
   .nodeAlign(sankeyLeft)
@@ -211,53 +304,86 @@ const graph = sankey<DiagramNode, DiagramLink>()
     [66, 24],
     [850, 696],
   ])({
-  nodes: nodes.map((node) => ({ ...node })),
-  links: links.map((link) => ({ ...link })),
+  // Vote capacity shares keep all stages on the population scale; these are not person counts.
+  nodes: nodes.map((node) => ({ ...node, value: node.value / (node.voteUnit ? votesPerVoter : 1) })),
+  links: links.filter((link) => link.value > 0).map((link) => ({
+    ...link,
+    value: link.value / (nodes.find((node) => node.id === link.target)?.voteUnit ? votesPerVoter : 1),
+  })),
 }) as { nodes: LayoutNode[]; links: LayoutLink[] };
 const path = sankeyLinkHorizontal<DiagramNode, DiagramLink>();
-const callouts = graph.nodes
-  .filter((node) => node.callout)
-  .map((node, index) => {
-    // ponytail: 210px is a rough label-width estimate for "fits right of the node"
-    if (node.y1 + 210 <= 708) {
+// ponytail: 210px is a rough label-width estimate for "fits right of the node";
+// end-anchored callouts stack top-down with a fixed 44px gap
+let calloutY = -Infinity;
+let startCalloutY = -Infinity;
+const callouts = [
+  ...graph.nodes
+    .filter((node) => node.callout && node.y1 + 210 <= 708)
+    .map((node) => {
+      const y = Math.max(node.x0 + 7, startCalloutY + 44);
+      startCalloutY = y;
       return {
         node,
         anchor: "start" as const,
         x: node.y1 + 12,
-        y: node.x0 + 7,
+        y,
         line: {
           x1: node.y1,
           y1: node.x0 + 3,
           x2: node.y1 + 8,
-          y2: node.x0 + 3,
+          y2: y - 4,
         },
       };
-    }
-    return {
-      node,
-      anchor: "end" as const,
-      x: 690,
-      y: node.x0 + 30 + index * 8,
-      line: {
-        x1: (node.y0 + node.y1) / 2,
-        y1: node.x0,
-        x2: 690,
-        y2: node.x0 + 34 + index * 8,
-      },
-    };
-  });
+    }),
+  // ponytail: 210px is a rough label-width estimate for "fits right of the node";
+  // end-anchored callouts stack top-down with a fixed 44px gap
+  ...graph.nodes
+    .filter((node) => node.callout && node.y1 + 210 > 708)
+    .sort((a, b) => a.x0 - b.x0)
+    .map((node, index) => {
+      // place below the previous callout's text, at least 44px apart
+      const fallbackY = node.x0 + 34;
+      const y = index === 0 ? fallbackY : Math.max(fallbackY, calloutY + 44);
+      calloutY = y;
+      return {
+        node,
+        anchor: "end" as const,
+        x: 690,
+        y,
+        line: {
+          x1: (node.y0 + node.y1) / 2,
+          y1: node.x0,
+          x2: 690,
+          y2: y - 6,
+        },
+      };
+    }),
+];
+const sourceLabels: Record<string, string> = {
+  results: "endgültiges Wahlergebnis",
+  population: "Bevölkerungsstand",
+  structure: "Strukturdaten",
+  register: "Melderegister-Auszählung",
+  foreign: "ausländische Bevölkerung",
+};
+const publisher = data.sources[0]?.publisher ?? "";
+const sourceLinks = data.sources.map((source) => ({
+  href: source.url,
+  label: sourceLabels[source.id] ?? source.id,
+}));
 const tableRows = [
   ...nodes.filter((node) => !node.id.startsWith("party-")),
   ...displayedParties.map((party) => ({
     label: party.name,
     value: party.votes,
+    voteUnit: true,
   })),
-  { label: "Sonstige Parteien", value: otherVotes, subtotal: true },
+  { label: "Sonstige Parteien", value: otherVotes, voteUnit: true, subtotal: true },
   ...data.secondVotes.parties
     .filter(
       (party) => !displayedParties.some((shown) => shown.name === party.name),
     )
-    .map((party) => ({ label: party.name, value: party.votes, minor: true })),
+    .map((party) => ({ label: party.name, value: party.votes, voteUnit: true, minor: true })),
 ];
 ---
 
@@ -268,9 +394,9 @@ const tableRows = [
     <meta name="viewport" content="width=device-width" />
     <meta
       name="description"
-      content="Wie Berlin bei der Abgeordnetenhauswahl 2023 gewählt hat."
+      content={`Wie ${state.name} bei der Wahl ${Astro.params.year} gewählt hat.`}
     />
-    <title>Wer hat gewählt? Berlin 2023</title>
+    <title>{`Wer hat gewählt? ${state.name} ${Astro.params.year}`}</title>
   </head>
   <body>
     <main>
@@ -283,24 +409,28 @@ const tableRows = [
       />
       <header>
         <div>
-          <p class="eyebrow">Abgeordnetenhauswahl · Zweitstimme</p>
-          <h1>Wer hat in Berlin gewählt?</h1>
-          <p class="intro">
-            Von allen gemeldeten Einwohner:innen bis zu den gültigen
-            Zweitstimmen bei der Wiederholungswahl am 12. Februar 2023.
-          </p>
+          <p class="eyebrow">{data.eyebrow}</p>
+          <h1>Wer hat in {state.name} gewählt?</h1>
+          <p class="intro">{data.intro}</p>
         </div>
         <label>
           Wahljahr
           <select aria-label="Wahljahr auswählen">
-            <option value="2023" selected>2023</option>
+            {state.years.toSorted((a, b) => b - a).map((year) => (
+              <option
+                value={String(year)}
+                selected={String(year) === Astro.params.year}
+              >
+                {year}
+              </option>
+            ))}
           </select>
         </label>
       </header>
 
       <section class="status" aria-label="Datenstatus">
-        <strong>Endgültiges Ergebnis</strong>
-        <span>Bevölkerungsstand: 31. Dezember 2022</span>
+        <strong>{resultStatusLabels[data.resultStatus]}</strong>
+        <span>Bevölkerungsstand: {populationDate}</span>
       </section>
 
       <figure>
@@ -311,13 +441,10 @@ const tableRows = [
             aria-labelledby="diagram-title diagram-description"
           >
             <title id="diagram-title">
-              Wahlbeteiligung und Zweitstimmen in Berlin 2023
+              {`Wahlbeteiligung und ${data.secondVotes.label.toLowerCase()} in ${state.name} ${Astro.params.year}`}
             </title>
             <desc id="diagram-description">
-              Sankey-Diagramm von 3.850.809 Einwohnerinnen und Einwohnern über
-              Wahlberechtigung, Wahlbeteiligung und gültige Zweitstimmen bis zu
-              den Parteien CDU, SPD, GRÜNE, DIE LINKE, AfD und FDP sowie
-              Sonstige.
+              {`Sankey-Diagramm von ${format.format(data.population.residents)} Einwohner:innen über Wahlberechtigung, Wahlbeteiligung und ${data.secondVotes.label.toLowerCase()} bis zu den Parteien ${topParties} sowie Sonstige.`}
             </desc>
 
             <g transform="matrix(0 1 1 0 0 0)" class="links">
@@ -330,7 +457,7 @@ const tableRows = [
                   >
                     <title>
                       {link.source.label} → {link.target.label}:{" "}
-                      {format.format(link.value)}
+                      {nodeValue(link.target, link.value)}
                     </title>
                   </path>
                 ))
@@ -348,8 +475,7 @@ const tableRows = [
                     fill={node.color}
                   >
                     <title>
-                      {node.label}: {format.format(node.value)} (
-                      {percentage(node.value)})
+                      {node.label}: {nodeValue(node)}
                     </title>
                   </rect>
                 ))
@@ -358,15 +484,26 @@ const tableRows = [
 
             <g class="labels" aria-hidden="true">
               {
+                // bottom node of its column: label below the bar;
+                // thin adjacent bars: stagger the second label a row higher
                 graph.nodes
                   .filter(
                     (node) => !node.callout && !node.id.startsWith("party-"),
                   )
                   .map((node) => (
-                    <text x={node.y0 + 3} y={node.x0 - 24}>
+                    <text
+                      x={node.y0 + 3}
+                      y={
+                        node.id === "nonVoters"
+                          ? node.x1 + 18
+                          : node.id === "nonGerman"
+                            ? node.x0 - 54
+                            : node.x0 - 24
+                      }
+                    >
                       <tspan x={node.y0 + 3}>{node.label}</tspan>
                       <tspan x={node.y0 + 3} dy="15">
-                        {format.format(node.value)} · {percentage(node.value)}
+                        {nodeValue(node)}
                       </tspan>
                     </text>
                   ))
@@ -382,7 +519,7 @@ const tableRows = [
                     >
                       <tspan x={node.y0 + 3}>{node.label}</tspan>
                       <tspan x={node.y0 + 3} dy="15">
-                        {format.format(node.value)} · {percentage(node.value)}
+                        {nodeValue(node)}
                       </tspan>
                     </text>
                   ))
@@ -403,8 +540,7 @@ const tableRows = [
                     >
                       <tspan x={callout.x}>{callout.node.label}</tspan>
                       <tspan x={callout.x} dy="17">
-                        {format.format(callout.node.value)} ·{" "}
-                        {percentage(callout.node.value)}
+                        {nodeValue(callout.node)}
                       </tspan>
                     </text>
                   </g>
@@ -414,11 +550,12 @@ const tableRows = [
           </svg>
         </div>
         <figcaption>
-          * Die Aufteilung der nicht Wahlberechtigten ist eine Schätzung.
+          <p>* Die Aufteilung der nicht Wahlberechtigten ist eine Schätzung.
           Melderegister und Wählerverzeichnis haben unterschiedliche Stichtage;
           Mindestwohndauer und Wahlrechtsausschlüsse sind nicht vollständig
-          abbildbar. Parteien unter 5 % außer der FDP sind als „Sonstige“
-          zusammengefasst.
+          abbildbar.</p>
+          <p>Parteien unter 5 % außer der FDP sind als „Sonstige“ zusammengefasst.</p>
+          {ballots && <p>** Pro Stimmzettel sind bis zu {votesPerVoter} Stimmen möglich. Ab „{data.secondVotes.label}“ zeigen die Prozentwerte Stimmen ÷ ({votesPerVoter} × Einwohnerzahl) × 100, keine Personenanteile. Nicht ausgeschöpfte Stimmen sind die Differenz zwischen möglichen und gültigen Stimmen auf gültigen Stimmzetteln.</p>}
         </figcaption>
       </figure>
 
@@ -428,7 +565,7 @@ const tableRows = [
           <table>
             <thead>
               <tr
-                ><th>Gruppe</th><th>Anzahl</th><th>Anteil an Einwohner:innen</th
+                ><th>Gruppe</th><th>Anzahl</th><th>{ballots ? "Anteil an Einwohner:innen / Stimmenpotenzial" : "Anteil an Einwohner:innen"}</th
                 ></tr
               >
             </thead>
@@ -446,8 +583,8 @@ const tableRows = [
                   >
                     <>
                       <th scope="row">{row.label}</th>
-                      <td>{format.format(row.value)}</td>
-                      <td>{percentage(row.value)}</td>
+                      <td>{format.format(row.value)}{row.voteUnit && ballots ? " Stimmen" : ""}</td>
+                      <td>{percentage(row.value / (row.voteUnit ? votesPerVoter : 1))}</td>
                     </>
                   </tr>
                 ))
@@ -459,17 +596,24 @@ const tableRows = [
 
       <footer>
         <p>
-          Quellen: Amt für Statistik Berlin-Brandenburg,{" "}
-          <a href={sourceUrl("population")}>Einwohnerregister 31.12.2022</a>,{
-            " "
-          }
-          <a href={sourceUrl("structure")}>Strukturdaten 2023</a> und{" "}
-          <a href={sourceUrl("results")}>endgültiges Wahlergebnis 2023</a>.
+          Quellen: {publisher},{" "}
+          {sourceLinks.map((link, index) => (
+            <>
+              {index > 0 &&
+                (index === sourceLinks.length - 1 ? " und " : ", ")}
+              <a href={link.href}>{link.label}</a>
+            </>
+          ))}
+          .
         </p>
         <p>
-          Keine gültige Zweitstimme: {format.format(data.secondVotes.invalid)} ungültig
-          und{" "}
-          {format.format(data.secondVotes.noSecondVote)} ohne abgegebene Zweitstimme.
+          {data.ballots
+            ? `${format.format(data.ballots.invalid)} ungültige Stimmzettel${
+                data.ballots.none > 0
+                  ? `, ${format.format(data.ballots.none)} Wähler:innen ohne Stimmzettel`
+                  : ""
+              }.`
+            : `Keine gültige Zweitstimme: ${format.format(data.secondVotes.invalid)} ungültig und ${format.format(data.secondVotes.noSecondVote)} ohne abgegebene Zweitstimme.`}
         </p>
       </footer>
     </main>
@@ -584,6 +728,13 @@ const tableRows = [
     background: var(--caption-surface);
     font-size: 0.8rem;
     line-height: 1.55;
+  }
+
+  figcaption p {
+    margin: 0;
+  }
+  figcaption p + p {
+    margin-top: 0.5rem;
   }
 
   details {
