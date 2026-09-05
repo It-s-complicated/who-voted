@@ -1,0 +1,23 @@
+---
+import RouteIndex from "../../components/RouteIndex.astro";
+import { states } from "../../data/states";
+
+export function getStaticPaths() {
+  return Object.entries(states).map(([state, election]) => ({
+    params: { state },
+    props: election,
+  }));
+}
+
+const { name, years } = Astro.props;
+---
+
+<RouteIndex
+  title={name}
+  description={`Wahlbeteiligung in ${name}. Wähle ein Wahljahr aus.`}
+  breadcrumbs={[{ label: "Startseite", href: "/", home: true }, { label: name }]}
+  links={years.toSorted((a, b) => b - a).map((year) => ({
+    href: `/${Astro.params.state}/${year}/`,
+    label: String(year),
+  }))}
+/>

@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 
-const rawDirectory = 'data/raw/2023';
+const rawDirectory = 'data/raw/berlin/2023';
 const sourceFiles = {
   structure: `${rawDirectory}/structure.pdf`,
   population: `${rawDirectory}/population.pdf`,
@@ -171,7 +171,7 @@ const data = {
   })),
 };
 
-// ponytail: direct PDF-to-JSON is enough for one election; add SQLite with the second year.
-await mkdir('public/data', { recursive: true });
-await writeFile('public/data/2023.json', `${JSON.stringify(data, null, 2)}\n`);
-console.log('Validated and wrote public/data/2023.json');
+// Each state needs its own parser for its official source format.
+await mkdir('public/data/berlin', { recursive: true });
+await writeFile('public/data/berlin/2023.json', `${JSON.stringify(data, null, 2)}\n`);
+console.log('Validated and wrote public/data/berlin/2023.json');

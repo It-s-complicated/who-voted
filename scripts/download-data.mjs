@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 import { mkdir, writeFile } from 'node:fs/promises';
 
-const rawDirectory = 'data/raw/2023';
+const rawDirectory = 'data/raw/berlin/2023';
 const sources = {
   'structure.pdf':
     'https://download.statistik-berlin-brandenburg.de/b92c90f8fa8b534e/45210729b5a5/SB_B07-02-01_2023j05_BE.pdf',

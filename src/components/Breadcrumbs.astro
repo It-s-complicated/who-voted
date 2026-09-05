@@ -1,0 +1,85 @@
+---
+import "../styles/global.css";
+
+interface Props {
+  items: { label: string; href?: string; home?: boolean }[];
+}
+
+const { items } = Astro.props;
+---
+
+<nav aria-label="Breadcrumbs">
+  <ol>
+    {
+      items.map((item, index) => (
+        <li>
+          {item.href ? (
+            <a href={item.href}>
+              {item.home ? (
+                <>
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V10Z" />
+                  </svg>
+                  <span class="sr-only">{item.label}</span>
+                </>
+              ) : (
+                item.label
+              )}
+            </a>
+          ) : (
+            <span
+              aria-current={index === items.length - 1 ? "page" : undefined}
+            >
+              {item.label}
+            </span>
+          )}
+        </li>
+      ))
+    }
+  </ol>
+</nav>
+
+<style>
+  nav {
+    margin-bottom: 2rem;
+  }
+  ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 0.7rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    color: var(--text-muted);
+    font-size: 0.88rem;
+  }
+  li {
+    display: flex;
+    gap: 0.7rem;
+    align-items: center;
+  }
+  li:not(:last-child)::after {
+    content: "/";
+    color: var(--callout-line);
+  }
+  a:has(svg) {
+    display: inline-flex;
+    align-items: center;
+  }
+  svg {
+    width: 1rem;
+    height: 1rem;
+    fill: currentColor;
+  }
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+</style>

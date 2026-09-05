@@ -4,19 +4,19 @@
     {
       "id": "structure",
       "url": "https://download.statistik-berlin-brandenburg.de/b92c90f8fa8b534e/45210729b5a5/SB_B07-02-01_2023j05_BE.pdf",
-      "file": "data/raw/2023/structure.pdf",
+      "file": "data/raw/berlin/2023/structure.pdf",
       "sha256": "fbd27d733cd637485ae58a6c0a8c8a2f078a8c6bd0e6044c5f269cbe52d5f92a"
     },
     {
       "id": "population",
       "url": "https://download.statistik-berlin-brandenburg.de/e501bddfe3150920/e07c5833fe8e/SB_A01-05-00_2022h02_BE.pdf",
-      "file": "data/raw/2023/population.pdf",
+      "file": "data/raw/berlin/2023/population.pdf",
       "sha256": "d051f69b08f9aff6e29822de0d29c3e5771371505742490371e391eed3b492a7"
     },
     {
       "id": "results",
       "url": "https://download.statistik-berlin-brandenburg.de/538210b8454f4642/99e340a74910/SB_B07-02-03_2023j05_BE.pdf",
-      "file": "data/raw/2023/results.pdf",
+      "file": "data/raw/berlin/2023/results.pdf",
       "sha256": "5b5b08d6c0f4b1c11bfab91895234801d4ab0227ddcdf02fd79732888cceda4b"
     }
   ]

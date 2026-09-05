@@ -1,0 +1,52 @@
+---
+import "@fontsource-variable/fraunces";
+import "../styles/global.css";
+import Breadcrumbs from "./Breadcrumbs.astro";
+
+interface Props {
+  title: string;
+  description: string;
+  links: { href: string; label: string; note?: string }[];
+  breadcrumbs?: { label: string; href?: string; home?: boolean }[];
+}
+
+const { title, description, links, breadcrumbs } = Astro.props;
+---
+
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content={description} />
+    <title>{title} · Wer hat gewählt?</title>
+  </head>
+  <body>
+    <main>
+      {breadcrumbs && <Breadcrumbs items={breadcrumbs} />}
+      <header>
+        <h1>{title}</h1>
+        <p>{description}</p>
+      </header>
+      {links.length > 0 ? (
+        <ul>
+          {links.map(({ href, label, note }) => (
+            <li><a href={href}>{label}</a>{note && <span>{note}</span>}</li>
+          ))}
+        </ul>
+      ) : (
+        <p class="empty">Noch keine Wahljahre verfügbar. Die Wahldaten werden vorbereitet.</p>
+      )}
+    </main>
+  </body>
+</html>
+
+<style>
+  main { line-height: 1.55; }
+  p { max-width: 65ch; margin: 0; color: var(--text-muted); }
+  ul { list-style: none; padding: 0; margin: 0; }
+  li { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0.25rem 1.5rem; padding: 1rem 0; border-bottom: 1px solid var(--divider); }
+  li a { font-size: 1.5rem; font-weight: 600; padding: 0.25rem 0; }
+  li span { color: var(--text-muted); }
+  .empty { margin-top: 1.5rem; }
+</style>

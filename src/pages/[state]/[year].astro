@@ -1,10 +1,22 @@
 ---
 import "@fontsource-variable/fraunces";
+import "../../styles/global.css";
+import Breadcrumbs from "../../components/Breadcrumbs.astro";
+import { states } from "../../data/states";
 import { readFileSync } from "node:fs";
 import { sankey, sankeyLeft, sankeyLinkHorizontal } from "d3-sankey";
 import type { SankeyLink, SankeyNode } from "d3-sankey";
 
-type ElectionData = typeof import("../../public/data/2023.json");
+export function getStaticPaths() {
+  return Object.entries(states).flatMap(([state, { years }]) =>
+    years.map((year) => ({ params: { state, year: String(year) } })),
+  );
+}
+
+const state = states[Astro.params.state ?? ""];
+if (!state) throw new Error(`Unknown state: ${Astro.params.state}`);
+
+type ElectionData = typeof import("../../../public/data/berlin/2023.json");
 type DiagramNode = {
   id: string;
   label: string;
@@ -25,7 +37,7 @@ type LayoutLink = SankeyLink<DiagramNode, DiagramLink> & {
 };
 
 const data = JSON.parse(
-  readFileSync("public/data/2023.json", "utf8"),
+  readFileSync(`public/data/${Astro.params.state}/${Astro.params.year}.json`, "utf8"),
 ) as ElectionData;
 const format = new Intl.NumberFormat("de-DE");
 function percentage(value: number): string {
@@ -262,6 +274,13 @@ const tableRows = [
   </head>
   <body>
     <main>
+      <Breadcrumbs
+        items={[
+          { label: "Startseite", href: "/", home: true },
+          { label: state.name, href: `/${Astro.params.state}/` },
+          { label: Astro.params.year ?? "" },
+        ]}
+      />
       <header>
         <div>
           <p class="eyebrow">Abgeordnetenhauswahl · Zweitstimme</p>
@@ -458,54 +477,26 @@ const tableRows = [
 </html>
 
 <style>
-  :global(*) {
-    box-sizing: border-box;
-  }
-  :global(body) {
-    margin: 0;
-    color: #1c1b1a;
-    background: #fdfcfa;
-    font-family: ui-sans-serif, system-ui, "Segoe UI", sans-serif;
-    -webkit-font-smoothing: antialiased;
-  }
-  main {
-    width: min(100% - 2rem, 66rem);
-    margin: 0 auto;
-    padding: 2.5rem 0 4rem;
-  }
-
   header {
     display: flex;
     justify-content: space-between;
     align-items: end;
     gap: 2rem;
-    padding-bottom: 1.75rem;
-    border-bottom: 3px solid #1c1b1a;
   }
   h1 {
     max-width: 15ch;
-    margin: 0.3rem 0 0.9rem;
-    font-family: "Fraunces Variable", Georgia, serif;
-    font-size: clamp(2.4rem, 6vw, 4.6rem);
-    font-weight: 620;
-    font-variation-settings:
-      "opsz" 100,
-      "SOFT" 0,
-      "WONK" 1;
-    line-height: 1.02;
-    letter-spacing: -0.015em;
-    text-wrap: balance;
+    margin-top: 0.3rem;
   }
   .eyebrow {
     margin: 0;
-    color: #c8102e;
+    color: var(--primary);
     font-size: 0.88rem;
     font-weight: 550;
   }
   .intro {
     max-width: 40rem;
     margin: 0;
-    color: #55524d;
+    color: var(--text-muted);
     font-size: 1.02rem;
     line-height: 1.55;
   }
@@ -517,14 +508,14 @@ const tableRows = [
     font-weight: 650;
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    color: #55524d;
+    color: var(--text-muted);
   }
   select {
     width: 100%;
     padding: 0.6rem 0.7rem;
     color: inherit;
-    background: #fff;
-    border: 1px solid #1c1b1a;
+    background: var(--surface);
+    border: 1px solid var(--ink);
     border-radius: 0;
     font: inherit;
   }
@@ -536,20 +527,20 @@ const tableRows = [
     gap: 0.75rem;
     margin: 0.3rem 0 1.5rem;
     padding: 0.55rem 0;
-    border-bottom: 1px solid #c9c5be;
+    border-bottom: 1px solid var(--divider);
     font-size: 0.8rem;
   }
   .status strong {
     font-weight: 650;
   }
   .status span {
-    color: #55524d;
+    color: var(--text-muted);
   }
 
   figure {
     margin: 0;
-    background: #fff;
-    border: 1px solid #1c1b1a;
+    background: var(--surface);
+    border: 1px solid var(--ink);
     overflow: hidden;
   }
   .diagram-scroll {
@@ -560,45 +551,45 @@ const tableRows = [
     width: 100%;
     min-width: 38rem;
     height: auto;
-    background: #fff;
+    background: var(--surface);
   }
   .links path {
     fill: none;
     stroke-opacity: 0.55;
   }
   .nodes rect {
-    stroke: #fff;
+    stroke: var(--surface);
     stroke-width: 1.5;
   }
   .labels text {
-    fill: #1c1b1a;
+    fill: var(--ink);
     font-family: ui-sans-serif, system-ui, sans-serif;
     font-size: 12px;
     font-weight: 600;
   }
   .labels tspan + tspan {
-    fill: #6b6760;
+    fill: var(--text-secondary);
     font-size: 10.5px;
     font-weight: 400;
     font-variant-numeric: tabular-nums;
   }
   .labels line {
-    stroke: #8f8b84;
+    stroke: var(--callout-line);
     stroke-width: 1;
   }
   figcaption {
     padding: 0.9rem 1.1rem 1rem;
-    color: #55524d;
-    border-top: 1px solid #1c1b1a;
-    background: #faf8f5;
+    color: var(--text-muted);
+    border-top: 1px solid var(--ink);
+    background: var(--caption-surface);
     font-size: 0.8rem;
     line-height: 1.55;
   }
 
   details {
     margin-top: 1rem;
-    background: #fff;
-    border: 1px solid #1c1b1a;
+    background: var(--surface);
+    border: 1px solid var(--ink);
   }
   summary {
     padding: 0.85rem 1.1rem;
@@ -606,7 +597,7 @@ const tableRows = [
     font-weight: 650;
   }
   summary::marker {
-    color: #c8102e;
+    color: var(--primary);
   }
   .table-scroll {
     overflow-x: auto;
@@ -620,12 +611,12 @@ const tableRows = [
   th,
   td {
     padding: 0.55rem 0.65rem;
-    border-bottom: 1px solid #e4e1db;
+    border-bottom: 1px solid var(--table-divider);
     text-align: right;
   }
   tr.minor th,
   tr.minor td {
-    color: #6b6760;
+    color: var(--text-secondary);
     font-weight: 400;
     font-size: 0.92em;
   }
@@ -637,18 +628,18 @@ const tableRows = [
     font-weight: 650;
   }
   tr.subtotal td {
-    border-bottom: 1px solid #1c1b1a;
+    border-bottom: 1px solid var(--ink);
   }
   th:first-child {
     text-align: left;
   }
   thead th {
-    color: #55524d;
+    color: var(--text-muted);
     font-size: 0.72rem;
     font-weight: 650;
     text-transform: uppercase;
     letter-spacing: 0.07em;
-    border-bottom: 1px solid #1c1b1a;
+    border-bottom: 1px solid var(--ink);
   }
 
   footer {
@@ -656,32 +647,18 @@ const tableRows = [
     gap: 0.35rem;
     margin-top: 1.5rem;
     padding-top: 0.9rem;
-    color: #55524d;
+    color: var(--text-muted);
     font-size: 0.82rem;
     line-height: 1.5;
-    border-top: 3px solid #1c1b1a;
+    border-top: 3px solid var(--ink);
   }
   footer p {
     margin: 0;
-  }
-  a {
-    color: inherit;
-    text-decoration-color: #c8102e;
-    text-decoration-thickness: 1px;
-    text-underline-offset: 0.18em;
-  }
-  a:hover {
-    color: #c8102e;
-  }
-  :global(:focus-visible) {
-    outline: 2px solid #c8102e;
-    outline-offset: 2px;
   }
 
   @media (max-width: 42rem) {
     main {
       width: min(100% - 1rem, 66rem);
-      padding-top: 1.5rem;
     }
     header {
       display: grid;

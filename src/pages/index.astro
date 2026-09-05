@@ -1,3 +1,14 @@
 ---
-return Astro.redirect('/2023/');
+import RouteIndex from "../components/RouteIndex.astro";
+import { states } from "../data/states";
 ---
+
+<RouteIndex
+  title="Wer hat gewählt?"
+  description="Wahlbeteiligung im Verhältnis zur Bevölkerung. Wähle ein Bundesland aus."
+  links={Object.entries(states).map(([state, { name, years }]) => ({
+    href: `/${state}/`,
+    label: name,
+    note: years.length === 0 ? "In Vorbereitung" : years.join(", "),
+  }))}
+/>
