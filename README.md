@@ -28,22 +28,28 @@ Completeness includes residents below voting age and residents excluded by
 citizenship, usually requiring additional official demographic data beyond
 election results. Population, age, and citizenship data must have reference dates
 close to the election date; disclose any timing gaps or mismatches between sources.
+See [the all-state data availability review](DATA_AVAILABILITY_REVIEW.md) for
+official source alternatives, timing gaps, and remaining demographic data needs.
 
 `src/data/states.ts` lists all 16 states with their latest completed election date
-and official result link, verified against the Bundeswahlleiterin on 5 September
-2026. Upcoming elections are excluded. Update this catalog after an election;
+and official result link, reviewed on 12 September 2026. Sachsen-Anhalt includes
+its preliminary 2026 result as well as 2021; there are 17 election datasets.
 `years` lists only elections with local diagram datasets.
 
-Every state has a diagram for its latest election: population → voting age →
-eligibility → turnout → party results. Berlin, Hamburg, Bremen, Bayern, Hessen,
-Sachsen and Thüringen additionally split the non-voters into "Unter <Wahlalter>",
-"Nichtdeutsche" and a small "Sonstige Differenzen" remainder, estimated from
-Destatis table 12411-0014 (Bevölkerung nach Altersjahren und Nationalität,
-Stichtag 31.12.). Where the age-and-nationality arithmetic cannot stay
-nonnegative (the birthday cohort between reference date and election day
-outgrows the not-eligible group, e.g. NRW), the split is omitted and replaced
-with a note. See `NONVOTER_BREAKDOWN.md` for the method and the per-state
-status. Store processed data at `public/data/<state>/<year>.json` and
-source files at `data/raw/<state>/<year>/`; `pnpm data:download <state>/<year>`
-fetches new sources and `pnpm data:build` validates and converts them.
+Every state has a diagram for its latest election. Berlin, Hamburg, Bremen and
+Saarland split the non-eligible population into residents below voting age,
+non-German residents of voting age, and a reconciliation remainder. All other
+datasets preserve these demographic counts in annotations because they exceed
+the non-eligible total derived from the electoral roll.
+
+The import uses coherent population, age and citizenship snapshots: census-day
+2022 data for NRW, Schleswig-Holstein and Saarland; the nearest available annual
+snapshot for other area states; and dedicated sources for Berlin, Hamburg and
+Bremen. Timing gaps and Hamburg's age-ratio estimate are visible on the pages.
+See [NONVOTER_BREAKDOWN.md](NONVOTER_BREAKDOWN.md) for methods and current counts.
+Processed datasets live at `public/data/<state>/<year>.json`, source manifests
+at `data/raw/<state>/<year>/`, and shared exports at `data/raw/population/`.
+`pnpm data:download <state>/<year>` refreshes sources; `pnpm data:build` validates
+and converts them. `pnpm test` also checks demographic parser failures, invalid
+metadata, vote conservation, generated pages and Sankey geometry.
 Add verified sources and a parser before enabling another diagram year.

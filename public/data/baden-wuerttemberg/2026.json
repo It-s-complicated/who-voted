@@ -10,13 +10,28 @@
   "population": {
     "residents": 11238761,
     "referenceDate": "2025-12-31",
-    "basis": "Bevölkerungsfortschreibung auf Basis des Zensus 2022"
+    "basis": "Bevölkerungsfortschreibung auf Basis des Zensus 2022",
+    "sourceId": "population",
+    "demographics": {
+      "referenceDate": "2025-12-31",
+      "underVotingAge": 1719555,
+      "nonGermanVotingAgeOrOlder": 1777879,
+      "method": "direct",
+      "sourceIds": [
+        "population"
+      ]
+    },
+    "note": "Der Bevölkerungsstichtag liegt 67 Tage vor der Wahl. Alter und Staatsangehörigkeit beziehen sich auf den demografischen Stichtag, nicht auf den Wahltag."
   },
   "eligibility": {
     "eligible": 7764858,
     "notEligible": 3473903,
-    "estimatedBreakdown": null,
-    "note": "Die nicht wahlberechtigte Bevölkerung wird als Gesamtgruppe gezeigt. Eine verifizierte Aufteilung nach Alter und Staatsangehörigkeit liegt in diesem Datensatz nicht vor. Bevölkerungsstand und Wählerverzeichnis haben unterschiedliche Stichtage."
+    "estimatedBreakdown": {
+      "underVotingAge": 1719555,
+      "nonGermanVotingAgeOrOlder": 1777879,
+      "otherOrTimingDifference": 0
+    },
+    "note": "Die Bevölkerungsstatistik zählt 1.719.555 Personen unter 16 Jahren und 1.777.879 nichtdeutsche Personen ab 16 Jahren. Ihre Summe übersteigt die aus Bevölkerung minus Wahlberechtigten berechnete Gruppe um 23.531 Personen. Bevölkerungsstatistik und Wählerverzeichnis unterscheiden sich in Stichtag, Erhebungsmethode und Revisionsstand."
   },
   "turnout": {
     "voters": 5406737,
@@ -124,17 +139,20 @@
       "file": "data/raw/baden-wuerttemberg/2026/state-results.html",
       "publisher": "Statistisches Landesamt Baden-Württemberg",
       "location": "Ergebnistabelle, Land Baden-Württemberg, Zweitstimmen",
-      "sha256": "01b9d7edac2461e1790b03cb3392f14b5441c908686643182a48cae4be45ce48",
-      "retrievedAt": "2026-09-05T21:35:41.132Z"
+      "electionDate": "2026-03-08",
+      "retrievedAt": "2026-09-05T21:35:41.132Z",
+      "sha256": "01b9d7edac2461e1790b03cb3392f14b5441c908686643182a48cae4be45ce48"
     },
     {
       "id": "population",
-      "file": "data/raw/population/2025.html",
-      "url": "https://www.statistikportal.de/de/bevoelkerung/flaeche-und-bevoelkerung",
-      "publisher": "Statistische Ämter des Bundes und der Länder",
-      "location": "Bevölkerung – Bundesländer, 2025, Gesamt",
-      "sha256": "b282ab4036bbab8a1488c0a0814269eeb3e16cc8a4a32bfc5a520f0e432176b0",
-      "retrievedAt": "2026-09-05T21:35:41.132Z"
+      "url": "https://genesis.destatis.de/genesis/api/rest/tables/12411-0014/download/ffcsv/de",
+      "file": "data/raw/population/genesis-12411-0014-flat.zip",
+      "publisher": "Statistisches Bundesamt (Destatis)",
+      "location": "Tabelle 12411-0014, Bevölkerung nach Altersjahren und Nationalität, Stichtag 31.12.",
+      "referenceDate": "2025-12-31",
+      "basis": "Bevölkerungsfortschreibung auf Basis des Zensus 2022",
+      "retrievedAt": "2026-09-05T21:35:41.132Z",
+      "sha256": "890d1386cbf9c19e97d750792c6c068c00c7141d8cd4c286f633ec0a8dbc736c"
     }
   ]
 }

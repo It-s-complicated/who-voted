@@ -8,15 +8,30 @@
   "eyebrow": "Landtagswahl · Zweitstimmen",
   "intro": "Von der Bevölkerung über die Wahlbeteiligung bis zu den gültigen Zweitstimmen bei der Landtagswahl am 26. September 2021.",
   "population": {
-    "residents": 1610774,
-    "referenceDate": "2020-12-31",
-    "basis": "Bevölkerungsfortschreibung auf Basis des Zensus 2011"
+    "residents": 1611160,
+    "referenceDate": "2021-12-31",
+    "basis": "Bevölkerungsfortschreibung auf Basis des Zensus 2011",
+    "sourceId": "population",
+    "demographics": {
+      "referenceDate": "2021-12-31",
+      "underVotingAge": 247445,
+      "nonGermanVotingAgeOrOlder": 64400,
+      "method": "direct",
+      "sourceIds": [
+        "population"
+      ]
+    },
+    "note": "Der Bevölkerungsstichtag liegt 96 Tage nach der Wahl. Alter und Staatsangehörigkeit beziehen sich auf den demografischen Stichtag, nicht auf den Wahltag. Der zeitliche Abstand schränkt die Vergleichbarkeit mit der Wahl ein; eine nähere, zusammenpassende Aufteilung nach Alter und Staatsangehörigkeit ist hier nicht verfügbar."
   },
   "eligibility": {
     "eligible": 1312471,
-    "notEligible": 298303,
-    "estimatedBreakdown": null,
-    "note": "Die nicht wahlberechtigte Bevölkerung wird als Gesamtgruppe gezeigt. Eine verifizierte Aufteilung nach Alter und Staatsangehörigkeit liegt in diesem Datensatz nicht vor. Bevölkerungsstand und Wählerverzeichnis haben unterschiedliche Stichtage."
+    "notEligible": 298689,
+    "estimatedBreakdown": {
+      "underVotingAge": 247445,
+      "nonGermanVotingAgeOrOlder": 64400,
+      "otherOrTimingDifference": 0
+    },
+    "note": "Die Bevölkerungsstatistik zählt 247.445 Personen unter 18 Jahren und 64.400 nichtdeutsche Personen ab 18 Jahren. Ihre Summe übersteigt die aus Bevölkerung minus Wahlberechtigten berechnete Gruppe um 13.156 Personen. Bevölkerungsstatistik und Wählerverzeichnis unterscheiden sich in Stichtag, Erhebungsmethode und Revisionsstand."
   },
   "turnout": {
     "voters": 928807,
@@ -135,18 +150,21 @@
       "url": "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-13.html",
       "file": "data/raw/mecklenburg-vorpommern/2021/results.html",
       "publisher": "Die Bundeswahlleiterin",
-      "location": "Ergebnis der letzten Landtagswahl, Landesergebnis",
-      "sha256": "b5d44d4abd0e13a80b6393d5fc529ba473475da87a8aae9fc9e0e83c2ddd026a",
-      "retrievedAt": "2026-09-05T21:35:53.696Z"
+      "location": "Ergebnis der Landtagswahl, Landesergebnis",
+      "electionDate": "2021-09-26",
+      "retrievedAt": "2026-09-05T21:35:53.696Z",
+      "sha256": "b5d44d4abd0e13a80b6393d5fc529ba473475da87a8aae9fc9e0e83c2ddd026a"
     },
     {
       "id": "population",
-      "file": "data/raw/population/monitor-2022.pdf",
-      "url": "https://www.statistik.niedersachsen.de/download/190492/Niedersachsen-Monitor_Ausgabe_2022_barrierearm_-_Der_systematische_Bund-Laender-Vergleich_zur_Positionsbestimmung_des_Landes_Niedersachsen..pdf",
-      "publisher": "Landesamt für Statistik Niedersachsen",
-      "location": "PDF-Seite 16, Tabelle 1: Bevölkerungsstand und Dichte",
-      "sha256": "3f9742245be837d7bcbd22e2689a0ed426d237c1888a43b080aa16b016e33f20",
-      "retrievedAt": "2026-09-05T21:35:53.696Z"
+      "url": "https://genesis.destatis.de/genesis/api/rest/tables/12411-0014/download/ffcsv/de",
+      "file": "data/raw/population/genesis-12411-0014-flat.zip",
+      "publisher": "Statistisches Bundesamt (Destatis)",
+      "location": "Tabelle 12411-0014, Bevölkerung nach Altersjahren und Nationalität, Stichtag 31.12.",
+      "referenceDate": "2021-12-31",
+      "basis": "Bevölkerungsfortschreibung auf Basis des Zensus 2011",
+      "retrievedAt": "2026-09-05T21:35:53.696Z",
+      "sha256": "890d1386cbf9c19e97d750792c6c068c00c7141d8cd4c286f633ec0a8dbc736c"
     }
   ]
 }

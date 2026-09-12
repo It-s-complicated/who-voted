@@ -1,4 +1,4 @@
-// Latest completed elections, checked on 2026-09-05 against the Bundeswahlleiterin.
+// Latest completed elections; Sachsen-Anhalt updated from the state authority on 2026-09-12.
 // years contains only elections with local diagram datasets.
 export const states: Record<string, {
   name: string;
@@ -86,9 +86,9 @@ export const states: Record<string, {
   },
   "sachsen-anhalt": {
     name: "Sachsen-Anhalt",
-    years: [2021],
-    latestElection: "2021-06-06",
-    resultsUrl: "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-15.html",
+    years: [2021, 2026],
+    latestElection: "2026-09-06",
+    resultsUrl: "https://wahlergebnisse.sachsen-anhalt.de/wahlen/lt26/erg_land.html",
   },
   "schleswig-holstein": {
     name: "Schleswig-Holstein",

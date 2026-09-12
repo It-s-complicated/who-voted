@@ -7,6 +7,8 @@ const routes = Object.entries(states).flatMap(([slug, state]) => state.years.map
 for (const route of routes) {
   const data = JSON.parse(readFileSync(`public/data/${route}.json`, 'utf8'));
   const html = readFileSync(`dist/${route}/index.html`, 'utf8');
+  assert.ok(html.includes(data.population.note), `${route}: population timing annotation`);
+  if (data.population.demographics.note) assert.ok(html.includes(data.population.demographics.note), `${route}: demographic method annotation`);
   const svg = html.match(/<svg\b[^>]*role="img"[\s\S]*?<\/svg>/)[0];
   const rects = [...svg.matchAll(/<rect\b([^>]*)>\s*<title>([\s\S]*?)<\/title>/g)];
   const node = (label) => {
@@ -26,9 +28,13 @@ for (const route of routes) {
     assert.match(band.attrs, /fill="#[a-f0-9]{6}"/i);
     if (party.name.toLowerCase() === 'die linke') assert.ok(band.attrs.includes('fill="#bd4598"'));
   }
+  if (data.eligibility.note) assert.ok(html.includes(data.eligibility.note), `${route}: split overhang annotation`);
   if (data.eligibility.estimatedBreakdown) {
-    for (const label of [`Unter ${data.votingAge}`, `Nichtdeutsch, ${data.votingAge}+`, 'Sonstige Differenz*']) {
+    for (const label of [`Unter ${data.votingAge}`, `Nichtdeutsch, ${data.votingAge}+`]) {
       assert.ok(node(label).height > 0, `${route}: demographic branch remains in the diagram`);
+    }
+    if (data.eligibility.estimatedBreakdown.otherOrTimingDifference > 0) {
+      assert.ok(node('Sonstige Differenz*').height > 0, `${route}: residual branch remains in the diagram`);
     }
   } else {
     assert.ok(!rects.some((rect) => /Unter \d|Sonstige Differenz/.test(rect[2])), `${route}: no invented demographics`);

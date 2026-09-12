@@ -9,7 +9,19 @@
   "intro": "Von allen gemeldeten Einwohner:innen bis zu den gültigen Stimmen bei der Bürgerschaftswahl am 14. Mai 2023.",
   "population": {
     "residents": 695758,
-    "referenceDate": "2022-12-31"
+    "referenceDate": "2022-12-31",
+    "basis": "Bevölkerungsfortschreibung auf Basis des Zensus 2022",
+    "sourceId": "population",
+    "demographics": {
+      "referenceDate": "2022-12-31",
+      "underVotingAge": 107034,
+      "nonGermanVotingAgeOrOlder": 121617,
+      "method": "direct",
+      "sourceIds": [
+        "population"
+      ]
+    },
+    "note": "Der Bevölkerungsstichtag liegt 134 Tage vor der Wahl. Alter und Staatsangehörigkeit beziehen sich auf den demografischen Stichtag, nicht auf den Wahltag. Der zeitliche Abstand schränkt die Vergleichbarkeit mit der Wahl ein; eine nähere, zusammenpassende Aufteilung nach Alter und Staatsangehörigkeit ist hier nicht verfügbar."
   },
   "eligibility": {
     "eligible": 460778,

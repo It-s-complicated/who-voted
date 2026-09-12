@@ -8,15 +8,30 @@
   "eyebrow": "Landtagswahl · Zweitstimmen",
   "intro": "Von der Bevölkerung über die Wahlbeteiligung bis zu den gültigen Zweitstimmen bei der Landtagswahl am 22. September 2024.",
   "population": {
-    "residents": 2581667,
-    "referenceDate": "2023-12-31",
-    "basis": "Bevölkerungsfortschreibung auf Basis des Zensus 2011"
+    "residents": 2556747,
+    "referenceDate": "2024-12-31",
+    "basis": "Bevölkerungsfortschreibung auf Basis des Zensus 2022",
+    "sourceId": "population",
+    "demographics": {
+      "referenceDate": "2024-12-31",
+      "underVotingAge": 362385,
+      "nonGermanVotingAgeOrOlder": 149574,
+      "method": "direct",
+      "sourceIds": [
+        "population"
+      ]
+    },
+    "note": "Der Bevölkerungsstichtag liegt 100 Tage nach der Wahl. Alter und Staatsangehörigkeit beziehen sich auf den demografischen Stichtag, nicht auf den Wahltag. Der zeitliche Abstand schränkt die Vergleichbarkeit mit der Wahl ein; eine nähere, zusammenpassende Aufteilung nach Alter und Staatsangehörigkeit ist hier nicht verfügbar."
   },
   "eligibility": {
     "eligible": 2076920,
-    "notEligible": 504747,
-    "estimatedBreakdown": null,
-    "note": "Die nicht wahlberechtigte Bevölkerung wird als Gesamtgruppe gezeigt. Eine verifizierte Aufteilung nach Alter und Staatsangehörigkeit liegt in diesem Datensatz nicht vor. Bevölkerungsstand und Wählerverzeichnis haben unterschiedliche Stichtage."
+    "notEligible": 479827,
+    "estimatedBreakdown": {
+      "underVotingAge": 362385,
+      "nonGermanVotingAgeOrOlder": 149574,
+      "otherOrTimingDifference": 0
+    },
+    "note": "Die Bevölkerungsstatistik zählt 362.385 Personen unter 16 Jahren und 149.574 nichtdeutsche Personen ab 16 Jahren. Ihre Summe übersteigt die aus Bevölkerung minus Wahlberechtigten berechnete Gruppe um 32.132 Personen. Bevölkerungsstatistik und Wählerverzeichnis unterscheiden sich in Stichtag, Erhebungsmethode und Revisionsstand."
   },
   "turnout": {
     "voters": 1513975,
@@ -96,17 +111,20 @@
       "file": "data/raw/brandenburg/2024/results.pdf",
       "publisher": "Landeswahlleiter Brandenburg",
       "location": "PDF-Seite 1, Land Brandenburg, Zweitstimmen",
-      "sha256": "736e85de5af12e8cb0c8e0103667b81c77b01bbc503bc83c05c4090834b55deb",
-      "retrievedAt": "2026-09-05T21:35:53.462Z"
+      "electionDate": "2024-09-22",
+      "retrievedAt": "2026-09-05T21:35:53.462Z",
+      "sha256": "736e85de5af12e8cb0c8e0103667b81c77b01bbc503bc83c05c4090834b55deb"
     },
     {
       "id": "population",
-      "file": "data/raw/population/monitor-2024.pdf",
-      "url": "https://www.statistischebibliothek.de/mir/servlets/MCRFileNodeServlet/NIAusgabe_derivate_00000439/Niedersachsen-Monitor-2024_pdfa.pdf",
-      "publisher": "Landesamt für Statistik Niedersachsen",
-      "location": "PDF-Seite 17, Tabelle 1: Bevölkerungsstand und -dichte",
-      "sha256": "fb857cd74ef0e2c6fa545d22a0fb159cebe734c22dbdbad3a28afc54174dd623",
-      "retrievedAt": "2026-09-05T21:35:53.462Z"
+      "url": "https://genesis.destatis.de/genesis/api/rest/tables/12411-0014/download/ffcsv/de",
+      "file": "data/raw/population/genesis-12411-0014-flat.zip",
+      "publisher": "Statistisches Bundesamt (Destatis)",
+      "location": "Tabelle 12411-0014, Bevölkerung nach Altersjahren und Nationalität, Stichtag 31.12.",
+      "referenceDate": "2024-12-31",
+      "basis": "Bevölkerungsfortschreibung auf Basis des Zensus 2022",
+      "retrievedAt": "2026-09-05T21:35:53.462Z",
+      "sha256": "890d1386cbf9c19e97d750792c6c068c00c7141d8cd4c286f633ec0a8dbc736c"
     }
   ]
 }

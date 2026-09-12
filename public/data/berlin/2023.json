@@ -11,7 +11,19 @@
     "residents": 3850809,
     "referenceDate": "2022-12-31",
     "structureResidents": 3821881,
-    "structureReferenceDate": "2022-06-30"
+    "structureReferenceDate": "2022-06-30",
+    "basis": "Einwohnermelderegister",
+    "sourceId": "population",
+    "demographics": {
+      "referenceDate": "2022-12-31",
+      "underVotingAge": 632890,
+      "nonGermanVotingAgeOrOlder": 776341,
+      "method": "direct",
+      "sourceIds": [
+        "population"
+      ]
+    },
+    "note": "Der Bevölkerungsstichtag liegt 43 Tage vor der Wahl. Alter und Staatsangehörigkeit beziehen sich auf den demografischen Stichtag, nicht auf den Wahltag."
   },
   "eligibility": {
     "eligible": 2431776,

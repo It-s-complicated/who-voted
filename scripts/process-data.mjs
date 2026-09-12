@@ -4,6 +4,7 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { states as stateCatalog } from '../src/data/states.ts';
 import { stateSources } from './state-sources.mjs';
 import { validateElection } from './validate-election.mjs';
+import { populationSnapshot } from './population.mjs';
 
 function pdfPage(file, firstPage, lastPage = firstPage) {
   return execFileSync(
@@ -551,51 +552,30 @@ function officialCount(value) {
   return Number(value.replace(/[. ]/g, ''));
 }
 
-// ponytail: flat CSV from a fixed Destatis export layout; swap in a parser if
-// the GENESIS flat export schema ever changes (columns: 5=time, 9=Land,
-// 13=Nationalität, 17=Geschlecht, 20=Altersjahr code, 22=value)
-function genesisAgePopulation(file) {
-  const csv = execFileSync('unzip', ['-p', file, '12411-0014_de_flat.csv'], {
-    maxBuffer: 256 * 1024 * 1024,
-  }).toString('utf8');
-  const population = new Map();
-  for (const line of csv.split('\n')) {
-    const cells = line.split(';');
-    if (cells[0] !== '12411' || cells[16] !== 'Insgesamt' || cells[11] === '%TOTAL%') continue;
-    population.set(`${cells[4]}|${cells[8]}|${cells[11]}|${cells[19]}`, Number(cells[21]));
-  }
-  return population;
-}
-
-// Estimated non-voter split from official single-year age × nationality counts
-// at 31.12.; returns null when the arithmetic cannot stay nonnegative (the
-// birthday cohort between reference date and election day can outgrow the
-// not-eligible group, e.g. NRW), in which case the page keeps its overall note.
-function nonVoterBreakdown(file, land, refDate, votingAge, notEligible) {
-  const population = genesisAgePopulation(file);
-  const total = (nationality, upTo) => {
-    let sum = 0;
-    for (let age = 0; age < (upTo ?? 91); age += 1) {
-      sum += population.get(`${refDate}|${land}|${nationality}|ALT${String(age).padStart(3, '0')}`) ?? 0;
-      if (upTo == null && age === 90) sum += population.get(`${refDate}|${land}|${nationality}|ALT090UM`) ?? 0;
-    }
-    return sum;
-  };
-  const underVotingAge = total('NATD', votingAge) + total('NATA', votingAge);
-  const nonGermanVotingAgeOrOlder = total('NATA') - total('NATA', votingAge);
-  const otherOrTimingDifference = notEligible - underVotingAge - nonGermanVotingAgeOrOlder;
-  if (otherOrTimingDifference < 0) return null;
-  return { underVotingAge, nonGermanVotingAgeOrOlder, otherOrTimingDifference };
-}
-
-async function otherStateData(slug, sources) {
+async function otherStateData(route, sources) {
+  const [slug, yearText] = route.split('/');
+  const year = Number(yearText);
   const state = stateCatalog[slug];
-  const year = Number(state.latestElection.slice(0, 4));
+  const electionDate = sources.results.electionDate;
   let eligible, voters, invalid, valid, parties;
   const votesPerVoter = slug === 'bayern' ? 2 : 1;
   const voteLabel = ({ bayern: 'Gesamtstimmen', saarland: 'Stimmen', hessen: 'Landesstimmen', 'rheinland-pfalz': 'Landesstimmen' })[slug] ?? 'Zweitstimmen';
 
-  if (slug === 'brandenburg') {
+  if (route === 'sachsen-anhalt/2026') {
+    const html = await readFile(sources.results.file, 'utf8');
+    const widgets = [...html.matchAll(/<script[^>]*type="application\/json"[^>]*>([\s\S]*?)<\/script>/g)]
+      .map((match) => JSON.parse(match[1]).x?.tag?.attribs);
+    const table = widgets.find((widget) => widget?.elementId === 'ergtable')?.data;
+    if (!table || !/2661\s+von\s+2661\s+Wahlbezirken/.test(html)) throw new Error('Incomplete Sachsen-Anhalt 2026 results');
+    const counts = table['anzahl.wj.x'];
+    [eligible, voters, , invalid, valid] = counts;
+    parties = table.merkmal.slice(5).flatMap((label, index) => {
+      const votes = counts[index + 5];
+      if (votes === 'NA') return [];
+      if (!Number.isSafeInteger(votes) || votes < 0) throw new Error('Invalid Sachsen-Anhalt party count');
+      return [{ name: label.replaceAll('&shy;', '').replace(/<[^>]*>/g, ''), votes }];
+    });
+  } else if (slug === 'brandenburg') {
     const text = pdfPage(sources.results.file, 1);
     eligible = firstCount(lineStartingWith(text, 'Wahlberechtigte '));
     voters = firstCount(lineStartingWith(text, 'Wähler / Wahlbeteiligung'));
@@ -646,43 +626,38 @@ async function otherStateData(slug, sources) {
   }
   parties.sort((a, b) => b.votes - a.votes);
 
-  const referenceDate = `${year - 1}-12-31`;
-  let residents;
-  if (year === 2026) {
-    const html = await readFile(sources.population.file, 'utf8');
-    if (!html.includes('2025')) throw new Error('Expected 2025 population');
-    residents = officialCount(htmlRows(html).find((row) => row[0] === state.name)?.[1]);
-  } else {
-    const text = pdfPage(sources.population.file, sources.population.page);
-    const cells = lineStartingWith(text, state.name).trim().split(/\s{2,}/);
-    residents = officialCount(cells[year === 2021 || year === 2023 ? 1 : 2]);
-  }
+  const { referenceDate, basis } = sources.population;
   const votingAge = ['baden-wuerttemberg', 'brandenburg', 'schleswig-holstein'].includes(slug) ? 16 : 18;
-  const date = new Intl.DateTimeFormat('de-DE', { dateStyle: 'long' }).format(new Date(state.latestElection));
+  const { residents, underVotingAge, nonGermanVotingAgeOrOlder } = populationSnapshot(sources.population, state.name, votingAge);
+  const date = new Intl.DateTimeFormat('de-DE', { dateStyle: 'long' }).format(new Date(electionDate));
   const notEligible = residents - eligible;
-  const breakdown = sources.breakdown
-    ? nonVoterBreakdown(sources.breakdown.file, state.name, referenceDate, votingAge, notEligible)
-    : null;
+  // ponytail: when the demographic split overhangs the register total (timing/revision noise),
+  // show the true parts and drop the residual band instead of hiding the split in a footnote
+  const otherOrTimingDifference = Math.max(0, notEligible - underVotingAge - nonGermanVotingAgeOrOlder);
+  const breakdown = { underVotingAge, nonGermanVotingAgeOrOlder, otherOrTimingDifference };
+  const format = new Intl.NumberFormat('de-DE');
   return {
     data: {
       id: `${slug}-ltw-${year}`, year,
       title: `Landtagswahl in ${state.name}`,
-      electionDate: state.latestElection,
-      resultStatus: 'final',
+      electionDate,
+      resultStatus: sources.results.resultStatus ?? 'final',
       votingAge,
       eyebrow: `Landtagswahl · ${voteLabel}`,
       intro: `Von der Bevölkerung über die Wahlbeteiligung bis zu den gültigen ${voteLabel} bei der Landtagswahl am ${date}.`,
       population: {
-        residents, referenceDate,
-        basis: `Bevölkerungsfortschreibung auf Basis des Zensus ${year === 2026 ? 2022 : 2011}`,
+        residents, referenceDate, basis, sourceId: 'population',
+        demographics: {
+          referenceDate, underVotingAge, nonGermanVotingAgeOrOlder,
+          method: 'direct', sourceIds: ['population'],
+          ...(basis === 'Zensus 2022' ? { note: 'Zensuswerte sind durch das Geheimhaltungsverfahren leicht verändert; Summen können geringfügig abweichen.' } : {}),
+        },
       },
       eligibility: {
         eligible,
         notEligible,
-        ...(breakdown ? { estimatedBreakdown: breakdown } : {
-          estimatedBreakdown: null,
-          note: 'Die nicht wahlberechtigte Bevölkerung wird als Gesamtgruppe gezeigt. Eine verifizierte Aufteilung nach Alter und Staatsangehörigkeit liegt in diesem Datensatz nicht vor. Bevölkerungsstand und Wählerverzeichnis haben unterschiedliche Stichtage.',
-        }),
+        estimatedBreakdown: breakdown,
+        ...(underVotingAge + nonGermanVotingAgeOrOlder > notEligible ? { note: `Die Bevölkerungsstatistik zählt ${format.format(underVotingAge)} Personen unter ${votingAge} Jahren und ${format.format(nonGermanVotingAgeOrOlder)} nichtdeutsche Personen ab ${votingAge} Jahren. Ihre Summe übersteigt die aus Bevölkerung minus Wahlberechtigten berechnete Gruppe um ${format.format(underVotingAge + nonGermanVotingAgeOrOlder - notEligible)} Personen. Bevölkerungsstatistik und Wählerverzeichnis unterscheiden sich in Stichtag, Erhebungsmethode und Revisionsstand.` } : {}),
       },
       turnout: { voters, nonVoters: eligible - voters },
       secondVotes: {
@@ -698,7 +673,6 @@ async function otherStateData(slug, sources) {
     },
     sourceFiles: Object.fromEntries(
       Object.entries(sources)
-        .filter(([id]) => id !== 'breakdown' || breakdown)
         .map(([id, source]) => [id, source.file]),
     ),
   };
@@ -707,16 +681,16 @@ async function otherStateData(slug, sources) {
 // --- assembly ---
 
 const states = {
-  berlin: berlinData(),
-  hamburg: hamburgData(),
-  bremen: await bremenData(),
+  'berlin/2023': berlinData(),
+  'hamburg/2025': hamburgData(),
+  'bremen/2023': await bremenData(),
 };
 for (const [route, sources] of Object.entries(stateSources)) {
-  const slug = route.split('/')[0];
-  states[slug] = await otherStateData(slug, sources);
+  states[route] = await otherStateData(route, sources);
 }
 
-for (const [state, parsed] of Object.entries(states)) {
+for (const [route, parsed] of Object.entries(states)) {
+  const state = route.split('/')[0];
   const manifest = JSON.parse(
     await readFile(`data/raw/${state}/${parsed.data.year}/sources.json`, 'utf8'),
   );
@@ -729,12 +703,30 @@ for (const [state, parsed] of Object.entries(states)) {
       assertEqual(sha256, manifestSources[id].sha256, `${state} ${id} checksum`);
       return {
         ...manifestSources[id],
-        retrievedAt: manifest.retrievedAt,
+        retrievedAt: manifestSources[id].retrievedAt ?? manifest.retrievedAt,
         publisher: manifestSources[id].publisher ?? parsed.publisher,
         license: manifestSources[id].license ?? parsed.license,
       };
     }),
   );
+
+  const population = parsed.data.population;
+  if (!population.demographics) {
+    const { underVotingAge, nonGermanVotingAgeOrOlder } = parsed.data.eligibility.estimatedBreakdown;
+    population.basis = state === 'bremen' ? 'Bevölkerungsfortschreibung auf Basis des Zensus 2022' : 'Einwohnermelderegister';
+    population.sourceId = state === 'hamburg' ? 'register' : 'population';
+    population.demographics = {
+      referenceDate: population.referenceDate, underVotingAge, nonGermanVotingAgeOrOlder,
+      method: state === 'hamburg' ? 'estimated' : 'direct',
+      sourceIds: state === 'hamburg' ? ['register', 'foreign', 'population'] : ['population'],
+      ...(state === 'hamburg' ? { note: 'Die Unter-16-Zahlen sind geschätzt: Unter-18-Bestände des Melderegisters werden mit dem Altersverhältnis der Bevölkerungsfortschreibung umgerechnet, auch für nichtdeutsche Minderjährige. Eine direkte Auszählung nach Alter und Staatsangehörigkeit liegt hier nicht vor.' } : {}),
+    };
+  }
+  const gap = Math.round((Date.parse(population.referenceDate) - Date.parse(parsed.data.electionDate)) / 86400000);
+  const demographicGap = Math.round((Date.parse(population.demographics.referenceDate) - Date.parse(parsed.data.electionDate)) / 86400000);
+  population.note = gap === 0 ? 'Die Bevölkerungsdaten beziehen sich auf den Wahltag.'
+    : `Der Bevölkerungsstichtag liegt ${Math.abs(gap)} Tage ${gap > 0 ? 'nach' : 'vor'} der Wahl. Alter und Staatsangehörigkeit beziehen sich auf den demografischen Stichtag, nicht auf den Wahltag.`;
+  if (Math.abs(demographicGap) > 90) population.note += ' Der zeitliche Abstand schränkt die Vergleichbarkeit mit der Wahl ein; eine nähere, zusammenpassende Aufteilung nach Alter und Staatsangehörigkeit ist hier nicht verfügbar.';
 
   validateElection(parsed.data);
   const year = parsed.data.year;

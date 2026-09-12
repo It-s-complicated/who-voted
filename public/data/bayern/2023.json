@@ -8,18 +8,30 @@
   "eyebrow": "Landtagswahl · Gesamtstimmen",
   "intro": "Von der Bevölkerung über die Wahlbeteiligung bis zu den gültigen Gesamtstimmen bei der Landtagswahl am 8. Oktober 2023.",
   "population": {
-    "residents": 13369393,
-    "referenceDate": "2022-12-31",
-    "basis": "Bevölkerungsfortschreibung auf Basis des Zensus 2011"
+    "residents": 13176426,
+    "referenceDate": "2023-12-31",
+    "basis": "Bevölkerungsfortschreibung auf Basis des Zensus 2022",
+    "sourceId": "population",
+    "demographics": {
+      "referenceDate": "2023-12-31",
+      "underVotingAge": 2222958,
+      "nonGermanVotingAgeOrOlder": 1706978,
+      "method": "direct",
+      "sourceIds": [
+        "population"
+      ]
+    },
+    "note": "Der Bevölkerungsstichtag liegt 84 Tage nach der Wahl. Alter und Staatsangehörigkeit beziehen sich auf den demografischen Stichtag, nicht auf den Wahltag."
   },
   "eligibility": {
     "eligible": 9430600,
-    "notEligible": 3938793,
+    "notEligible": 3745826,
     "estimatedBreakdown": {
-      "underVotingAge": 2208310,
-      "nonGermanVotingAgeOrOlder": 1633042,
-      "otherOrTimingDifference": 97441
-    }
+      "underVotingAge": 2222958,
+      "nonGermanVotingAgeOrOlder": 1706978,
+      "otherOrTimingDifference": 0
+    },
+    "note": "Die Bevölkerungsstatistik zählt 2.222.958 Personen unter 18 Jahren und 1.706.978 nichtdeutsche Personen ab 18 Jahren. Ihre Summe übersteigt die aus Bevölkerung minus Wahlberechtigten berechnete Gruppe um 184.110 Personen. Bevölkerungsstatistik und Wählerverzeichnis unterscheiden sich in Stichtag, Erhebungsmethode und Revisionsstand."
   },
   "turnout": {
     "voters": 6895807,
@@ -103,27 +115,21 @@
       "url": "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-9.html",
       "file": "data/raw/bayern/2023/results.html",
       "publisher": "Die Bundeswahlleiterin",
-      "location": "Ergebnis der letzten Landtagswahl, Landesergebnis",
-      "sha256": "2314594e7e85b682c78d30eb81e3e899c3d0a5b3f27baa611db73695e2285228",
-      "retrievedAt": "2026-09-05T21:35:51.599Z"
+      "location": "Ergebnis der Landtagswahl, Landesergebnis",
+      "electionDate": "2023-10-08",
+      "retrievedAt": "2026-09-05T21:35:51.599Z",
+      "sha256": "2314594e7e85b682c78d30eb81e3e899c3d0a5b3f27baa611db73695e2285228"
     },
     {
       "id": "population",
-      "file": "data/raw/population/monitor-2024.pdf",
-      "url": "https://www.statistischebibliothek.de/mir/servlets/MCRFileNodeServlet/NIAusgabe_derivate_00000439/Niedersachsen-Monitor-2024_pdfa.pdf",
-      "publisher": "Landesamt für Statistik Niedersachsen",
-      "location": "PDF-Seite 17, Tabelle 1: Bevölkerungsstand und -dichte",
-      "sha256": "fb857cd74ef0e2c6fa545d22a0fb159cebe734c22dbdbad3a28afc54174dd623",
-      "retrievedAt": "2026-09-05T21:35:51.599Z"
-    },
-    {
-      "id": "breakdown",
       "url": "https://genesis.destatis.de/genesis/api/rest/tables/12411-0014/download/ffcsv/de",
       "file": "data/raw/population/genesis-12411-0014-flat.zip",
       "publisher": "Statistisches Bundesamt (Destatis)",
       "location": "Tabelle 12411-0014, Bevölkerung nach Altersjahren und Nationalität, Stichtag 31.12.",
-      "sha256": "890d1386cbf9c19e97d750792c6c068c00c7141d8cd4c286f633ec0a8dbc736c",
-      "retrievedAt": "2026-09-05T21:35:51.599Z"
+      "referenceDate": "2023-12-31",
+      "basis": "Bevölkerungsfortschreibung auf Basis des Zensus 2022",
+      "retrievedAt": "2026-09-05T21:35:51.599Z",
+      "sha256": "890d1386cbf9c19e97d750792c6c068c00c7141d8cd4c286f633ec0a8dbc736c"
     }
   ]
 }

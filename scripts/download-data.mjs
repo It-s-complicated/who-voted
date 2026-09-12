@@ -60,8 +60,8 @@ for (const [directory, files] of Object.entries(sources)) {
           method: 'POST',
           headers: {
             'content-type': 'application/json',
-            origin: 'https://genesis.destatis.de',
-            referer: 'https://genesis.destatis.de/',
+            origin: new URL(source.url).origin,
+            referer: `${new URL(source.url).origin}/`,
           },
           body: JSON.stringify(body),
         }

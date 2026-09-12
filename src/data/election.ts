@@ -7,7 +7,21 @@ export interface ElectionData {
   votingAge: number;
   eyebrow: string;
   intro: string;
-  population: { residents: number; referenceDate: string; basis?: string };
+  population: {
+    residents: number;
+    referenceDate: string;
+    basis: string;
+    sourceId: string;
+    note: string;
+    demographics: {
+      referenceDate: string;
+      underVotingAge: number;
+      nonGermanVotingAgeOrOlder: number;
+      method: 'direct' | 'estimated';
+      sourceIds: string[];
+      note?: string;
+    };
+  };
   eligibility: {
     eligible: number;
     notEligible: number;

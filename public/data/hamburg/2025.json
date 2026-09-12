@@ -9,7 +9,22 @@
   "intro": "Von allen gemeldeten Einwohner:innen bis zu den gültigen Landesstimmen bei der Bürgerschaftswahl am 2. März 2025.",
   "population": {
     "residents": 1973896,
-    "referenceDate": "2024-12-31"
+    "referenceDate": "2024-12-31",
+    "basis": "Einwohnermelderegister",
+    "sourceId": "register",
+    "demographics": {
+      "referenceDate": "2024-12-31",
+      "underVotingAge": 293823,
+      "nonGermanVotingAgeOrOlder": 360864,
+      "method": "estimated",
+      "sourceIds": [
+        "register",
+        "foreign",
+        "population"
+      ],
+      "note": "Die Unter-16-Zahlen sind geschätzt: Unter-18-Bestände des Melderegisters werden mit dem Altersverhältnis der Bevölkerungsfortschreibung umgerechnet, auch für nichtdeutsche Minderjährige. Eine direkte Auszählung nach Alter und Staatsangehörigkeit liegt hier nicht vor."
+    },
+    "note": "Der Bevölkerungsstichtag liegt 61 Tage vor der Wahl. Alter und Staatsangehörigkeit beziehen sich auf den demografischen Stichtag, nicht auf den Wahltag."
   },
   "eligibility": {
     "eligible": 1313043,

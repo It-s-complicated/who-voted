@@ -8,15 +8,31 @@
   "eyebrow": "Landtagswahl · Zweitstimmen",
   "intro": "Von der Bevölkerung über die Wahlbeteiligung bis zu den gültigen Zweitstimmen bei der Landtagswahl am 8. Mai 2022.",
   "population": {
-    "residents": 2922005,
-    "referenceDate": "2021-12-31",
-    "basis": "Bevölkerungsfortschreibung auf Basis des Zensus 2011"
+    "residents": 2927542,
+    "referenceDate": "2022-05-15",
+    "basis": "Zensus 2022",
+    "sourceId": "population",
+    "demographics": {
+      "referenceDate": "2022-05-15",
+      "underVotingAge": 422648,
+      "nonGermanVotingAgeOrOlder": 210139,
+      "method": "direct",
+      "sourceIds": [
+        "population"
+      ],
+      "note": "Zensuswerte sind durch das Geheimhaltungsverfahren leicht verändert; Summen können geringfügig abweichen."
+    },
+    "note": "Der Bevölkerungsstichtag liegt 7 Tage nach der Wahl. Alter und Staatsangehörigkeit beziehen sich auf den demografischen Stichtag, nicht auf den Wahltag."
   },
   "eligibility": {
     "eligible": 2314417,
-    "notEligible": 607588,
-    "estimatedBreakdown": null,
-    "note": "Die nicht wahlberechtigte Bevölkerung wird als Gesamtgruppe gezeigt. Eine verifizierte Aufteilung nach Alter und Staatsangehörigkeit liegt in diesem Datensatz nicht vor. Bevölkerungsstand und Wählerverzeichnis haben unterschiedliche Stichtage."
+    "notEligible": 613125,
+    "estimatedBreakdown": {
+      "underVotingAge": 422648,
+      "nonGermanVotingAgeOrOlder": 210139,
+      "otherOrTimingDifference": 0
+    },
+    "note": "Die Bevölkerungsstatistik zählt 422.648 Personen unter 16 Jahren und 210.139 nichtdeutsche Personen ab 16 Jahren. Ihre Summe übersteigt die aus Bevölkerung minus Wahlberechtigten berechnete Gruppe um 19.662 Personen. Bevölkerungsstatistik und Wählerverzeichnis unterscheiden sich in Stichtag, Erhebungsmethode und Revisionsstand."
   },
   "turnout": {
     "voters": 1396747,
@@ -103,18 +119,21 @@
       "url": "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-1.html",
       "file": "data/raw/schleswig-holstein/2022/results.html",
       "publisher": "Die Bundeswahlleiterin",
-      "location": "Ergebnis der letzten Landtagswahl, Landesergebnis",
-      "sha256": "45381f5e845fb3831fc51a3cb8c9588b64e0861a3afda3961d1bd3d1f5161d15",
-      "retrievedAt": "2026-09-05T21:35:54.530Z"
+      "location": "Ergebnis der Landtagswahl, Landesergebnis",
+      "electionDate": "2022-05-08",
+      "retrievedAt": "2026-09-05T21:35:54.530Z",
+      "sha256": "45381f5e845fb3831fc51a3cb8c9588b64e0861a3afda3961d1bd3d1f5161d15"
     },
     {
       "id": "population",
-      "file": "data/raw/population/monitor-2022.pdf",
-      "url": "https://www.statistik.niedersachsen.de/download/190492/Niedersachsen-Monitor_Ausgabe_2022_barrierearm_-_Der_systematische_Bund-Laender-Vergleich_zur_Positionsbestimmung_des_Landes_Niedersachsen..pdf",
-      "publisher": "Landesamt für Statistik Niedersachsen",
-      "location": "PDF-Seite 16, Tabelle 1: Bevölkerungsstand und Dichte",
-      "sha256": "3f9742245be837d7bcbd22e2689a0ed426d237c1888a43b080aa16b016e33f20",
-      "retrievedAt": "2026-09-05T21:35:54.530Z"
+      "url": "https://ergebnisse.zensus2022.de/proxy/api/rest/tables/1000A-2012/download/ffcsv/de",
+      "file": "data/raw/population/zensus-1000A-2012-flat.zip",
+      "publisher": "Statistische Ämter des Bundes und der Länder",
+      "location": "Zensus 2022, Tabelle 1000A-2012, Bundesländer, Altersjahre, Staatsangehörigkeit",
+      "referenceDate": "2022-05-15",
+      "basis": "Zensus 2022",
+      "retrievedAt": "2026-09-12T20:47:32.392Z",
+      "sha256": "7ab237b6d372886e1fc2f21e44682597e2637dda2f01dd3b3f6eb1b88c517704"
     }
   ]
 }

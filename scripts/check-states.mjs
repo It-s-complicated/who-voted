@@ -7,7 +7,7 @@ const home = readFileSync('dist/index.html', 'utf8');
 for (const [slug, state] of Object.entries(states)) {
   assert.ok(home.includes(`href="/${slug}/"`), `${slug}: homepage link`);
   assert.match(state.latestElection, /^\d{4}-\d{2}-\d{2}$/);
-  assert.ok(state.latestElection <= '2026-09-05', `${slug}: completed election`);
+  assert.ok(state.latestElection <= '2026-09-12', `${slug}: completed election`);
   const page = readFileSync(`dist/${slug}/index.html`, 'utf8');
   assert.ok(page.includes(`/${slug}/${Number(state.latestElection.slice(0, 4))}/`), `${slug}: diagram link`);
   assert.ok(page.includes(String(Number(state.latestElection.slice(0, 4)))), `${slug}: election year`);

@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { states } from '../src/data/states.ts';
+import { parsePopulationRows } from './population.mjs';
 import { validateElection } from './validate-election.mjs';
 
 const expected = {
@@ -18,26 +19,21 @@ const expected = {
   'schleswig-holstein': [2314417, 1396747, 1387398],
   thueringen: [1655670, 1218089, 1207883],
 };
-// Estimated non-voter splits (underVotingAge, nonGermanVotingAgeOrOlder, other).
-// States missing here have no verified split; they must keep the overall note.
-const expectedBreakdown = {
-  berlin: [632890, 776341, 9802],
-  hamburg: [293823, 360864, 6166],
-  bremen: [107034, 121617, 6329],
-  bayern: [2208310, 1633042, 97441],
-  hessen: [1059549, 904347, 95229],
-  sachsen: [653015, 246495, 7274],
-  thueringen: [326406, 131081, 9178],
-};
 assert.equal(Object.keys(states).length, 16);
 for (const [slug, state] of Object.entries(states)) {
   assert.ok(state.years.includes(Number(state.latestElection.slice(0, 4))), `${slug}: latest election has data`);
   for (const year of state.years) {
     const data = JSON.parse(readFileSync(`public/data/${slug}/${year}.json`, 'utf8'));
     validateElection(data);
-    assert.equal(data.electionDate, state.latestElection);
-    if (expected[slug]) assert.deepEqual([data.eligibility.eligible, data.turnout.voters, data.secondVotes.valid], expected[slug], slug);
-    if (expectedBreakdown[slug]) assert.deepEqual(Object.values(data.eligibility.estimatedBreakdown ?? {}), expectedBreakdown[slug], `${slug}: breakdown`);
+    if (year === Number(state.latestElection.slice(0, 4))) assert.equal(data.electionDate, state.latestElection);
+    const resultCounts = slug === 'sachsen-anhalt' && year === 2026 ? [1706851, 1328211, 1315315] : expected[slug];
+    if (resultCounts) assert.deepEqual([data.eligibility.eligible, data.turnout.voters, data.secondVotes.valid], resultCounts, slug);
+    const demographics = data.population.demographics;
+    assert.deepEqual(data.eligibility.estimatedBreakdown, {
+      underVotingAge: demographics.underVotingAge,
+      nonGermanVotingAgeOrOlder: demographics.nonGermanVotingAgeOrOlder,
+      otherOrTimingDifference: Math.max(0, data.eligibility.notEligible - demographics.underVotingAge - demographics.nonGermanVotingAgeOrOlder),
+    }, `${slug}: breakdown`);
     // Independently break each conservation boundary: validation must reject it.
     for (const corrupt of [
       (d) => { d.turnout.voters = NaN; },
@@ -45,6 +41,16 @@ for (const [slug, state] of Object.entries(states)) {
       (d) => { d.secondVotes.parties[0].votes += 1; },
       (d) => { d.secondVotes.parties[0].votes = -1; },
       (d) => { d.sources = []; },
+      (d) => { delete d.population.demographics; },
+      (d) => { delete d.population.demographics.underVotingAge; },
+      (d) => { d.population.demographics.nonGermanVotingAgeOrOlder = NaN; },
+      (d) => { d.population.demographics.sourceIds = ['missing']; },
+      (d) => { d.population.sourceId = 'missing'; },
+      (d) => { d.population.basis = ''; },
+      (d) => { d.population.referenceDate = '2023-02-30'; },
+      (d) => { d.population.note = ''; },
+      (d) => { d.population.demographics.method = 'estimated'; delete d.population.demographics.note; },
+      (d) => { d.population.demographics.referenceDate = '2000-01-01'; delete d.population.demographics.note; },
       (d) => { if (d.ballots) d.ballots.valid += 1; else d.secondVotes.invalid += 1; },
       (d) => { if (d.eligibility.estimatedBreakdown) d.eligibility.estimatedBreakdown.underVotingAge += 1; else d.eligibility.estimatedBreakdown = { underVotingAge: 1, nonGermanVotingAgeOrOlder: 0, otherOrTimingDifference: 0 }; },
     ]) {
@@ -54,4 +60,31 @@ for (const [slug, state] of Object.entries(states)) {
     }
   }
 }
-console.log('Validated results for all 16 states and rejection of corrupt counts.');
+// Both export formats must reject missing, duplicate and malformed demographic cells.
+for (const census of [false, true]) {
+  const rows = [];
+  const foreign = census ? 'AUSLAND' : 'NATA';
+  function row(nationality, age, value) {
+    const cells = Array(22).fill('');
+    cells[4] = '2022-05-15'; cells[8] = 'Test';
+    cells[census ? 5 : 16] = census ? 'GEOBL1' : 'Insgesamt';
+    cells[census ? 15 : 11] = nationality;
+    cells[census ? 11 : 19] = age;
+    cells[census ? 17 : 21] = String(value);
+    return cells;
+  }
+  rows.push(row('', '', 1000), row(foreign, '', 200));
+  for (let age = 0; age < 18; age++) {
+    const code = census ? (age === 0 ? 'ALTERU01' : `ALTER${String(age).padStart(3, '0')}`) : `ALT${String(age).padStart(3, '0')}`;
+    rows.push(row('', code, 10), row(foreign, code, 2));
+  }
+  const parse = (input, age = 18) => parsePopulationRows(input, '2022-05-15', 'Test', age, census);
+  assert.deepEqual(parse(rows), { residents: 1000, underVotingAge: 180, nonGermanVotingAgeOrOlder: 164 });
+  assert.deepEqual(parse(rows, 16), { residents: 1000, underVotingAge: 160, nonGermanVotingAgeOrOlder: 168 });
+  assert.throws(() => parse(rows.slice(0, -1)));
+  assert.throws(() => parse([...rows, rows[0]]));
+  const malformed = structuredClone(rows);
+  malformed[2][census ? 17 : 21] = '-';
+  assert.throws(() => parse(malformed));
+}
+console.log('Validated 17 elections across all 16 states, demographic parsing, and rejection of corrupt data.');

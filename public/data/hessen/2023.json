@@ -8,18 +8,30 @@
   "eyebrow": "Landtagswahl · Landesstimmen",
   "intro": "Von der Bevölkerung über die Wahlbeteiligung bis zu den gültigen Landesstimmen bei der Landtagswahl am 8. Oktober 2023.",
   "population": {
-    "residents": 6391360,
-    "referenceDate": "2022-12-31",
-    "basis": "Bevölkerungsfortschreibung auf Basis des Zensus 2011"
+    "residents": 6267546,
+    "referenceDate": "2023-12-31",
+    "basis": "Bevölkerungsfortschreibung auf Basis des Zensus 2022",
+    "sourceId": "population",
+    "demographics": {
+      "referenceDate": "2023-12-31",
+      "underVotingAge": 1066211,
+      "nonGermanVotingAgeOrOlder": 945120,
+      "method": "direct",
+      "sourceIds": [
+        "population"
+      ]
+    },
+    "note": "Der Bevölkerungsstichtag liegt 84 Tage nach der Wahl. Alter und Staatsangehörigkeit beziehen sich auf den demografischen Stichtag, nicht auf den Wahltag."
   },
   "eligibility": {
     "eligible": 4332235,
-    "notEligible": 2059125,
+    "notEligible": 1935311,
     "estimatedBreakdown": {
-      "underVotingAge": 1059549,
-      "nonGermanVotingAgeOrOlder": 904347,
-      "otherOrTimingDifference": 95229
-    }
+      "underVotingAge": 1066211,
+      "nonGermanVotingAgeOrOlder": 945120,
+      "otherOrTimingDifference": 0
+    },
+    "note": "Die Bevölkerungsstatistik zählt 1.066.211 Personen unter 18 Jahren und 945.120 nichtdeutsche Personen ab 18 Jahren. Ihre Summe übersteigt die aus Bevölkerung minus Wahlberechtigten berechnete Gruppe um 76.020 Personen. Bevölkerungsstatistik und Wählerverzeichnis unterscheiden sich in Stichtag, Erhebungsmethode und Revisionsstand."
   },
   "turnout": {
     "voters": 2858313,
@@ -126,27 +138,21 @@
       "url": "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-6.html",
       "file": "data/raw/hessen/2023/results.html",
       "publisher": "Die Bundeswahlleiterin",
-      "location": "Ergebnis der letzten Landtagswahl, Landesergebnis",
-      "sha256": "c7b5f1d6af968626032d38a8a00e069e93b4f3d7092d4e84cd22b99894759df7",
-      "retrievedAt": "2026-09-05T21:35:53.655Z"
+      "location": "Ergebnis der Landtagswahl, Landesergebnis",
+      "electionDate": "2023-10-08",
+      "retrievedAt": "2026-09-05T21:35:53.655Z",
+      "sha256": "c7b5f1d6af968626032d38a8a00e069e93b4f3d7092d4e84cd22b99894759df7"
     },
     {
       "id": "population",
-      "file": "data/raw/population/monitor-2024.pdf",
-      "url": "https://www.statistischebibliothek.de/mir/servlets/MCRFileNodeServlet/NIAusgabe_derivate_00000439/Niedersachsen-Monitor-2024_pdfa.pdf",
-      "publisher": "Landesamt für Statistik Niedersachsen",
-      "location": "PDF-Seite 17, Tabelle 1: Bevölkerungsstand und -dichte",
-      "sha256": "fb857cd74ef0e2c6fa545d22a0fb159cebe734c22dbdbad3a28afc54174dd623",
-      "retrievedAt": "2026-09-05T21:35:53.655Z"
-    },
-    {
-      "id": "breakdown",
       "url": "https://genesis.destatis.de/genesis/api/rest/tables/12411-0014/download/ffcsv/de",
       "file": "data/raw/population/genesis-12411-0014-flat.zip",
       "publisher": "Statistisches Bundesamt (Destatis)",
       "location": "Tabelle 12411-0014, Bevölkerung nach Altersjahren und Nationalität, Stichtag 31.12.",
-      "sha256": "890d1386cbf9c19e97d750792c6c068c00c7141d8cd4c286f633ec0a8dbc736c",
-      "retrievedAt": "2026-09-05T21:35:53.655Z"
+      "referenceDate": "2023-12-31",
+      "basis": "Bevölkerungsfortschreibung auf Basis des Zensus 2022",
+      "retrievedAt": "2026-09-05T21:35:53.655Z",
+      "sha256": "890d1386cbf9c19e97d750792c6c068c00c7141d8cd4c286f633ec0a8dbc736c"
     }
   ]
 }

@@ -10,13 +10,28 @@
   "population": {
     "residents": 2180684,
     "referenceDate": "2020-12-31",
-    "basis": "Bevölkerungsfortschreibung auf Basis des Zensus 2011"
+    "basis": "Bevölkerungsfortschreibung auf Basis des Zensus 2011",
+    "sourceId": "population",
+    "demographics": {
+      "referenceDate": "2020-12-31",
+      "underVotingAge": 322661,
+      "nonGermanVotingAgeOrOlder": 87889,
+      "method": "direct",
+      "sourceIds": [
+        "population"
+      ]
+    },
+    "note": "Der Bevölkerungsstichtag liegt 157 Tage vor der Wahl. Alter und Staatsangehörigkeit beziehen sich auf den demografischen Stichtag, nicht auf den Wahltag. Der zeitliche Abstand schränkt die Vergleichbarkeit mit der Wahl ein; eine nähere, zusammenpassende Aufteilung nach Alter und Staatsangehörigkeit ist hier nicht verfügbar."
   },
   "eligibility": {
     "eligible": 1788930,
     "notEligible": 391754,
-    "estimatedBreakdown": null,
-    "note": "Die nicht wahlberechtigte Bevölkerung wird als Gesamtgruppe gezeigt. Eine verifizierte Aufteilung nach Alter und Staatsangehörigkeit liegt in diesem Datensatz nicht vor. Bevölkerungsstand und Wählerverzeichnis haben unterschiedliche Stichtage."
+    "estimatedBreakdown": {
+      "underVotingAge": 322661,
+      "nonGermanVotingAgeOrOlder": 87889,
+      "otherOrTimingDifference": 0
+    },
+    "note": "Die Bevölkerungsstatistik zählt 322.661 Personen unter 18 Jahren und 87.889 nichtdeutsche Personen ab 18 Jahren. Ihre Summe übersteigt die aus Bevölkerung minus Wahlberechtigten berechnete Gruppe um 18.796 Personen. Bevölkerungsstatistik und Wählerverzeichnis unterscheiden sich in Stichtag, Erhebungsmethode und Revisionsstand."
   },
   "turnout": {
     "voters": 1079045,
@@ -127,18 +142,21 @@
       "url": "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-15.html",
       "file": "data/raw/sachsen-anhalt/2021/results.html",
       "publisher": "Die Bundeswahlleiterin",
-      "location": "Ergebnis der letzten Landtagswahl, Landesergebnis",
-      "sha256": "604a6c8c10bf14b60ddab1c2b1baf38c49835f31978655df702d0dacd2ea31e8",
-      "retrievedAt": "2026-09-05T21:35:54.495Z"
+      "electionDate": "2021-06-06",
+      "location": "Landtagswahl 2021, Landesergebnis",
+      "retrievedAt": "2026-09-05T21:35:54.495Z",
+      "sha256": "604a6c8c10bf14b60ddab1c2b1baf38c49835f31978655df702d0dacd2ea31e8"
     },
     {
       "id": "population",
-      "file": "data/raw/population/monitor-2022.pdf",
-      "url": "https://www.statistik.niedersachsen.de/download/190492/Niedersachsen-Monitor_Ausgabe_2022_barrierearm_-_Der_systematische_Bund-Laender-Vergleich_zur_Positionsbestimmung_des_Landes_Niedersachsen..pdf",
-      "publisher": "Landesamt für Statistik Niedersachsen",
-      "location": "PDF-Seite 16, Tabelle 1: Bevölkerungsstand und Dichte",
-      "sha256": "3f9742245be837d7bcbd22e2689a0ed426d237c1888a43b080aa16b016e33f20",
-      "retrievedAt": "2026-09-05T21:35:54.495Z"
+      "url": "https://genesis.destatis.de/genesis/api/rest/tables/12411-0014/download/ffcsv/de",
+      "file": "data/raw/population/genesis-12411-0014-flat.zip",
+      "publisher": "Statistisches Bundesamt (Destatis)",
+      "location": "Tabelle 12411-0014, Bevölkerung nach Altersjahren und Nationalität, Stichtag 31.12.",
+      "referenceDate": "2020-12-31",
+      "basis": "Bevölkerungsfortschreibung auf Basis des Zensus 2011",
+      "retrievedAt": "2026-09-05T21:35:54.495Z",
+      "sha256": "890d1386cbf9c19e97d750792c6c068c00c7141d8cd4c286f633ec0a8dbc736c"
     }
   ]
 }
