@@ -26,7 +26,11 @@ for (const route of routes) {
     assert.match(band.attrs, /fill="#[a-f0-9]{6}"/i);
     if (party.name.toLowerCase() === 'die linke') assert.ok(band.attrs.includes('fill="#bd4598"'));
   }
-  if (data.eligibility.estimatedBreakdown === null) {
+  if (data.eligibility.estimatedBreakdown) {
+    for (const label of [`Unter ${data.votingAge}`, `Nichtdeutsch, ${data.votingAge}+`, 'Sonstige Differenz*']) {
+      assert.ok(node(label).height > 0, `${route}: demographic branch remains in the diagram`);
+    }
+  } else {
     assert.ok(!rects.some((rect) => /Unter \d|Sonstige Differenz/.test(rect[2])), `${route}: no invented demographics`);
     assert.ok(html.includes(data.eligibility.note));
   }

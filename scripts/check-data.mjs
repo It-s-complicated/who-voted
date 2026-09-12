@@ -21,6 +21,9 @@ const expected = {
 // Estimated non-voter splits (underVotingAge, nonGermanVotingAgeOrOlder, other).
 // States missing here have no verified split; they must keep the overall note.
 const expectedBreakdown = {
+  berlin: [632890, 776341, 9802],
+  hamburg: [293823, 360864, 6166],
+  bremen: [107034, 121617, 6329],
   bayern: [2208310, 1633042, 97441],
   hessen: [1059549, 904347, 95229],
   sachsen: [653015, 246495, 7274],
