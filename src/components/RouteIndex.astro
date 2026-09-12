@@ -1,4 +1,5 @@
 ---
+import { ClientRouter } from "astro:transitions";
 import "@fontsource-variable/fraunces";
 import "../styles/global.css";
 import Breadcrumbs from "./Breadcrumbs.astro";
@@ -20,6 +21,7 @@ const { title, description, links, breadcrumbs } = Astro.props;
     <meta name="viewport" content="width=device-width" />
     <meta name="description" content={description} />
     <title>{title} · Wer hat gewählt?</title>
+    <ClientRouter />
   </head>
   <body>
     <main>
