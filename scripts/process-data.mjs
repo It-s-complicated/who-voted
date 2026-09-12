@@ -632,9 +632,14 @@ async function otherStateData(route, sources) {
   const date = new Intl.DateTimeFormat('de-DE', { dateStyle: 'long' }).format(new Date(electionDate));
   const notEligible = residents - eligible;
   // ponytail: when the demographic split overhangs the register total (timing/revision noise),
-  // show the true parts and drop the residual band instead of hiding the split in a footnote
-  const otherOrTimingDifference = Math.max(0, notEligible - underVotingAge - nonGermanVotingAgeOrOlder);
-  const breakdown = { underVotingAge, nonGermanVotingAgeOrOlder, otherOrTimingDifference };
+  // keep the counts in the annotation and omit the Sankey split — rendering them anyway
+  // would draw more people leaving notEligible than entering it (see NONVOTER_BREAKDOWN.md)
+  const overhang = underVotingAge + nonGermanVotingAgeOrOlder > notEligible;
+  const breakdown = overhang ? null : {
+    underVotingAge,
+    nonGermanVotingAgeOrOlder,
+    otherOrTimingDifference: notEligible - underVotingAge - nonGermanVotingAgeOrOlder,
+  };
   const format = new Intl.NumberFormat('de-DE');
   return {
     data: {
@@ -657,7 +662,7 @@ async function otherStateData(route, sources) {
         eligible,
         notEligible,
         estimatedBreakdown: breakdown,
-        ...(underVotingAge + nonGermanVotingAgeOrOlder > notEligible ? { note: `Die Bevölkerungsstatistik zählt ${format.format(underVotingAge)} Personen unter ${votingAge} Jahren und ${format.format(nonGermanVotingAgeOrOlder)} nichtdeutsche Personen ab ${votingAge} Jahren. Ihre Summe übersteigt die aus Bevölkerung minus Wahlberechtigten berechnete Gruppe um ${format.format(underVotingAge + nonGermanVotingAgeOrOlder - notEligible)} Personen. Bevölkerungsstatistik und Wählerverzeichnis unterscheiden sich in Stichtag, Erhebungsmethode und Revisionsstand.` } : {}),
+        ...(overhang ? { note: `Die Bevölkerungsstatistik zählt ${format.format(underVotingAge)} Personen unter ${votingAge} Jahren und ${format.format(nonGermanVotingAgeOrOlder)} nichtdeutsche Personen ab ${votingAge} Jahren. Ihre Summe übersteigt die aus Bevölkerung minus Wahlberechtigten berechnete Gruppe um ${format.format(underVotingAge + nonGermanVotingAgeOrOlder - notEligible)} Personen. Bevölkerungsstatistik und Wählerverzeichnis unterscheiden sich in Stichtag, Erhebungsmethode und Revisionsstand.` } : {}),
       },
       turnout: { voters, nonVoters: eligible - voters },
       secondVotes: {

@@ -29,10 +29,11 @@ for (const [slug, state] of Object.entries(states)) {
     const resultCounts = slug === 'sachsen-anhalt' && year === 2026 ? [1706851, 1328211, 1315315] : expected[slug];
     if (resultCounts) assert.deepEqual([data.eligibility.eligible, data.turnout.voters, data.secondVotes.valid], resultCounts, slug);
     const demographics = data.population.demographics;
-    assert.deepEqual(data.eligibility.estimatedBreakdown, {
+    const knownSplit = demographics.underVotingAge + demographics.nonGermanVotingAgeOrOlder;
+    assert.deepEqual(data.eligibility.estimatedBreakdown, knownSplit > data.eligibility.notEligible ? null : {
       underVotingAge: demographics.underVotingAge,
       nonGermanVotingAgeOrOlder: demographics.nonGermanVotingAgeOrOlder,
-      otherOrTimingDifference: Math.max(0, data.eligibility.notEligible - demographics.underVotingAge - demographics.nonGermanVotingAgeOrOlder),
+      otherOrTimingDifference: data.eligibility.notEligible - knownSplit,
     }, `${slug}: breakdown`);
     // Independently break each conservation boundary: validation must reject it.
     for (const corrupt of [

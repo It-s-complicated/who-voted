@@ -312,9 +312,6 @@ const sankeyNodes = nodes.map((node) => ({
   ...node,
   value: node.value / (node.voteUnit ? votesPerVoter : 1),
 }));
-// capture vote-scaled values before the layout: d3-sankey rewrites node.value to
-// max(incoming, outgoing), which overstates notEligible when its demographic split overhangs
-const trueValues = new Map(sankeyNodes.map((node) => [node.id, node.value]));
 const graph = sankey<DiagramNode, DiagramLink>()
   .nodeId((node) => node.id)
   .nodeAlign(sankeyLeft)
@@ -338,7 +335,6 @@ const graph = sankey<DiagramNode, DiagramLink>()
           : 1),
     })),
 }) as { nodes: LayoutNode[]; links: LayoutLink[] };
-for (const node of graph.nodes) node.value = trueValues.get(node.id) ?? node.value;
 const path = sankeyLinkHorizontal<DiagramNode, DiagramLink>();
 // ponytail: 210px is a rough label-width estimate for "fits right of the node";
 // end-anchored callouts stack top-down with a fixed 44px gap
