@@ -21,6 +21,14 @@ Election URLs use `/:state/:year/`, with lowercase state slugs. Berlin is availa
 at `/berlin/2023/`. `/` lists the states, and `/:state/` lists available election
 years. The old `/2023/` route is removed.
 
+Berlin 2023 is the current gold standard for data completeness and presentation,
+including the Sankey chart itself and its info annotations. Use the rendered
+`/berlin/2023/` page as the reference; see [the benchmark in PRODUCT.md](PRODUCT.md#current-gold-standard-berlin-2023).
+Completeness includes residents below voting age and residents excluded by
+citizenship, usually requiring additional official demographic data beyond
+election results. Population, age, and citizenship data must have reference dates
+close to the election date; disclose any timing gaps or mismatches between sources.
+
 `src/data/states.ts` lists all 16 states with their latest completed election date
 and official result link, verified against the Bundeswahlleiterin on 5 September
 2026. Upcoming elections are excluded. Update this catalog after an election;
