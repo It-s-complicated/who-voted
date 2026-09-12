@@ -4,14 +4,21 @@ import "@fontsource-variable/fraunces";
 import "../styles/global.css";
 import Breadcrumbs from "./Breadcrumbs.astro";
 
+interface Link {
+  href: string;
+  label: string;
+  note?: string;
+}
+
 interface Props {
   title: string;
   description: string;
-  links: { href: string; label: string; note?: string }[];
+  links?: Link[];
+  groups?: { label: string; href?: string; links: Link[] }[];
   breadcrumbs?: { label: string; href?: string; home?: boolean }[];
 }
 
-const { title, description, links, breadcrumbs } = Astro.props;
+const { title, description, links, groups, breadcrumbs } = Astro.props;
 ---
 
 <!doctype html>
@@ -30,7 +37,18 @@ const { title, description, links, breadcrumbs } = Astro.props;
         <h1>{title}</h1>
         <p>{description}</p>
       </header>
-      {links.length > 0 ? (
+      {groups ? (
+        <ul>
+          {groups.map(({ label, href, links: yearLinks }) => (
+            <li>
+              <a href={href}>{label}</a>
+              {yearLinks.map(({ href, label }) => (
+                <a class="year" href={href}>{label}</a>
+              ))}
+            </li>
+          ))}
+        </ul>
+      ) : links && links.length > 0 ? (
         <ul>
           {links.map(({ href, label, note }) => (
             <li><a href={href}>{label}</a>{note && <span>{note}</span>}</li>
@@ -50,5 +68,6 @@ const { title, description, links, breadcrumbs } = Astro.props;
   li { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0.25rem 1.5rem; padding: 1rem 0; border-bottom: 1px solid var(--divider); }
   li a { font-size: 1.5rem; font-weight: 600; padding: 0.25rem 0; }
   li span { color: var(--text-muted); }
+  li a.year { font-size: 1rem; font-weight: 400; }
   .empty { margin-top: 1.5rem; }
 </style>

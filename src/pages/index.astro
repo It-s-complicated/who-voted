@@ -5,10 +5,12 @@ import { states } from "../data/states";
 
 <RouteIndex
   title="Wer hat gewählt?"
-  description="Wahlbeteiligung im Verhältnis zur Bevölkerung. Wähle ein Bundesland aus."
-  links={Object.entries(states).map(([state, { name, latestElection }]) => ({
-    href: `/${state}/`,
+  description="Wahlbeteiligung im Verhältnis zur Bevölkerung. Wähle ein Bundesland und Wahljahr aus."
+  groups={Object.entries(states).map(([state, { name, years }]) => ({
     label: name,
-    note: `Letzte Wahl: ${new Intl.DateTimeFormat("de-DE").format(new Date(latestElection))}`,
+    href: `/${state}/`,
+    links: years
+      .toSorted((a, b) => b - a)
+      .map((year) => ({ href: `/${state}/${year}/`, label: String(year) })),
   }))}
 />
