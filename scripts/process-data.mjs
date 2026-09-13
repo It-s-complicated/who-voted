@@ -1,6 +1,10 @@
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { states as stateCatalog } from '../src/data/states.ts';
+import { stateSources } from './state-sources.mjs';
+import { validateElection } from './validate-election.mjs';
+import { populationSnapshot } from './population.mjs';
 
 function pdfPage(file, firstPage, lastPage = firstPage) {
   return execFileSync(
@@ -528,15 +532,170 @@ async function bremenData() {
   };
 }
 
+// --- Other states ---
+
+// ponytail: these two retained official HTML table layouts are fixed;
+// use an HTML parser if the publishers change the markup beyond these tables.
+function htmlRows(html) {
+  return [...html.matchAll(/<tr\b[^>]*>([\s\S]*?)<\/tr>/g)].map((row) =>
+    [...row[1].matchAll(/<t[hd]\b[^>]*>([\s\S]*?)<\/t[hd]>/g)].map((cell) =>
+      cell[1].replace(/<[^>]*>/g, '').replace(/&(?:amp|nbsp|auml|ouml|uuml|Auml|Ouml|Uuml|szlig);/g,
+        (entity) => ({ '&amp;': '&', '&nbsp;': ' ', '&auml;': 'ä', '&ouml;': 'ö', '&uuml;': 'ü', '&Auml;': 'Ä', '&Ouml;': 'Ö', '&Uuml;': 'Ü', '&szlig;': 'ß' })[entity])
+        .replace(/\s+/g, ' ').trim(),
+    ),
+  );
+}
+
+function officialCount(value) {
+  if (value === '–' || value === '-') return 0;
+  if (typeof value !== 'string' || !/^\d[\d. ]*$/.test(value)) throw new Error(`Invalid official count: ${value}`);
+  return Number(value.replace(/[. ]/g, ''));
+}
+
+async function otherStateData(route, sources) {
+  const [slug, yearText] = route.split('/');
+  const year = Number(yearText);
+  const state = stateCatalog[slug];
+  const electionDate = sources.results.electionDate;
+  let eligible, voters, invalid, valid, parties;
+  const votesPerVoter = slug === 'bayern' ? 2 : 1;
+  const voteLabel = ({ bayern: 'Gesamtstimmen', saarland: 'Stimmen', hessen: 'Landesstimmen', 'rheinland-pfalz': 'Landesstimmen' })[slug] ?? 'Zweitstimmen';
+
+  if (route === 'sachsen-anhalt/2026') {
+    const html = await readFile(sources.results.file, 'utf8');
+    const widgets = [...html.matchAll(/<script[^>]*type="application\/json"[^>]*>([\s\S]*?)<\/script>/g)]
+      .map((match) => JSON.parse(match[1]).x?.tag?.attribs);
+    const table = widgets.find((widget) => widget?.elementId === 'ergtable')?.data;
+    if (!table || !/2661\s+von\s+2661\s+Wahlbezirken/.test(html)) throw new Error('Incomplete Sachsen-Anhalt 2026 results');
+    const counts = table['anzahl.wj.x'];
+    [eligible, voters, , invalid, valid] = counts;
+    parties = table.merkmal.slice(5).flatMap((label, index) => {
+      const votes = counts[index + 5];
+      if (votes === 'NA') return [];
+      if (!Number.isSafeInteger(votes) || votes < 0) throw new Error('Invalid Sachsen-Anhalt party count');
+      return [{ name: label.replaceAll('&shy;', '').replace(/<[^>]*>/g, ''), votes }];
+    });
+  } else if (slug === 'brandenburg') {
+    const text = pdfPage(sources.results.file, 1);
+    eligible = firstCount(lineStartingWith(text, 'Wahlberechtigte '));
+    voters = firstCount(lineStartingWith(text, 'Wähler / Wahlbeteiligung'));
+    const secondCount = (label) => {
+      const fields = lineStartingWith(text, label).trim().split(/\s{2,}/);
+      return officialCount(fields.at(-2));
+    };
+    invalid = secondCount('Ungültige Stimmen insgesamt');
+    valid = secondCount('Gültige Stimmen insgesamt');
+    parties = ['SPD', 'AfD', 'CDU', 'GRÜNE/B 90', 'DIE LINKE', 'BVB / FREIE WÄHLER', 'FDP', 'Tierschutzpartei', 'Plus', 'BSW', 'III. Weg', 'DKP', 'DLW', 'WU']
+      .map((name) => ({ name: name === 'GRÜNE/B 90' ? 'GRÜNE' : name, votes: secondCount(name) }));
+  } else if (slug === 'rheinland-pfalz') {
+    const { shared, sheets } = xlsxSheets(sources.results.file);
+    const rows = xlsxRows(sheets.LW_2026_WK, shared);
+    const districts = rows.filter((row) => row[1] === 'G' && /^\d \d{3}$/.test(String(row[0]).trim()));
+    assertEqual(districts.length, 52, 'Rheinland-Pfalz constituencies');
+    const row = {};
+    for (const col of ['I', 'J', 'AU', 'AW', 'AY', 'BA', 'BC', 'BE', 'BG', 'BI', 'BK', 'BM', 'BO', 'BQ', 'BS', 'BU']) {
+      row[colIndex(col)] = districts.reduce((sum, district) => {
+        const value = district[colIndex(col)];
+        if (!Number.isSafeInteger(value) || value < 0) throw new Error(`Missing Rheinland-Pfalz ${col} count`);
+        return sum + value;
+      }, 0);
+    }
+    eligible = row[colIndex('I')];
+    voters = row[colIndex('J')];
+    invalid = row[colIndex('AU')];
+    valid = row[colIndex('AW')];
+    parties = ['AY', 'BA', 'BC', 'BE', 'BG', 'BI', 'BK', 'BM', 'BO', 'BQ', 'BS', 'BU'].map((col) => ({
+      name: rows[2][colIndex(col)], votes: row[colIndex(col)],
+    }));
+
+  } else {
+    const html = await readFile(sources.results.file, 'utf8');
+    const table = html.match(/<table\b[^>]*>[\s\S]*?Wahlberechtigte[\s\S]*?<\/table>/)?.[0];
+    if (!table || !html.includes(String(year))) throw new Error(`${slug}: missing results table`);
+    const rows = htmlRows(table).filter((row) => row.length > 1);
+    const col = slug === 'baden-wuerttemberg' ? 4 : ['bayern', 'saarland'].includes(slug) ? 1 : 3;
+    const value = (label) => officialCount(rows.find((row) => row[0].startsWith(label))?.[col]);
+    eligible = value('Wahlberechtigte');
+    voters = value('Wähl');
+    invalid = value('Ungültige');
+    valid = value('Gültige');
+    const start = rows.findIndex((row) => row[0].startsWith('Gültige')) + 1;
+    parties = rows.slice(start).filter((row) => !(row[0].startsWith('Einzelbewerb') && row[col] === '')).map((row) => ({
+      name: row[0].replace(/ \(.*\)$/, ''), votes: officialCount(row[col]),
+    })).filter((party) => party.votes > 0);
+  }
+  parties.sort((a, b) => b.votes - a.votes);
+
+  const { referenceDate, basis } = sources.population;
+  const votingAge = ['baden-wuerttemberg', 'brandenburg', 'schleswig-holstein'].includes(slug) ? 16 : 18;
+  const { residents, underVotingAge, nonGermanVotingAgeOrOlder } = populationSnapshot(sources.population, state.name, votingAge);
+  const date = new Intl.DateTimeFormat('de-DE', { dateStyle: 'long' }).format(new Date(electionDate));
+  const notEligible = residents - eligible;
+  // ponytail: when the demographic split overhangs the register total (timing/revision noise),
+  // keep the counts in the annotation and omit the Sankey split — rendering them anyway
+  // would draw more people leaving notEligible than entering it (see NONVOTER_BREAKDOWN.md)
+  const overhang = underVotingAge + nonGermanVotingAgeOrOlder > notEligible;
+  const breakdown = overhang ? null : {
+    underVotingAge,
+    nonGermanVotingAgeOrOlder,
+    otherOrTimingDifference: notEligible - underVotingAge - nonGermanVotingAgeOrOlder,
+  };
+  const format = new Intl.NumberFormat('de-DE');
+  return {
+    data: {
+      id: `${slug}-ltw-${year}`, year,
+      title: `Landtagswahl in ${state.name}`,
+      electionDate,
+      resultStatus: sources.results.resultStatus ?? 'final',
+      votingAge,
+      eyebrow: `Landtagswahl · ${voteLabel}`,
+      intro: `Von der Bevölkerung über die Wahlbeteiligung bis zu den gültigen ${voteLabel} bei der Landtagswahl am ${date}.`,
+      population: {
+        residents, referenceDate, basis, sourceId: 'population',
+        demographics: {
+          referenceDate, underVotingAge, nonGermanVotingAgeOrOlder,
+          method: 'direct', sourceIds: ['population'],
+          ...(basis === 'Zensus 2022' ? { note: 'Zensuswerte sind durch das Geheimhaltungsverfahren leicht verändert; Summen können geringfügig abweichen.' } : {}),
+        },
+      },
+      eligibility: {
+        eligible,
+        notEligible,
+        estimatedBreakdown: breakdown,
+        ...(overhang ? { note: `Die Bevölkerungsstatistik zählt ${format.format(underVotingAge)} Personen unter ${votingAge} Jahren und ${format.format(nonGermanVotingAgeOrOlder)} nichtdeutsche Personen ab ${votingAge} Jahren. Ihre Summe übersteigt die aus Bevölkerung minus Wahlberechtigten berechnete Gruppe um ${format.format(underVotingAge + nonGermanVotingAgeOrOlder - notEligible)} Personen. Bevölkerungsstatistik und Wählerverzeichnis unterscheiden sich in Stichtag, Erhebungsmethode und Revisionsstand.` } : {}),
+      },
+      turnout: { voters, nonVoters: eligible - voters },
+      secondVotes: {
+        label: `Gültige ${voteLabel}`, valid, votesPerVoter,
+        noValidSecondVote: voters * votesPerVoter - valid,
+        invalid,
+        noSecondVote: voters * votesPerVoter - valid - invalid,
+        noValidLabel: slug === 'bayern' ? 'Ungültige / fehlende Stimmen' : `Keine gültige ${voteLabel === 'Stimmen' ? 'Stimme' : voteLabel === 'Landesstimmen' ? 'Landesstimme' : 'Zweitstimme'}`,
+        parties,
+      },
+      ...(slug === 'bayern' ? { unitNote: 'In Bayern zählen Erst- und Zweitstimmen zusammen für die Sitzverteilung. Jede Person hat zwei Stimmen. Ab den gültigen Gesamtstimmen zeigen die Bänder Stimmen geteilt durch zwei; sie lassen sich nicht einzelnen Personen zuordnen.' } : {}),
+      sources: null,
+    },
+    sourceFiles: Object.fromEntries(
+      Object.entries(sources)
+        .map(([id, source]) => [id, source.file]),
+    ),
+  };
+}
+
 // --- assembly ---
 
 const states = {
-  berlin: berlinData(),
-  hamburg: hamburgData(),
-  bremen: await bremenData(),
+  'berlin/2023': berlinData(),
+  'hamburg/2025': hamburgData(),
+  'bremen/2023': await bremenData(),
 };
+for (const [route, sources] of Object.entries(stateSources)) {
+  states[route] = await otherStateData(route, sources);
+}
 
-for (const [state, parsed] of Object.entries(states)) {
+for (const [route, parsed] of Object.entries(states)) {
+  const state = route.split('/')[0];
   const manifest = JSON.parse(
     await readFile(`data/raw/${state}/${parsed.data.year}/sources.json`, 'utf8'),
   );
@@ -549,13 +708,32 @@ for (const [state, parsed] of Object.entries(states)) {
       assertEqual(sha256, manifestSources[id].sha256, `${state} ${id} checksum`);
       return {
         ...manifestSources[id],
-        retrievedAt: manifest.retrievedAt,
-        publisher: parsed.publisher,
-        license: parsed.license,
+        retrievedAt: manifestSources[id].retrievedAt ?? manifest.retrievedAt,
+        publisher: manifestSources[id].publisher ?? parsed.publisher,
+        license: manifestSources[id].license ?? parsed.license,
       };
     }),
   );
 
+  const population = parsed.data.population;
+  if (!population.demographics) {
+    const { underVotingAge, nonGermanVotingAgeOrOlder } = parsed.data.eligibility.estimatedBreakdown;
+    population.basis = state === 'bremen' ? 'Bevölkerungsfortschreibung auf Basis des Zensus 2022' : 'Einwohnermelderegister';
+    population.sourceId = state === 'hamburg' ? 'register' : 'population';
+    population.demographics = {
+      referenceDate: population.referenceDate, underVotingAge, nonGermanVotingAgeOrOlder,
+      method: state === 'hamburg' ? 'estimated' : 'direct',
+      sourceIds: state === 'hamburg' ? ['register', 'foreign', 'population'] : ['population'],
+      ...(state === 'hamburg' ? { note: 'Die Unter-16-Zahlen sind geschätzt: Unter-18-Bestände des Melderegisters werden mit dem Altersverhältnis der Bevölkerungsfortschreibung umgerechnet, auch für nichtdeutsche Minderjährige. Eine direkte Auszählung nach Alter und Staatsangehörigkeit liegt hier nicht vor.' } : {}),
+    };
+  }
+  const gap = Math.round((Date.parse(population.referenceDate) - Date.parse(parsed.data.electionDate)) / 86400000);
+  const demographicGap = Math.round((Date.parse(population.demographics.referenceDate) - Date.parse(parsed.data.electionDate)) / 86400000);
+  population.note = gap === 0 ? 'Die Bevölkerungsdaten beziehen sich auf den Wahltag.'
+    : `Der Bevölkerungsstichtag liegt ${Math.abs(gap)} Tage ${gap > 0 ? 'nach' : 'vor'} der Wahl. Alter und Staatsangehörigkeit beziehen sich auf den demografischen Stichtag, nicht auf den Wahltag.`;
+  if (Math.abs(demographicGap) > 90) population.note += ' Der zeitliche Abstand schränkt die Vergleichbarkeit mit der Wahl ein; eine nähere, zusammenpassende Aufteilung nach Alter und Staatsangehörigkeit ist hier nicht verfügbar.';
+
+  validateElection(parsed.data);
   const year = parsed.data.year;
   await mkdir(`public/data/${state}`, { recursive: true });
   await writeFile(

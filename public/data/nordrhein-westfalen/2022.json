@@ -1,0 +1,187 @@
+{
+  "id": "nordrhein-westfalen-ltw-2022",
+  "year": 2022,
+  "title": "Landtagswahl in Nordrhein-Westfalen",
+  "electionDate": "2022-05-15",
+  "resultStatus": "final",
+  "votingAge": 18,
+  "eyebrow": "Landtagswahl · Zweitstimmen",
+  "intro": "Von der Bevölkerung über die Wahlbeteiligung bis zu den gültigen Zweitstimmen bei der Landtagswahl am 15. Mai 2022.",
+  "population": {
+    "residents": 17890489,
+    "referenceDate": "2022-05-15",
+    "basis": "Zensus 2022",
+    "sourceId": "population",
+    "demographics": {
+      "referenceDate": "2022-05-15",
+      "underVotingAge": 3024274,
+      "nonGermanVotingAgeOrOlder": 2110762,
+      "method": "direct",
+      "sourceIds": [
+        "population"
+      ],
+      "note": "Zensuswerte sind durch das Geheimhaltungsverfahren leicht verändert; Summen können geringfügig abweichen."
+    },
+    "note": "Die Bevölkerungsdaten beziehen sich auf den Wahltag."
+  },
+  "eligibility": {
+    "eligible": 12965858,
+    "notEligible": 4924631,
+    "estimatedBreakdown": null,
+    "note": "Die Bevölkerungsstatistik zählt 3.024.274 Personen unter 18 Jahren und 2.110.762 nichtdeutsche Personen ab 18 Jahren. Ihre Summe übersteigt die aus Bevölkerung minus Wahlberechtigten berechnete Gruppe um 210.405 Personen. Bevölkerungsstatistik und Wählerverzeichnis unterscheiden sich in Stichtag, Erhebungsmethode und Revisionsstand."
+  },
+  "turnout": {
+    "voters": 7200293,
+    "nonVoters": 5765565
+  },
+  "secondVotes": {
+    "label": "Gültige Zweitstimmen",
+    "valid": 7146831,
+    "votesPerVoter": 1,
+    "noValidSecondVote": 53462,
+    "invalid": 53462,
+    "noSecondVote": 0,
+    "noValidLabel": "Keine gültige Zweitstimme",
+    "parties": [
+      {
+        "name": "CDU",
+        "votes": 2552276
+      },
+      {
+        "name": "SPD",
+        "votes": 1905002
+      },
+      {
+        "name": "GRÜNE",
+        "votes": 1299821
+      },
+      {
+        "name": "FDP",
+        "votes": 418460
+      },
+      {
+        "name": "AfD",
+        "votes": 388768
+      },
+      {
+        "name": "DIE LINKE",
+        "votes": 146634
+      },
+      {
+        "name": "Die PARTEI",
+        "votes": 76006
+      },
+      {
+        "name": "Tierschutzpartei",
+        "votes": 75811
+      },
+      {
+        "name": "dieBasis",
+        "votes": 60084
+      },
+      {
+        "name": "FREIE WÄHLER",
+        "votes": 49985
+      },
+      {
+        "name": "Volt",
+        "votes": 45177
+      },
+      {
+        "name": "PIRATEN",
+        "votes": 19248
+      },
+      {
+        "name": "Team Todenhöfer",
+        "votes": 14799
+      },
+      {
+        "name": "FAMILIE",
+        "votes": 14684
+      },
+      {
+        "name": "ÖDP",
+        "votes": 9664
+      },
+      {
+        "name": "LIEBE",
+        "votes": 8235
+      },
+      {
+        "name": "Die Humanisten",
+        "votes": 8211
+      },
+      {
+        "name": "Gesundheitsforschung",
+        "votes": 6833
+      },
+      {
+        "name": "LfK",
+        "votes": 6364
+      },
+      {
+        "name": "PdF",
+        "votes": 6154
+      },
+      {
+        "name": "Volksabstimmung",
+        "votes": 5606
+      },
+      {
+        "name": "Die Urbane.",
+        "votes": 5201
+      },
+      {
+        "name": "BIG",
+        "votes": 4222
+      },
+      {
+        "name": "ZENTRUM",
+        "votes": 4162
+      },
+      {
+        "name": "DSP",
+        "votes": 3839
+      },
+      {
+        "name": "MLPD",
+        "votes": 3354
+      },
+      {
+        "name": "DKP",
+        "votes": 3049
+      },
+      {
+        "name": "DIE VIOLETTEN",
+        "votes": 2990
+      },
+      {
+        "name": "neo",
+        "votes": 2192
+      }
+    ]
+  },
+  "sources": [
+    {
+      "id": "results",
+      "url": "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-5.html",
+      "file": "data/raw/nordrhein-westfalen/2022/results.html",
+      "publisher": "Die Bundeswahlleiterin",
+      "location": "Ergebnis der Landtagswahl, Landesergebnis",
+      "electionDate": "2022-05-15",
+      "retrievedAt": "2026-09-05T21:35:54.233Z",
+      "sha256": "6fcfdf6fe0d3c092164f7da255321fa52f11d5f9fd84468fe3e11ad4bfba1431"
+    },
+    {
+      "id": "population",
+      "url": "https://ergebnisse.zensus2022.de/proxy/api/rest/tables/1000A-2012/download/ffcsv/de",
+      "file": "data/raw/population/zensus-1000A-2012-flat.zip",
+      "publisher": "Statistische Ämter des Bundes und der Länder",
+      "location": "Zensus 2022, Tabelle 1000A-2012, Bundesländer, Altersjahre, Staatsangehörigkeit",
+      "referenceDate": "2022-05-15",
+      "basis": "Zensus 2022",
+      "retrievedAt": "2026-09-12T20:47:32.392Z",
+      "sha256": "7ab237b6d372886e1fc2f21e44682597e2637dda2f01dd3b3f6eb1b88c517704"
+    }
+  ]
+}

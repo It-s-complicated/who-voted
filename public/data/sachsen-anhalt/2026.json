@@ -1,0 +1,131 @@
+{
+  "id": "sachsen-anhalt-ltw-2026",
+  "year": 2026,
+  "title": "Landtagswahl in Sachsen-Anhalt",
+  "electionDate": "2026-09-06",
+  "resultStatus": "preliminary",
+  "votingAge": 18,
+  "eyebrow": "Landtagswahl · Zweitstimmen",
+  "intro": "Von der Bevölkerung über die Wahlbeteiligung bis zu den gültigen Zweitstimmen bei der Landtagswahl am 6. September 2026.",
+  "population": {
+    "residents": 2120252,
+    "referenceDate": "2025-12-31",
+    "basis": "Bevölkerungsfortschreibung auf Basis des Zensus 2022",
+    "sourceId": "population",
+    "demographics": {
+      "referenceDate": "2025-12-31",
+      "underVotingAge": 313614,
+      "nonGermanVotingAgeOrOlder": 130492,
+      "method": "direct",
+      "sourceIds": [
+        "population"
+      ]
+    },
+    "note": "Der Bevölkerungsstichtag liegt 249 Tage vor der Wahl. Alter und Staatsangehörigkeit beziehen sich auf den demografischen Stichtag, nicht auf den Wahltag. Der zeitliche Abstand schränkt die Vergleichbarkeit mit der Wahl ein; eine nähere, zusammenpassende Aufteilung nach Alter und Staatsangehörigkeit ist hier nicht verfügbar."
+  },
+  "eligibility": {
+    "eligible": 1706851,
+    "notEligible": 413401,
+    "estimatedBreakdown": null,
+    "note": "Die Bevölkerungsstatistik zählt 313.614 Personen unter 18 Jahren und 130.492 nichtdeutsche Personen ab 18 Jahren. Ihre Summe übersteigt die aus Bevölkerung minus Wahlberechtigten berechnete Gruppe um 30.705 Personen. Bevölkerungsstatistik und Wählerverzeichnis unterscheiden sich in Stichtag, Erhebungsmethode und Revisionsstand."
+  },
+  "turnout": {
+    "voters": 1328211,
+    "nonVoters": 378640
+  },
+  "secondVotes": {
+    "label": "Gültige Zweitstimmen",
+    "valid": 1315315,
+    "votesPerVoter": 1,
+    "noValidSecondVote": 12896,
+    "invalid": 12896,
+    "noSecondVote": 0,
+    "noValidLabel": "Keine gültige Zweitstimme",
+    "parties": [
+      {
+        "name": "AfD",
+        "votes": 576037
+      },
+      {
+        "name": "CDU",
+        "votes": 226622
+      },
+      {
+        "name": "SPD",
+        "votes": 122303
+      },
+      {
+        "name": "GRÜNE",
+        "votes": 117498
+      },
+      {
+        "name": "Die Linke",
+        "votes": 112541
+      },
+      {
+        "name": "BSW",
+        "votes": 69291
+      },
+      {
+        "name": "FDP",
+        "votes": 33969
+      },
+      {
+        "name": "FREIE WÄHLER",
+        "votes": 15430
+      },
+      {
+        "name": "Tierschutzpartei",
+        "votes": 14356
+      },
+      {
+        "name": "Gartenpartei",
+        "votes": 7482
+      },
+      {
+        "name": "TIERSCHUTZALLIANZ",
+        "votes": 7283
+      },
+      {
+        "name": "Volt",
+        "votes": 4339
+      },
+      {
+        "name": "Die PARTEI",
+        "votes": 3487
+      },
+      {
+        "name": "PdF",
+        "votes": 2778
+      },
+      {
+        "name": "dieBasis",
+        "votes": 1899
+      }
+    ]
+  },
+  "sources": [
+    {
+      "id": "results",
+      "url": "https://wahlergebnisse.sachsen-anhalt.de/wahlen/lt26/erg_land.html",
+      "file": "data/raw/sachsen-anhalt/2026/results.html",
+      "publisher": "Statistisches Landesamt Sachsen-Anhalt",
+      "resultStatus": "preliminary",
+      "location": "Landesergebnis, eingebettete Tabelle ergtable, Zweitstimmen (anzahl.wj.x)",
+      "electionDate": "2026-09-06",
+      "retrievedAt": "2026-09-12T20:47:32.392Z",
+      "sha256": "2309c8f7cbffcd0a9865674801a4367c47ba38427675de5ea31201981f4f9e04"
+    },
+    {
+      "id": "population",
+      "url": "https://genesis.destatis.de/genesis/api/rest/tables/12411-0014/download/ffcsv/de",
+      "file": "data/raw/population/genesis-12411-0014-flat.zip",
+      "publisher": "Statistisches Bundesamt (Destatis)",
+      "location": "Tabelle 12411-0014, Bevölkerung nach Altersjahren und Nationalität, Stichtag 31.12.",
+      "referenceDate": "2025-12-31",
+      "basis": "Bevölkerungsfortschreibung auf Basis des Zensus 2022",
+      "retrievedAt": "2026-09-05T21:35:51.599Z",
+      "sha256": "890d1386cbf9c19e97d750792c6c068c00c7141d8cd4c286f633ec0a8dbc736c"
+    }
+  ]
+}

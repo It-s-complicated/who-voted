@@ -1,0 +1,27 @@
+{
+  "retrievedAt": "2026-09-12T20:47:32.392Z",
+  "sources": [
+    {
+      "id": "results",
+      "url": "https://wahlergebnisse.sachsen-anhalt.de/wahlen/lt26/erg_land.html",
+      "file": "data/raw/sachsen-anhalt/2026/results.html",
+      "publisher": "Statistisches Landesamt Sachsen-Anhalt",
+      "resultStatus": "preliminary",
+      "location": "Landesergebnis, eingebettete Tabelle ergtable, Zweitstimmen (anzahl.wj.x)",
+      "electionDate": "2026-09-06",
+      "retrievedAt": "2026-09-12T20:47:32.392Z",
+      "sha256": "2309c8f7cbffcd0a9865674801a4367c47ba38427675de5ea31201981f4f9e04"
+    },
+    {
+      "id": "population",
+      "url": "https://genesis.destatis.de/genesis/api/rest/tables/12411-0014/download/ffcsv/de",
+      "file": "data/raw/population/genesis-12411-0014-flat.zip",
+      "publisher": "Statistisches Bundesamt (Destatis)",
+      "location": "Tabelle 12411-0014, Bevölkerung nach Altersjahren und Nationalität, Stichtag 31.12.",
+      "referenceDate": "2025-12-31",
+      "basis": "Bevölkerungsfortschreibung auf Basis des Zensus 2022",
+      "retrievedAt": "2026-09-05T21:35:51.599Z",
+      "sha256": "890d1386cbf9c19e97d750792c6c068c00c7141d8cd4c286f633ec0a8dbc736c"
+    }
+  ]
+}

@@ -1,0 +1,146 @@
+{
+  "id": "saarland-ltw-2022",
+  "year": 2022,
+  "title": "Landtagswahl in Saarland",
+  "electionDate": "2022-03-27",
+  "resultStatus": "final",
+  "votingAge": 18,
+  "eyebrow": "Landtagswahl · Stimmen",
+  "intro": "Von der Bevölkerung über die Wahlbeteiligung bis zu den gültigen Stimmen bei der Landtagswahl am 27. März 2022.",
+  "population": {
+    "residents": 1006864,
+    "referenceDate": "2022-05-15",
+    "basis": "Zensus 2022",
+    "sourceId": "population",
+    "demographics": {
+      "referenceDate": "2022-05-15",
+      "underVotingAge": 152278,
+      "nonGermanVotingAgeOrOlder": 105403,
+      "method": "direct",
+      "sourceIds": [
+        "population"
+      ],
+      "note": "Zensuswerte sind durch das Geheimhaltungsverfahren leicht verändert; Summen können geringfügig abweichen."
+    },
+    "note": "Der Bevölkerungsstichtag liegt 49 Tage nach der Wahl. Alter und Staatsangehörigkeit beziehen sich auf den demografischen Stichtag, nicht auf den Wahltag."
+  },
+  "eligibility": {
+    "eligible": 746307,
+    "notEligible": 260557,
+    "estimatedBreakdown": {
+      "underVotingAge": 152278,
+      "nonGermanVotingAgeOrOlder": 105403,
+      "otherOrTimingDifference": 2876
+    }
+  },
+  "turnout": {
+    "voters": 458113,
+    "nonVoters": 288194
+  },
+  "secondVotes": {
+    "label": "Gültige Stimmen",
+    "valid": 452411,
+    "votesPerVoter": 1,
+    "noValidSecondVote": 5702,
+    "invalid": 5702,
+    "noSecondVote": 0,
+    "noValidLabel": "Keine gültige Stimme",
+    "parties": [
+      {
+        "name": "SPD",
+        "votes": 196801
+      },
+      {
+        "name": "CDU",
+        "votes": 129154
+      },
+      {
+        "name": "AfD",
+        "votes": 25719
+      },
+      {
+        "name": "GRÜNE",
+        "votes": 22598
+      },
+      {
+        "name": "FDP",
+        "votes": 21618
+      },
+      {
+        "name": "DIE LINKE",
+        "votes": 11689
+      },
+      {
+        "name": "Tierschutzpartei",
+        "votes": 10391
+      },
+      {
+        "name": "FREIE WÄHLER",
+        "votes": 7636
+      },
+      {
+        "name": "dieBasis",
+        "votes": 6448
+      },
+      {
+        "name": "bunt.saar",
+        "votes": 6216
+      },
+      {
+        "name": "Die PARTEI",
+        "votes": 4716
+      },
+      {
+        "name": "FAMILIE",
+        "votes": 3836
+      },
+      {
+        "name": "Volt",
+        "votes": 2645
+      },
+      {
+        "name": "PIRATEN",
+        "votes": 1318
+      },
+      {
+        "name": "ÖPD",
+        "votes": 613
+      },
+      {
+        "name": "SGV",
+        "votes": 412
+      },
+      {
+        "name": "Gesundheitsforschung",
+        "votes": 368
+      },
+      {
+        "name": "Die Humanistien",
+        "votes": 233
+      }
+    ]
+  },
+  "sources": [
+    {
+      "id": "results",
+      "url": "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-10.html",
+      "file": "data/raw/saarland/2022/results.html",
+      "publisher": "Die Bundeswahlleiterin",
+      "location": "Ergebnis der Landtagswahl, Landesergebnis",
+      "electionDate": "2022-03-27",
+      "retrievedAt": "2026-09-05T21:35:54.415Z",
+      "sha256": "3238a89a316ac37e58fb7a03b6a2a6a6c38003f60b77fee13f963a014c18bc38"
+    },
+    {
+      "id": "population",
+      "url": "https://ergebnisse.zensus2022.de/proxy/api/rest/tables/1000A-2012/download/ffcsv/de",
+      "file": "data/raw/population/zensus-1000A-2012-flat.zip",
+      "publisher": "Statistische Ämter des Bundes und der Länder",
+      "location": "Zensus 2022, Tabelle 1000A-2012, Bundesländer, Altersjahre, Staatsangehörigkeit",
+      "referenceDate": "2022-05-15",
+      "basis": "Zensus 2022",
+      "retrievedAt": "2026-09-12T20:47:32.392Z",
+      "sha256": "7ab237b6d372886e1fc2f21e44682597e2637dda2f01dd3b3f6eb1b88c517704"
+    }
+  ]
+}

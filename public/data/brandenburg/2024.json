@@ -1,0 +1,126 @@
+{
+  "id": "brandenburg-ltw-2024",
+  "year": 2024,
+  "title": "Landtagswahl in Brandenburg",
+  "electionDate": "2024-09-22",
+  "resultStatus": "final",
+  "votingAge": 16,
+  "eyebrow": "Landtagswahl · Zweitstimmen",
+  "intro": "Von der Bevölkerung über die Wahlbeteiligung bis zu den gültigen Zweitstimmen bei der Landtagswahl am 22. September 2024.",
+  "population": {
+    "residents": 2556747,
+    "referenceDate": "2024-12-31",
+    "basis": "Bevölkerungsfortschreibung auf Basis des Zensus 2022",
+    "sourceId": "population",
+    "demographics": {
+      "referenceDate": "2024-12-31",
+      "underVotingAge": 362385,
+      "nonGermanVotingAgeOrOlder": 149574,
+      "method": "direct",
+      "sourceIds": [
+        "population"
+      ]
+    },
+    "note": "Der Bevölkerungsstichtag liegt 100 Tage nach der Wahl. Alter und Staatsangehörigkeit beziehen sich auf den demografischen Stichtag, nicht auf den Wahltag. Der zeitliche Abstand schränkt die Vergleichbarkeit mit der Wahl ein; eine nähere, zusammenpassende Aufteilung nach Alter und Staatsangehörigkeit ist hier nicht verfügbar."
+  },
+  "eligibility": {
+    "eligible": 2076920,
+    "notEligible": 479827,
+    "estimatedBreakdown": null,
+    "note": "Die Bevölkerungsstatistik zählt 362.385 Personen unter 16 Jahren und 149.574 nichtdeutsche Personen ab 16 Jahren. Ihre Summe übersteigt die aus Bevölkerung minus Wahlberechtigten berechnete Gruppe um 32.132 Personen. Bevölkerungsstatistik und Wählerverzeichnis unterscheiden sich in Stichtag, Erhebungsmethode und Revisionsstand."
+  },
+  "turnout": {
+    "voters": 1513975,
+    "nonVoters": 562945
+  },
+  "secondVotes": {
+    "label": "Gültige Zweitstimmen",
+    "valid": 1501619,
+    "votesPerVoter": 1,
+    "noValidSecondVote": 12356,
+    "invalid": 12356,
+    "noSecondVote": 0,
+    "noValidLabel": "Keine gültige Zweitstimme",
+    "parties": [
+      {
+        "name": "SPD",
+        "votes": 463800
+      },
+      {
+        "name": "AfD",
+        "votes": 438904
+      },
+      {
+        "name": "BSW",
+        "votes": 202421
+      },
+      {
+        "name": "CDU",
+        "votes": 181716
+      },
+      {
+        "name": "GRÜNE",
+        "votes": 62057
+      },
+      {
+        "name": "DIE LINKE",
+        "votes": 44706
+      },
+      {
+        "name": "BVB / FREIE WÄHLER",
+        "votes": 38573
+      },
+      {
+        "name": "Tierschutzpartei",
+        "votes": 30041
+      },
+      {
+        "name": "Plus",
+        "votes": 13584
+      },
+      {
+        "name": "FDP",
+        "votes": 12475
+      },
+      {
+        "name": "DLW",
+        "votes": 6633
+      },
+      {
+        "name": "WU",
+        "votes": 3878
+      },
+      {
+        "name": "III. Weg",
+        "votes": 1810
+      },
+      {
+        "name": "DKP",
+        "votes": 1021
+      }
+    ]
+  },
+  "sources": [
+    {
+      "id": "results",
+      "url": "https://wahlen.brandenburg.de/sixcms/media.php/9/1.%20Landesergebnis%20gesamt_Internet.pdf",
+      "file": "data/raw/brandenburg/2024/results.pdf",
+      "publisher": "Landeswahlleiter Brandenburg",
+      "location": "PDF-Seite 1, Land Brandenburg, Zweitstimmen",
+      "electionDate": "2024-09-22",
+      "retrievedAt": "2026-09-05T21:35:53.462Z",
+      "sha256": "736e85de5af12e8cb0c8e0103667b81c77b01bbc503bc83c05c4090834b55deb"
+    },
+    {
+      "id": "population",
+      "url": "https://genesis.destatis.de/genesis/api/rest/tables/12411-0014/download/ffcsv/de",
+      "file": "data/raw/population/genesis-12411-0014-flat.zip",
+      "publisher": "Statistisches Bundesamt (Destatis)",
+      "location": "Tabelle 12411-0014, Bevölkerung nach Altersjahren und Nationalität, Stichtag 31.12.",
+      "referenceDate": "2024-12-31",
+      "basis": "Bevölkerungsfortschreibung auf Basis des Zensus 2022",
+      "retrievedAt": "2026-09-05T21:35:53.462Z",
+      "sha256": "890d1386cbf9c19e97d750792c6c068c00c7141d8cd4c286f633ec0a8dbc736c"
+    }
+  ]
+}

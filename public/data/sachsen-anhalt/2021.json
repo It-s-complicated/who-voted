@@ -1,0 +1,158 @@
+{
+  "id": "sachsen-anhalt-ltw-2021",
+  "year": 2021,
+  "title": "Landtagswahl in Sachsen-Anhalt",
+  "electionDate": "2021-06-06",
+  "resultStatus": "final",
+  "votingAge": 18,
+  "eyebrow": "Landtagswahl · Zweitstimmen",
+  "intro": "Von der Bevölkerung über die Wahlbeteiligung bis zu den gültigen Zweitstimmen bei der Landtagswahl am 6. Juni 2021.",
+  "population": {
+    "residents": 2180684,
+    "referenceDate": "2020-12-31",
+    "basis": "Bevölkerungsfortschreibung auf Basis des Zensus 2011",
+    "sourceId": "population",
+    "demographics": {
+      "referenceDate": "2020-12-31",
+      "underVotingAge": 322661,
+      "nonGermanVotingAgeOrOlder": 87889,
+      "method": "direct",
+      "sourceIds": [
+        "population"
+      ]
+    },
+    "note": "Der Bevölkerungsstichtag liegt 157 Tage vor der Wahl. Alter und Staatsangehörigkeit beziehen sich auf den demografischen Stichtag, nicht auf den Wahltag. Der zeitliche Abstand schränkt die Vergleichbarkeit mit der Wahl ein; eine nähere, zusammenpassende Aufteilung nach Alter und Staatsangehörigkeit ist hier nicht verfügbar."
+  },
+  "eligibility": {
+    "eligible": 1788930,
+    "notEligible": 391754,
+    "estimatedBreakdown": null,
+    "note": "Die Bevölkerungsstatistik zählt 322.661 Personen unter 18 Jahren und 87.889 nichtdeutsche Personen ab 18 Jahren. Ihre Summe übersteigt die aus Bevölkerung minus Wahlberechtigten berechnete Gruppe um 18.796 Personen. Bevölkerungsstatistik und Wählerverzeichnis unterscheiden sich in Stichtag, Erhebungsmethode und Revisionsstand."
+  },
+  "turnout": {
+    "voters": 1079045,
+    "nonVoters": 709885
+  },
+  "secondVotes": {
+    "label": "Gültige Zweitstimmen",
+    "valid": 1063697,
+    "votesPerVoter": 1,
+    "noValidSecondVote": 15348,
+    "invalid": 15348,
+    "noSecondVote": 0,
+    "noValidLabel": "Keine gültige Zweitstimme",
+    "parties": [
+      {
+        "name": "CDU",
+        "votes": 394810
+      },
+      {
+        "name": "AfD",
+        "votes": 221487
+      },
+      {
+        "name": "DIE LINKE",
+        "votes": 116927
+      },
+      {
+        "name": "SPD",
+        "votes": 89475
+      },
+      {
+        "name": "FDP",
+        "votes": 68277
+      },
+      {
+        "name": "GRÜNE",
+        "votes": 63145
+      },
+      {
+        "name": "FREIE WÄHLER",
+        "votes": 33291
+      },
+      {
+        "name": "dieBasis",
+        "votes": 15623
+      },
+      {
+        "name": "Tierschutzpartei",
+        "votes": 15279
+      },
+      {
+        "name": "Gartenpartei",
+        "votes": 8583
+      },
+      {
+        "name": "Die PARTEI",
+        "votes": 7768
+      },
+      {
+        "name": "Tierschutz hier!",
+        "votes": 6238
+      },
+      {
+        "name": "Tierschutzallianz",
+        "votes": 5109
+      },
+      {
+        "name": "Gesundheitsforschung",
+        "votes": 3951
+      },
+      {
+        "name": "PIRATEN",
+        "votes": 3815
+      },
+      {
+        "name": "NPD",
+        "votes": 2888
+      },
+      {
+        "name": "WiR2020",
+        "votes": 1649
+      },
+      {
+        "name": "FBM",
+        "votes": 1613
+      },
+      {
+        "name": "Die Humanisten",
+        "votes": 1405
+      },
+      {
+        "name": "ÖDP",
+        "votes": 1062
+      },
+      {
+        "name": "Klimaliste ST",
+        "votes": 827
+      },
+      {
+        "name": "LKR",
+        "votes": 475
+      }
+    ]
+  },
+  "sources": [
+    {
+      "id": "results",
+      "url": "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-15.html",
+      "file": "data/raw/sachsen-anhalt/2021/results.html",
+      "publisher": "Die Bundeswahlleiterin",
+      "electionDate": "2021-06-06",
+      "location": "Landtagswahl 2021, Landesergebnis",
+      "retrievedAt": "2026-09-05T21:35:54.495Z",
+      "sha256": "604a6c8c10bf14b60ddab1c2b1baf38c49835f31978655df702d0dacd2ea31e8"
+    },
+    {
+      "id": "population",
+      "url": "https://genesis.destatis.de/genesis/api/rest/tables/12411-0014/download/ffcsv/de",
+      "file": "data/raw/population/genesis-12411-0014-flat.zip",
+      "publisher": "Statistisches Bundesamt (Destatis)",
+      "location": "Tabelle 12411-0014, Bevölkerung nach Altersjahren und Nationalität, Stichtag 31.12.",
+      "referenceDate": "2020-12-31",
+      "basis": "Bevölkerungsfortschreibung auf Basis des Zensus 2011",
+      "retrievedAt": "2026-09-05T21:35:54.495Z",
+      "sha256": "890d1386cbf9c19e97d750792c6c068c00c7141d8cd4c286f633ec0a8dbc736c"
+    }
+  ]
+}
