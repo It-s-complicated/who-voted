@@ -388,7 +388,7 @@ const callouts = [
     }),
 ];
 const sourceLabels: Record<string, string> = {
-  results: "endgültiges Wahlergebnis",
+  results: data.resultStatus === "preliminary" ? "vorläufiges Wahlergebnis" : "endgültiges Wahlergebnis",
   population: "Bevölkerungsstand",
   breakdown: "Bevölkerung nach Altersjahren und Nationalität",
   structure: "Strukturdaten",

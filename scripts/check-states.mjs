@@ -15,7 +15,10 @@ for (const [slug, state] of Object.entries(states)) {
   for (const year of state.years) {
     const data = JSON.parse(readFileSync(`public/data/${slug}/${year}.json`, 'utf8'));
     assert.equal(data.year, year);
-    assert.ok(readFileSync(`dist/${slug}/${year}/index.html`, 'utf8').includes('<svg'));
+    const diagram = readFileSync(`dist/${slug}/${year}/index.html`, 'utf8');
+    assert.ok(diagram.includes('<svg'));
+    const resultLabel = data.resultStatus === 'preliminary' ? 'vorläufiges' : 'endgültiges';
+    assert.ok(diagram.includes(`: ${resultLabel} Wahlergebnis</a>`), `${slug}/${year}: source result status`);
   }
 }
 console.log('Verified all 16 state pages, diagram links, and available diagrams.');
