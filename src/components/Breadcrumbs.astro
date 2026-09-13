@@ -9,33 +9,39 @@ const { items } = Astro.props;
 ---
 
 <nav aria-label="Breadcrumbs">
-  <ol>
-    {
-      items.map((item, index) => (
-        <li>
-          {item.href ? (
-            <a href={item.href}>
-              {item.home ? (
-                <>
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V10Z" />
-                  </svg>
-                  <span class="sr-only">{item.label}</span>
-                </>
-              ) : (
-                item.label
-              )}
-            </a>
-          ) : (
-            <span
-              aria-current={index === items.length - 1 ? "page" : undefined}
-            >
-              {item.label}
-            </span>
-          )}
-        </li>
-      ))
-    }
+  <ol itemscope itemtype="https://schema.org/BreadcrumbList">
+    {items.map((item, index) => (
+      <li
+        itemprop="itemListElement"
+        itemscope
+        itemtype="https://schema.org/ListItem"
+      >
+        {item.href ? (
+          <a href={item.href} itemprop="item">
+            {item.home ? (
+              <>
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V10Z" />
+                </svg>
+                <span class="sr-only" itemprop="name">
+                  {item.label}
+                </span>
+              </>
+            ) : (
+              item.label
+            )}
+          </a>
+        ) : (
+          <span
+            aria-current={index === items.length - 1 ? "page" : undefined}
+            itemprop="name"
+          >
+            {item.label}
+          </span>
+        )}
+        <meta itemprop="position" content={(index + 1).toString()} />
+      </li>
+    ))}
   </ol>
 </nav>
 
