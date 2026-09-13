@@ -631,14 +631,12 @@ async function otherStateData(route, sources) {
   const { residents, underVotingAge, nonGermanVotingAgeOrOlder } = populationSnapshot(sources.population, state.name, votingAge);
   const date = new Intl.DateTimeFormat('de-DE', { dateStyle: 'long' }).format(new Date(electionDate));
   const notEligible = residents - eligible;
-  // ponytail: when the demographic split overhangs the register total (timing/revision noise),
-  // keep the counts in the annotation and omit the Sankey split — rendering them anyway
-  // would draw more people leaving notEligible than entering it (see NONVOTER_BREAKDOWN.md)
+  // Preserve source counts; the chart estimates its split proportionally.
   const overhang = underVotingAge + nonGermanVotingAgeOrOlder > notEligible;
-  const breakdown = overhang ? null : {
+  const breakdown = {
     underVotingAge,
     nonGermanVotingAgeOrOlder,
-    otherOrTimingDifference: notEligible - underVotingAge - nonGermanVotingAgeOrOlder,
+    otherOrTimingDifference: Math.max(0, notEligible - underVotingAge - nonGermanVotingAgeOrOlder),
   };
   const format = new Intl.NumberFormat('de-DE');
   return {

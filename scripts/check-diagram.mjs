@@ -29,17 +29,31 @@ for (const route of routes) {
     if (party.name.toLowerCase() === 'die linke') assert.ok(band.attrs.includes('fill="#bd4598"'));
   }
   if (data.eligibility.note) assert.ok(html.includes(data.eligibility.note), `${route}: split overhang annotation`);
-  if (data.eligibility.estimatedBreakdown) {
-    for (const label of [`Unter ${data.votingAge}`, `Nichtdeutsch, ${data.votingAge}+`]) {
-      assert.ok(node(label).height > 0, `${route}: demographic branch remains in the diagram`);
-    }
-    if (data.eligibility.estimatedBreakdown.otherOrTimingDifference > 0) {
-      assert.ok(node('Sonstige Differenz*').height > 0, `${route}: residual branch remains in the diagram`);
-    }
-  } else {
-    assert.ok(!rects.some((rect) => /Unter \d|Sonstige Differenz/.test(rect[2])), `${route}: no invented demographics`);
-    assert.ok(html.includes(data.eligibility.note));
+  const breakdown = data.eligibility.estimatedBreakdown;
+  assert.ok(breakdown, `${route}: demographic breakdown available`);
+  const total = breakdown.underVotingAge + breakdown.nonGermanVotingAgeOrOlder;
+  const scale = node('Einwohner:innen').height / data.population.residents;
+  for (const [label, count] of [
+    [`Unter ${data.votingAge}*`, breakdown.underVotingAge],
+    [`Nichtdeutsch, ${data.votingAge}+*`, breakdown.nonGermanVotingAgeOrOlder],
+  ]) {
+    const estimate = data.eligibility.notEligible * count / total;
+    assert.ok(Math.abs(node(label).height - estimate * scale) < 1e-10, `${route}: proportional demographic estimate`);
+    assert.equal(node(label).title, `${label}: ca. ${new Intl.NumberFormat('de-DE').format(Math.round(estimate / 1000) * 1000)} · ~${Math.round(estimate / data.population.residents * 100)} %`, `${route}: rounded estimate label`);
+    assert.ok(html.includes(`${label.replace(/\*$/, "")} (Bevölkerungsstatistik)`), `${route}: original data identified in table`);
+    assert.ok(html.includes(new Intl.NumberFormat('de-DE').format(count)), `${route}: source count retained`);
   }
+  const nonEligible = node('Nicht wahlberechtigt');
+  assert.ok(nonEligible.title.includes(new Intl.NumberFormat('de-DE').format(data.eligibility.notEligible)), `${route}: unchanged non-eligible count`);
+  assert.ok(Math.abs(nonEligible.height - data.eligibility.notEligible * scale) < 1e-10, `${route}: truthful non-eligible width`);
+  assert.ok(Math.abs(nonEligible.height - node(`Unter ${data.votingAge}*`).height - node(`Nichtdeutsch, ${data.votingAge}+*`).height) < 1e-10, `${route}: estimated flow balances`);
+  assert.ok(Math.abs(node('Einwohner:innen').height - node('Wahlberechtigt').height - nonEligible.height) < 1e-10, `${route}: population is 100 percent`);
+  assert.ok(!svg.includes('Statistische Differenz') && !svg.includes('Sonstige Differenz'), `${route}: no reconciliation ribbons`);
+  assert.ok(!svg.includes('Geschätzte Aufteilung'), `${route}: no extra estimate heading`);
+  assert.ok(html.includes('* Geschätzte Aufteilung:'), `${route}: asterisks explained in caption`);
+  assert.ok(html.includes('proportional an die rechnerische Zahl'), `${route}: estimation explained`);
+  const difference = data.eligibility.notEligible - total;
+  if (difference !== 0) assert.ok(html.includes(`${new Intl.NumberFormat('de-DE').format(difference)} Personen`), `${route}: signed source discrepancy retained`);
   if (data.ballots) {
     assert.equal(valid.title, `${validLabel}: ${percent(data.secondVotes.valid)}`);
     const unused = node('Nicht ausgeschöpfte Stimmen');

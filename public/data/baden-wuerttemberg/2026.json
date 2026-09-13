@@ -26,7 +26,11 @@
   "eligibility": {
     "eligible": 7764858,
     "notEligible": 3473903,
-    "estimatedBreakdown": null,
+    "estimatedBreakdown": {
+      "underVotingAge": 1719555,
+      "nonGermanVotingAgeOrOlder": 1777879,
+      "otherOrTimingDifference": 0
+    },
     "note": "Die Bevölkerungsstatistik zählt 1.719.555 Personen unter 16 Jahren und 1.777.879 nichtdeutsche Personen ab 16 Jahren. Ihre Summe übersteigt die aus Bevölkerung minus Wahlberechtigten berechnete Gruppe um 23.531 Personen. Bevölkerungsstatistik und Wählerverzeichnis unterscheiden sich in Stichtag, Erhebungsmethode und Revisionsstand."
   },
   "turnout": {

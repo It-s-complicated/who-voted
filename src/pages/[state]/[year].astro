@@ -23,6 +23,7 @@ type DiagramNode = {
   label: string;
   value: number;
   voteUnit?: boolean;
+  sourceValue?: number;
   color: string;
   order: number;
   callout?: boolean;
@@ -48,7 +49,11 @@ const format = new Intl.NumberFormat("de-DE");
 function percentage(value: number): string {
   return `${((value / data.population.residents) * 100).toFixed(1).replace(".", ",")} %`;
 }
-function nodeValue(node: DiagramNode, value = node.value): string {
+function nodeValue(
+  node: DiagramNode,
+  value = node.value,
+): string {
+  if (node.sourceValue !== undefined) return `ca. ${format.format(Math.round(value / 1000) * 1000)} · ~${Math.round(value / data.population.residents * 100)} %`;
   return node.voteUnit && data.secondVotes.votesPerVoter > 1
     ? percentage(value)
     : `${format.format(value)} · ${percentage(value)}`;
@@ -86,6 +91,16 @@ const ballots = data.ballots;
 const votesPerVoter = data.secondVotes.votesPerVoter;
 const multiVote = votesPerVoter > 1;
 const breakdown = data.eligibility.estimatedBreakdown;
+const demographicTotal = breakdown
+  ? breakdown.underVotingAge + breakdown.nonGermanVotingAgeOrOlder
+  : 0;
+const estimatedUnderAge = demographicTotal > 0 && breakdown
+  ? data.eligibility.notEligible * breakdown.underVotingAge / demographicTotal
+  : 0;
+const estimatedNonGerman = demographicTotal > 0
+  ? data.eligibility.notEligible - estimatedUnderAge
+  : 0;
+const demographicDifference = data.eligibility.notEligible - demographicTotal;
 const noValidLabel = data.secondVotes.noValidLabel ?? "Keine gültige Zweitstimme";
 const unusedVotes = ballots
   ? ballots.valid * votesPerVoter - data.secondVotes.valid
@@ -140,28 +155,22 @@ const nodes: DiagramNode[] = [
     color: "#b5b4b4",
     order: 1,
   },
-  ...(breakdown ? [
+  ...(breakdown && demographicTotal > 0 ? [
   {
     id: "underAge",
-    label: `Unter ${data.votingAge}`,
-    value: breakdown.underVotingAge,
+    label: `Unter ${data.votingAge}*`,
+    value: estimatedUnderAge,
+    sourceValue: breakdown.underVotingAge,
     color: "#aaa8a8",
     order: 2,
   },
   {
     id: "nonGerman",
-    label: `Nichtdeutsch, ${data.votingAge}+`,
-    value: breakdown.nonGermanVotingAgeOrOlder,
+    label: `Nichtdeutsch, ${data.votingAge}+*`,
+    value: estimatedNonGerman,
+    sourceValue: breakdown.nonGermanVotingAgeOrOlder,
     color: "#c8c6c7",
     order: 3,
-  },
-  {
-    id: "eligibilityResidual",
-    label: "Sonstige Differenz*",
-    value: breakdown.otherOrTimingDifference,
-    color: "#dad9d9",
-    order: 4,
-    callout: true,
   },
   ].filter((node) => node.value > 0) : []),
   {
@@ -249,21 +258,16 @@ const links: DiagramLink[] = [
   },
   { source: "eligible", target: "voters", value: data.turnout.voters },
   { source: "eligible", target: "nonVoters", value: data.turnout.nonVoters },
-  ...(breakdown ? [
+  ...(breakdown && demographicTotal > 0 ? [
   {
     source: "notEligible",
     target: "underAge",
-    value: breakdown.underVotingAge,
+    value: estimatedUnderAge,
   },
   {
     source: "notEligible",
     target: "nonGerman",
-    value: breakdown.nonGermanVotingAgeOrOlder,
-  },
-  {
-    source: "notEligible",
-    target: "eligibilityResidual",
-    value: breakdown.otherOrTimingDifference,
+    value: estimatedNonGerman,
   },
   ] : []),
   {
@@ -396,7 +400,12 @@ const sourceLinks = data.sources.map((source) => ({
   label: `${source.publisher}: ${sourceLabels[source.id] ?? source.id}`,
 }));
 const tableRows = [
-  ...nodes.filter((node) => !node.id.startsWith("party-") && node.value > 0),
+  ...nodes.filter((node) => !node.id.startsWith("party-") && node.value > 0)
+    .map((node) => node.sourceValue === undefined ? node : {
+      ...node,
+      label: `${node.label.replace(/\*$/, "")} (Bevölkerungsstatistik)`,
+      value: node.sourceValue,
+    }),
   ...displayedParties.map((party) => ({
     label: party.name,
     value: party.votes,
@@ -537,7 +546,7 @@ const tableRows = [
                   )
                   .map((node) => (
                     <text
-                      x={node.y0 + 3}
+                      text-anchor={node.id === "nonGerman" ? "end" : "start"}
                       y={
                         node.id === "nonVoters"
                           ? node.x1 + 18
@@ -546,8 +555,8 @@ const tableRows = [
                             : node.x0 - 24
                       }
                     >
-                      <tspan x={node.y0 + 3}>{node.label}</tspan>
-                      <tspan x={node.y0 + 3} dy="15">
+                      <tspan x={node.id === "nonGerman" ? node.y1 - 3 : node.y0 + 3}>{node.label}</tspan>
+                      <tspan x={node.id === "nonGerman" ? node.y1 - 3 : node.y0 + 3} dy="15">
                         {nodeValue(node)}
                       </tspan>
                     </text>
@@ -596,9 +605,20 @@ const tableRows = [
         </div>
         <figcaption>
           {breakdown && (
-            <p>* Die Aufteilung der nicht Wahlberechtigten ist eine Schätzung.
-              Melderegister und Wählerverzeichnis haben unterschiedliche Stichtage und Revisionsstände;
-              Mindestwohndauer und Wahlrechtsausschlüsse sind nicht vollständig abbildbar.</p>
+            <p><strong>* Geschätzte Aufteilung:</strong> Die Anteile für Alter und Staatsangehörigkeit
+              wurden aus Bevölkerungsdaten abgeleitet und proportional an die rechnerische Zahl
+              der nicht Wahlberechtigten angepasst. Dabei nehmen wir an, dass das Verhältnis
+              der beiden Gruppen übertragbar ist und sie die Gruppe vollständig abdecken.
+              Unterschiedliche Stichtage und Erhebungsgrundlagen verhindern eine exakte Aufteilung.
+              Die Prozentwerte beziehen sich auf alle Einwohner:innen und sind auf ganze Prozent
+              gerundet. Die geschätzten Personenzahlen sind mit „ca.“ gekennzeichnet und auf Tausender
+              gerundet; die Bandbreiten verwenden die ungerundeten Schätzwerte.
+              Die Tabelle enthält die ursprünglichen Bevölkerungszahlen.</p>
+          )}
+          {breakdown && demographicDifference !== 0 && (
+            <p>Abweichung der Ausgangsdaten: Bevölkerung minus Wahlberechtigte minus beide
+              Bevölkerungsgruppen = {format.format(demographicDifference)} Personen.
+              Diese Differenz ist keine zusätzliche Bevölkerungsgruppe.</p>
           )}
           {data.eligibility.note && <p>{data.eligibility.note}</p>}
           {data.population.basis && <p>Bevölkerungsgrundlage: {data.population.basis}, Stand {populationDate}.</p>}

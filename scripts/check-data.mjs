@@ -30,10 +30,10 @@ for (const [slug, state] of Object.entries(states)) {
     if (resultCounts) assert.deepEqual([data.eligibility.eligible, data.turnout.voters, data.secondVotes.valid], resultCounts, slug);
     const demographics = data.population.demographics;
     const knownSplit = demographics.underVotingAge + demographics.nonGermanVotingAgeOrOlder;
-    assert.deepEqual(data.eligibility.estimatedBreakdown, knownSplit > data.eligibility.notEligible ? null : {
+    assert.deepEqual(data.eligibility.estimatedBreakdown, {
       underVotingAge: demographics.underVotingAge,
       nonGermanVotingAgeOrOlder: demographics.nonGermanVotingAgeOrOlder,
-      otherOrTimingDifference: data.eligibility.notEligible - knownSplit,
+      otherOrTimingDifference: Math.max(0, data.eligibility.notEligible - knownSplit),
     }, `${slug}: breakdown`);
     // Independently break each conservation boundary: validation must reject it.
     for (const corrupt of [
