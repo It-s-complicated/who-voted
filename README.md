@@ -53,4 +53,5 @@ at `data/raw/<state>/<year>/`, and shared exports at `data/raw/population/`.
 `pnpm data:download <state>/<year>` refreshes sources; `pnpm data:build` validates
 and converts them. `pnpm test` also checks demographic parser failures, invalid
 metadata, vote conservation, generated pages and Sankey geometry.
-Add verified sources and a parser before enabling another diagram year.
+To add another diagram year, follow [Adding an election](ADDING_AN_ELECTION.md)
+for the required data, official evidence, pipeline changes, and validation.
