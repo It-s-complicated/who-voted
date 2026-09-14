@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import { mkdir, writeFile } from 'node:fs/promises';
-import { dirname } from 'node:path';
+import { dirname, extname } from 'node:path';
 import { states } from '../src/data/states.ts';
 import { stateSources } from './state-sources.mjs';
 
@@ -73,8 +73,13 @@ for (const [directory, files] of Object.entries(sources)) {
       if (!valid) throw new Error(`${source.url}: unexpected file type`);
       downloaded.set(dedupeKey, bytes);
     }
-    pending.push({ file: source.file, bytes });
-    manifest.sources.push({ ...metadata, sha256: createHash('sha256').update(bytes).digest('hex') });
+    const sha256 = createHash('sha256').update(bytes).digest('hex');
+    // Shared exports must never overwrite files referenced by another election.
+    const file = source.file.startsWith('data/raw/population/')
+      ? source.file.replace(/\.[^.]+$/, `-${sha256}${extname(source.file)}`)
+      : source.file;
+    pending.push({ file, bytes });
+    manifest.sources.push({ ...metadata, file, sha256 });
   }
   for (const { file, bytes } of pending) {
     await mkdir(dirname(file), { recursive: true });

@@ -688,7 +688,11 @@ const states = {
   'bremen/2023': await bremenData(),
 };
 for (const [route, sources] of Object.entries(stateSources)) {
-  states[route] = await otherStateData(route, sources);
+  const manifest = JSON.parse(await readFile(`data/raw/${route}/sources.json`, 'utf8'));
+  const recordedSources = Object.fromEntries(manifest.sources.map((source) => [
+    source.id, { ...sources[source.id], file: source.file },
+  ]));
+  states[route] = await otherStateData(route, recordedSources);
 }
 
 for (const [route, parsed] of Object.entries(states)) {
