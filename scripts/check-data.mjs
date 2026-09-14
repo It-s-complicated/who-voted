@@ -1,8 +1,28 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { states } from '../src/data/states.ts';
+import { states, summarizeState } from '../src/data/states.ts';
+import { stateSources } from './state-sources.mjs';
 import { parsePopulationRows } from './population.mjs';
 import { validateElection } from './validate-election.mjs';
+
+// A newer election must change the summary without changing historical metadata.
+const historical = structuredClone(states['sachsen-anhalt'].elections);
+const extended = { name: 'Sachsen-Anhalt', elections: structuredClone(historical) };
+extended.elections[2031] = { electionDate: '2031-09-07', url: 'https://example.org/2031/results.html' };
+const summary = summarizeState(extended);
+assert.equal(summary.latestElection, '2031-09-07');
+assert.equal(summary.resultsUrl, extended.elections[2031].url);
+assert.deepEqual(summary.years, [2021, 2026, 2031]);
+for (const year of [2021, 2026]) assert.deepEqual(summary.elections[year], historical[year]);
+for (const patch of [
+  { electionDate: undefined }, { electionDate: '2026-02-30' },
+  { electionDate: '2030-09-07' }, { url: undefined }, { url: 'not-a-url' },
+]) {
+  const broken = structuredClone(extended);
+  Object.assign(broken.elections[2026], patch);
+  assert.throws(() => summarizeState(broken), /Sachsen-Anhalt\/2026: missing or invalid/);
+}
+assert.throws(() => summarizeState({ name: 'Empty', elections: {} }), /no elections configured/);
 
 const expected = {
   'baden-wuerttemberg': [7764858, 5406737, 5375109],
@@ -25,6 +45,14 @@ for (const [slug, state] of Object.entries(states)) {
   for (const year of state.years) {
     const data = JSON.parse(readFileSync(`public/data/${slug}/${year}.json`, 'utf8'));
     validateElection(data);
+    const metadata = state.elections[year];
+    assert.equal(data.electionDate, metadata.electionDate);
+    assert.equal(data.sources.find((source) => source.id === 'results').url, metadata.url);
+    const source = stateSources[`${slug}/${year}`]?.results;
+    if (source) {
+      assert.equal(source.electionDate, metadata.electionDate);
+      assert.equal(source.url, metadata.url);
+    }
     if (year === Number(state.latestElection.slice(0, 4))) assert.equal(data.electionDate, state.latestElection);
     const resultCounts = slug === 'sachsen-anhalt' && year === 2026 ? [1706851, 1328211, 1315315] : expected[slug];
     if (resultCounts) assert.deepEqual([data.eligibility.eligible, data.turnout.voters, data.secondVotes.valid], resultCounts, slug);

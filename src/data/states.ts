@@ -1,105 +1,184 @@
-// Latest completed elections; Sachsen-Anhalt updated from the state authority on 2026-09-12.
-// years contains only elections with local diagram datasets.
-export const states: Record<string, {
-  name: string;
-  years: number[];
-  latestElection: string;
-  resultsUrl: string;
-}> = {
+type ElectionMetadata = { electionDate: string; url: string };
+type StateEntry = { name: string; elections: Record<number, ElectionMetadata> };
+
+// Dates and result URLs belong to individual elections, never to a moving "latest" entry.
+export function summarizeState(state: StateEntry) {
+  const entries = Object.entries(state.elections);
+  if (!entries.length) throw new Error(`${state.name}: no elections configured`);
+  for (const [year, election] of entries) {
+    const date = election?.electionDate;
+    if (typeof date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(date)
+      || !Number.isFinite(Date.parse(date)) || new Date(date).toISOString().slice(0, 10) !== date
+      || date.slice(0, 4) !== year) {
+      throw new Error(`${state.name}/${year}: missing or invalid electionDate`);
+    }
+    if (typeof election.url !== 'string' || !URL.canParse(election.url)
+      || new URL(election.url).protocol !== 'https:') {
+      throw new Error(`${state.name}/${year}: missing or invalid results URL`);
+    }
+  }
+  const latest = entries.map(([, election]) => election)
+    .toSorted((a, b) => b.electionDate.localeCompare(a.electionDate))[0];
+  return {
+    ...state,
+    years: entries.map(([year]) => Number(year)),
+    latestElection: latest.electionDate,
+    resultsUrl: latest.url,
+  };
+}
+
+// Only elections with local diagram datasets are listed.
+const catalog: Record<string, StateEntry> = {
   "baden-wuerttemberg": {
     name: "Baden-Württemberg",
-    years: [2026],
-    latestElection: "2026-03-08",
-    resultsUrl: "https://wahlen.statistik-bw.de/ltw26/",
+    elections: {
+      2026: {
+        electionDate: "2026-03-08",
+        url: "https://wahlen.statistik-bw.de/ltw26/"
+      }
+    }
   },
   "bayern": {
     name: "Bayern",
-    years: [2023],
-    latestElection: "2023-10-08",
-    resultsUrl: "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-9.html",
+    elections: {
+      2023: {
+        electionDate: "2023-10-08",
+        url: "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-9.html"
+      }
+    }
   },
   "berlin": {
     name: "Berlin",
-    years: [2023],
-    latestElection: "2023-02-12",
-    resultsUrl: "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-11.html",
+    elections: {
+      2023: {
+        electionDate: "2023-02-12",
+        url: "https://download.statistik-berlin-brandenburg.de/538210b8454f4642/99e340a74910/SB_B07-02-03_2023j05_BE.pdf"
+      }
+    }
   },
   "brandenburg": {
     name: "Brandenburg",
-    years: [2024],
-    latestElection: "2024-09-22",
-    resultsUrl: "https://wahlen.brandenburg.de/sixcms/media.php/9/1.%20Landesergebnis%20gesamt_Internet.pdf",
+    elections: {
+      2024: {
+        electionDate: "2024-09-22",
+        url: "https://wahlen.brandenburg.de/sixcms/media.php/9/1.%20Landesergebnis%20gesamt_Internet.pdf"
+      }
+    }
   },
   "bremen": {
     name: "Bremen",
-    years: [2023],
-    latestElection: "2023-05-14",
-    resultsUrl: "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-4.html",
+    elections: {
+      2023: {
+        electionDate: "2023-05-14",
+        url: "https://www.statistik.bremen.de/sixcms/media.php/13/Statistische%20Mitteilungen_126_pdfa_Auflage2.pdf"
+      }
+    }
   },
   "hamburg": {
     name: "Hamburg",
-    years: [2025],
-    latestElection: "2025-03-02",
-    resultsUrl: "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-2.html",
+    elections: {
+      2025: {
+        electionDate: "2025-03-02",
+        url: "https://www.statistik-nord.de/fileadmin/Dokumente/BUE2025_e_05.pdf"
+      }
+    }
   },
   "hessen": {
     name: "Hessen",
-    years: [2023],
-    latestElection: "2023-10-08",
-    resultsUrl: "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-6.html",
+    elections: {
+      2023: {
+        electionDate: "2023-10-08",
+        url: "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-6.html"
+      }
+    }
   },
   "mecklenburg-vorpommern": {
     name: "Mecklenburg-Vorpommern",
-    years: [2021],
-    latestElection: "2021-09-26",
-    resultsUrl: "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-13.html",
+    elections: {
+      2021: {
+        electionDate: "2021-09-26",
+        url: "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-13.html"
+      }
+    }
   },
   "niedersachsen": {
     name: "Niedersachsen",
-    years: [2022],
-    latestElection: "2022-10-09",
-    resultsUrl: "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-3.html",
+    elections: {
+      2022: {
+        electionDate: "2022-10-09",
+        url: "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-3.html"
+      }
+    }
   },
   "nordrhein-westfalen": {
     name: "Nordrhein-Westfalen",
-    years: [2022],
-    latestElection: "2022-05-15",
-    resultsUrl: "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-5.html",
+    elections: {
+      2022: {
+        electionDate: "2022-05-15",
+        url: "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-5.html"
+      }
+    }
   },
   "rheinland-pfalz": {
     name: "Rheinland-Pfalz",
-    years: [2026],
-    latestElection: "2026-03-22",
-    resultsUrl: "https://www.wahlen.rlp.de/landtagswahl/ergebnisse",
+    elections: {
+      2026: {
+        electionDate: "2026-03-22",
+        url: "https://www.wahlen.rlp.de/fileadmin/wahlen.rlp.de/dokumente-wahlen/ltw/Ergebnisdateien/2026/Endgueltiges_Ergebnis_LW_2026_Wahlkreise.xlsx"
+      }
+    }
   },
   "saarland": {
     name: "Saarland",
-    years: [2022],
-    latestElection: "2022-03-27",
-    resultsUrl: "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-10.html",
+    elections: {
+      2022: {
+        electionDate: "2022-03-27",
+        url: "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-10.html"
+      }
+    }
   },
   "sachsen": {
     name: "Sachsen",
-    years: [2024],
-    latestElection: "2024-09-01",
-    resultsUrl: "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-14.html",
+    elections: {
+      2024: {
+        electionDate: "2024-09-01",
+        url: "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-14.html"
+      }
+    }
   },
   "sachsen-anhalt": {
     name: "Sachsen-Anhalt",
-    years: [2021, 2026],
-    latestElection: "2026-09-06",
-    resultsUrl: "https://wahlergebnisse.sachsen-anhalt.de/wahlen/lt26/erg_land.html",
+    elections: {
+      2021: {
+        electionDate: "2021-06-06",
+        url: "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-15.html"
+      },
+      2026: {
+        electionDate: "2026-09-06",
+        url: "https://wahlergebnisse.sachsen-anhalt.de/wahlen/lt26/erg_land.html"
+      }
+    }
   },
   "schleswig-holstein": {
     name: "Schleswig-Holstein",
-    years: [2022],
-    latestElection: "2022-05-08",
-    resultsUrl: "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-1.html",
+    elections: {
+      2022: {
+        electionDate: "2022-05-08",
+        url: "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-1.html"
+      }
+    }
   },
   "thueringen": {
     name: "Thüringen",
-    years: [2024],
-    latestElection: "2024-09-01",
-    resultsUrl: "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-16.html",
-  },
+    elections: {
+      2024: {
+        electionDate: "2024-09-01",
+        url: "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-16.html"
+      }
+    }
+  }
 };
+
+export const states = Object.fromEntries(
+  Object.entries(catalog).map(([slug, state]) => [slug, summarizeState(state)]),
+);

@@ -28,33 +28,27 @@ const censusPopulation = {
 
 const stateResults = {
   'sachsen-anhalt/2021': {
-    url: 'https://www.bundeswahlleiterin.de/service/landtagswahlen/land-15.html',
     file: 'results.html',
     publisher: 'Die Bundeswahlleiterin',
-    electionDate: '2021-06-06',
     location: 'Landtagswahl 2021, Landesergebnis',
   },
   'sachsen-anhalt/2026': {
-    url: 'https://wahlergebnisse.sachsen-anhalt.de/wahlen/lt26/erg_land.html',
     file: 'results.html',
     publisher: 'Statistisches Landesamt Sachsen-Anhalt',
     resultStatus: 'preliminary',
     location: 'Landesergebnis, eingebettete Tabelle ergtable, Zweitstimmen (anzahl.wj.x)',
   },
   'baden-wuerttemberg/2026': {
-    url: 'https://wahlen.statistik-bw.de/ltw26/',
     file: 'state-results.html',
     publisher: 'Statistisches Landesamt Baden-Württemberg',
     location: 'Ergebnistabelle, Land Baden-Württemberg, Zweitstimmen',
   },
   'brandenburg/2024': {
-    url: 'https://wahlen.brandenburg.de/sixcms/media.php/9/1.%20Landesergebnis%20gesamt_Internet.pdf',
     file: 'results.pdf',
     publisher: 'Landeswahlleiter Brandenburg',
     location: 'PDF-Seite 1, Land Brandenburg, Zweitstimmen',
   },
   'rheinland-pfalz/2026': {
-    url: 'https://www.wahlen.rlp.de/fileadmin/wahlen.rlp.de/dokumente-wahlen/ltw/Ergebnisdateien/2026/Endgueltiges_Ergebnis_LW_2026_Wahlkreise.xlsx',
     file: 'results.xlsx',
     publisher: 'Landeswahlleiter Rheinland-Pfalz',
     location: 'LW_2026_WK, Summe der 52 Wahlkreise (KZ G), Landesstimmen',
@@ -67,16 +61,15 @@ export const stateSources = Object.fromEntries(
     .flatMap(([slug, state]) => state.years.map((year) => {
       const route = `${slug}/${year}`;
       const result = stateResults[route] ?? {
-        url: state.resultsUrl,
         file: 'results.html',
         publisher: 'Die Bundeswahlleiterin',
         location: 'Ergebnis der Landtagswahl, Landesergebnis',
       };
-      const electionDate = result.electionDate ?? state.latestElection;
+      const { electionDate, url } = state.elections[year];
       const census = ['nordrhein-westfalen/2022', 'schleswig-holstein/2022', 'saarland/2022'].includes(route);
       const referenceDate = census ? '2022-05-15' : `${Math.min(2025, Number(electionDate.slice(5, 7)) >= 7 ? year : year - 1)}-12-31`;
       return [route, {
-        results: { ...result, electionDate, file: `data/raw/${route}/${result.file}` },
+        results: { ...result, electionDate, url, file: `data/raw/${route}/${result.file}` },
         population: {
           ...(census ? censusPopulation : annualPopulation),
           referenceDate,

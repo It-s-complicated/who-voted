@@ -31,8 +31,9 @@ close to the election date; disclose any timing gaps or mismatches between sourc
 See [the all-state data availability review](DATA_AVAILABILITY_REVIEW.md) for
 official source alternatives, timing gaps, and remaining demographic data needs.
 
-`src/data/states.ts` lists all 16 states with their latest completed election date
-and official result link, reviewed on 12 September 2026. Sachsen-Anhalt includes
+`src/data/states.ts` lists all 16 states with an explicit date and result source URL
+for each election. Available years, the latest election date and its result link
+are derived from those entries; missing or invalid metadata fails immediately. Sachsen-Anhalt includes
 its preliminary 2026 result as well as 2021; there are 17 election datasets.
 `years` lists only elections with local diagram datasets.
 
