@@ -5,8 +5,8 @@
   "electionDate": "2024-09-01",
   "resultStatus": "final",
   "votingAge": 18,
-  "eyebrow": "Landtagswahl · Zweitstimmen",
-  "intro": "Von der Bevölkerung über die Wahlbeteiligung bis zu den gültigen Zweitstimmen bei der Landtagswahl am 1. September 2024.",
+  "eyebrow": "Landtagswahl · Landesstimmen",
+  "intro": "Von der Bevölkerung über die Wahlbeteiligung bis zu den gültigen Landesstimmen bei der Landtagswahl am 1. September 2024.",
   "population": {
     "residents": 2100277,
     "referenceDate": "2024-12-31",
@@ -38,13 +38,13 @@
     "nonVoters": 437581
   },
   "secondVotes": {
-    "label": "Gültige Zweitstimmen",
+    "label": "Gültige Landesstimmen",
     "valid": 1207883,
     "votesPerVoter": 1,
     "noValidSecondVote": 10206,
     "invalid": 10206,
     "noSecondVote": 0,
-    "noValidLabel": "Keine gültige Zweitstimme",
+    "noValidLabel": "Keine gültige Landesstimme",
     "parties": [
       {
         "name": "AfD",

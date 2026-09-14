@@ -3,6 +3,7 @@ import { execFileSync } from 'node:child_process';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { states as stateCatalog } from '../src/data/states.ts';
 import { stateSources } from './state-sources.mjs';
+import { electionRules } from './election-rules.mjs';
 import { validateElection } from './validate-election.mjs';
 import { populationSnapshot } from './population.mjs';
 
@@ -558,8 +559,7 @@ async function otherStateData(route, sources) {
   const state = stateCatalog[slug];
   const electionDate = sources.results.electionDate;
   let eligible, voters, invalid, valid, parties;
-  const votesPerVoter = slug === 'bayern' ? 2 : 1;
-  const voteLabel = ({ bayern: 'Gesamtstimmen', saarland: 'Stimmen', hessen: 'Landesstimmen', 'rheinland-pfalz': 'Landesstimmen' })[slug] ?? 'Zweitstimmen';
+  const { votingAge, voteLabel, votesPerVoter, resultColumn, unitNote } = electionRules(route);
 
   if (route === 'sachsen-anhalt/2026') {
     const html = await readFile(sources.results.file, 'utf8');
@@ -613,7 +613,7 @@ async function otherStateData(route, sources) {
     const table = html.match(/<table\b[^>]*>[\s\S]*?Wahlberechtigte[\s\S]*?<\/table>/)?.[0];
     if (!table || !html.includes(String(year))) throw new Error(`${slug}: missing results table`);
     const rows = htmlRows(table).filter((row) => row.length > 1);
-    const col = slug === 'baden-wuerttemberg' ? 4 : ['bayern', 'saarland'].includes(slug) ? 1 : 3;
+    const col = resultColumn;
     const value = (label) => officialCount(rows.find((row) => row[0].startsWith(label))?.[col]);
     eligible = value('Wahlberechtigte');
     voters = value('Wähl');
@@ -627,7 +627,6 @@ async function otherStateData(route, sources) {
   parties.sort((a, b) => b.votes - a.votes);
 
   const { referenceDate, basis } = sources.population;
-  const votingAge = ['baden-wuerttemberg', 'brandenburg', 'schleswig-holstein'].includes(slug) ? 16 : 18;
   const { residents, underVotingAge, nonGermanVotingAgeOrOlder } = populationSnapshot(sources.population, state.name, votingAge);
   const date = new Intl.DateTimeFormat('de-DE', { dateStyle: 'long' }).format(new Date(electionDate));
   const notEligible = residents - eligible;
@@ -668,10 +667,10 @@ async function otherStateData(route, sources) {
         noValidSecondVote: voters * votesPerVoter - valid,
         invalid,
         noSecondVote: voters * votesPerVoter - valid - invalid,
-        noValidLabel: slug === 'bayern' ? 'Ungültige / fehlende Stimmen' : `Keine gültige ${voteLabel === 'Stimmen' ? 'Stimme' : voteLabel === 'Landesstimmen' ? 'Landesstimme' : 'Zweitstimme'}`,
+        noValidLabel: votesPerVoter > 1 ? 'Ungültige / fehlende Stimmen' : `Keine gültige ${voteLabel === 'Stimmen' ? 'Stimme' : voteLabel === 'Landesstimmen' ? 'Landesstimme' : 'Zweitstimme'}`,
         parties,
       },
-      ...(slug === 'bayern' ? { unitNote: 'In Bayern zählen Erst- und Zweitstimmen zusammen für die Sitzverteilung. Jede Person hat zwei Stimmen. Ab den gültigen Gesamtstimmen zeigen die Bänder Stimmen geteilt durch zwei; sie lassen sich nicht einzelnen Personen zuordnen.' } : {}),
+      ...(unitNote ? { unitNote } : {}),
       sources: null,
     },
     sourceFiles: Object.fromEntries(

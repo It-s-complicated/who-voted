@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { states, summarizeState } from '../src/data/states.ts';
 import { stateSources } from './state-sources.mjs';
+import { electionRules } from './election-rules.mjs';
 import { parsePopulationRows } from './population.mjs';
 import { validateElection } from './validate-election.mjs';
 
@@ -23,6 +24,17 @@ for (const patch of [
   assert.throws(() => summarizeState(broken), /Sachsen-Anhalt\/2026: missing or invalid/);
 }
 assert.throws(() => summarizeState({ name: 'Empty', elections: {} }), /no elections configured/);
+
+// Unconfigured historical and future elections must never inherit state defaults.
+for (const route of ['baden-wuerttemberg/2021', 'schleswig-holstein/2009', 'sachsen-anhalt/2031', 'unknown/2026', 'toString']) {
+  assert.throws(() => electionRules(route), /missing election rules/);
+}
+const { sources: bwRuleSources, ...bwRules } = electionRules('baden-wuerttemberg/2026');
+assert.deepEqual(bwRules, {
+  votingAge: 16, voteLabel: 'Zweitstimmen', votesPerVoter: 1, resultColumn: 4,
+});
+assert.equal(electionRules('saarland/2022').resultColumn, 1);
+assert.equal(electionRules('sachsen-anhalt/2021').resultColumn, 3);
 
 const expected = {
   'baden-wuerttemberg': [7764858, 5406737, 5375109],
@@ -46,10 +58,20 @@ for (const [slug, state] of Object.entries(states)) {
     const data = JSON.parse(readFileSync(`public/data/${slug}/${year}.json`, 'utf8'));
     validateElection(data);
     const metadata = state.elections[year];
+    const rules = electionRules(`${slug}/${year}`);
+    assert.equal(data.votingAge, rules.votingAge);
+    assert.equal(data.secondVotes.label, `Gültige ${rules.voteLabel}`);
+    assert.equal(data.secondVotes.votesPerVoter, rules.votesPerVoter);
+    assert.ok(rules.sources.length > 0, `${slug}/${year}: official rule references required`);
+    for (const source of rules.sources) {
+      assert.equal(new URL(source.url).protocol, 'https:');
+      assert.ok(source.publisher && source.location);
+    }
     assert.equal(data.electionDate, metadata.electionDate);
     assert.equal(data.sources.find((source) => source.id === 'results').url, metadata.url);
     const source = stateSources[`${slug}/${year}`]?.results;
     if (source) {
+      assert.equal(data.unitNote, rules.unitNote);
       assert.equal(source.electionDate, metadata.electionDate);
       assert.equal(source.url, metadata.url);
     }
