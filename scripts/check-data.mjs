@@ -37,19 +37,20 @@ assert.equal(electionRules('saarland/2022').resultColumn, 1);
 assert.equal(electionRules('sachsen-anhalt/2021').resultColumn, 3);
 
 const expected = {
-  'baden-wuerttemberg': [7764858, 5406737, 5375109],
-  bayern: [9430600, 6895807, 13658782],
-  brandenburg: [2076920, 1513975, 1501619],
-  hessen: [4332235, 2858313, 2813313],
-  'mecklenburg-vorpommern': [1312471, 928807, 913863],
-  niedersachsen: [6064738, 3657967, 3623886],
-  'nordrhein-westfalen': [12965858, 7200293, 7146831],
-  'rheinland-pfalz': [2990064, 2046542, 2028230],
-  saarland: [746307, 458113, 452411],
-  sachsen: [3182683, 2367607, 2347973],
-  'sachsen-anhalt': [1788930, 1079045, 1063697],
-  'schleswig-holstein': [2314417, 1396747, 1387398],
-  thueringen: [1655670, 1218089, 1207883],
+  'baden-wuerttemberg/2026': [7764858, 5406737, 5375109],
+  'bayern/2023': [9430600, 6895807, 13658782],
+  'brandenburg/2024': [2076920, 1513975, 1501619],
+  'hessen/2023': [4332235, 2858313, 2813313],
+  'mecklenburg-vorpommern/2021': [1312471, 928807, 913863],
+  'niedersachsen/2022': [6064738, 3657967, 3623886],
+  'nordrhein-westfalen/2022': [12965858, 7200293, 7146831],
+  'rheinland-pfalz/2026': [2990064, 2046542, 2028230],
+  'saarland/2022': [746307, 458113, 452411],
+  'sachsen/2024': [3182683, 2367607, 2347973],
+  'sachsen-anhalt/2021': [1788930, 1079045, 1063697],
+  'sachsen-anhalt/2026': [1706851, 1328211, 1315315],
+  'schleswig-holstein/2022': [2314417, 1396747, 1387398],
+  'thueringen/2024': [1655670, 1218089, 1207883],
 };
 assert.equal(Object.keys(states).length, 16);
 for (const [slug, state] of Object.entries(states)) {
@@ -76,8 +77,8 @@ for (const [slug, state] of Object.entries(states)) {
       assert.equal(source.url, metadata.url);
     }
     if (year === Number(state.latestElection.slice(0, 4))) assert.equal(data.electionDate, state.latestElection);
-    const resultCounts = slug === 'sachsen-anhalt' && year === 2026 ? [1706851, 1328211, 1315315] : expected[slug];
-    if (resultCounts) assert.deepEqual([data.eligibility.eligible, data.turnout.voters, data.secondVotes.valid], resultCounts, slug);
+    const resultCounts = expected[`${slug}/${year}`];
+    if (resultCounts) assert.deepEqual([data.eligibility.eligible, data.turnout.voters, data.secondVotes.valid], resultCounts, `${slug}/${year}`);
     const demographics = data.population.demographics;
     const knownSplit = demographics.underVotingAge + demographics.nonGermanVotingAgeOrOlder;
     assert.deepEqual(data.eligibility.estimatedBreakdown, {
