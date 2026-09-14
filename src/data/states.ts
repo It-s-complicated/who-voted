@@ -52,7 +52,7 @@ const catalog: Record<string, StateEntry> = {
     elections: {
       2023: {
         electionDate: "2023-02-12",
-        url: "https://download.statistik-berlin-brandenburg.de/538210b8454f4642/99e340a74910/SB_B07-02-03_2023j05_BE.pdf"
+        url: "https://download.statistik-berlin-brandenburg.de/c6fffa8361dd1404/a8cc1bc593d9/DL_BE_AGHBVV2023.xlsx"
       }
     }
   },
@@ -61,7 +61,7 @@ const catalog: Record<string, StateEntry> = {
     elections: {
       2024: {
         electionDate: "2024-09-22",
-        url: "https://wahlen.brandenburg.de/sixcms/media.php/9/1.%20Landesergebnis%20gesamt_Internet.pdf"
+        url: "https://wahlergebnisse.brandenburg.de/12/500/20240922/landtagswahl_land/DL_BB_2_LT2024.xlsx"
       }
     }
   },

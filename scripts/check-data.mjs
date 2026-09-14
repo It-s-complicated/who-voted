@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { states, summarizeState } from '../src/data/states.ts';
 import { stateSources } from './state-sources.mjs';
@@ -35,6 +36,16 @@ assert.deepEqual(bwRules, {
 });
 assert.equal(electionRules('saarland/2022').resultColumn, 1);
 assert.equal(electionRules('sachsen-anhalt/2021').resultColumn, 3);
+
+// Baselines from the PDF imports, independently matched against the official XLSX
+// exports. Lock every non-provenance field, including each party's name and votes.
+for (const [route, expectedHash] of Object.entries({
+  "berlin/2023": "99da6992d97f120f239973ad85a67fcc9b49f229c6f21ba6a18a0cef1972b1d9",
+  "brandenburg/2024": "8804d6d8e3e9261d2223388055ab1be128f9dab870bd002f906339b1ad7b9d59"
+})) {
+  const { sources, ...data } = JSON.parse(readFileSync(`public/data/${route}.json`, 'utf8'));
+  assert.equal(createHash('sha256').update(JSON.stringify(data)).digest('hex'), expectedHash, `${route}: source migration preserves election data`);
+}
 
 const expected = {
   'baden-wuerttemberg/2026': [7764858, 5406737, 5375109],

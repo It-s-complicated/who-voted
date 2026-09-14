@@ -44,9 +44,9 @@ const stateResults = {
     location: 'Ergebnistabelle, Land Baden-Württemberg, Zweitstimmen',
   },
   'brandenburg/2024': {
-    file: 'results.pdf',
-    publisher: 'Landeswahlleiter Brandenburg',
-    location: 'PDF-Seite 1, Land Brandenburg, Zweitstimmen',
+    file: 'results.xlsx',
+    publisher: 'Amt für Statistik Berlin-Brandenburg',
+    location: 'Brandenburg_Landtagswahl_A_2, Landeszeile GI9900, Zweitstimmen (Anzahl)',
   },
   'rheinland-pfalz/2026': {
     file: 'results.xlsx',

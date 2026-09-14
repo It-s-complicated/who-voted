@@ -201,11 +201,12 @@
     },
     {
       "id": "results",
-      "url": "https://download.statistik-berlin-brandenburg.de/538210b8454f4642/99e340a74910/SB_B07-02-03_2023j05_BE.pdf",
-      "file": "data/raw/berlin/2023/results.pdf",
-      "sha256": "5b5b08d6c0f4b1c11bfab91895234801d4ab0227ddcdf02fd79732888cceda4b",
-      "retrievedAt": "2026-09-05T21:35:38.391Z",
+      "url": "https://download.statistik-berlin-brandenburg.de/c6fffa8361dd1404/a8cc1bc593d9/DL_BE_AGHBVV2023.xlsx",
+      "file": "data/raw/berlin/2023/results.xlsx",
+      "sha256": "66cef4c0180b42a8de7ba683579545bd989b51b597c274a6d3a481002ddc2caa",
+      "retrievedAt": "2026-09-14T13:36:34.943Z",
       "publisher": "Amt für Statistik Berlin-Brandenburg",
+      "location": "AGH_W2, Summe aller 3764 Wahlbezirke (Urnen- und Briefwahl), Zweitstimmen",
       "license": "CC BY 3.0 DE"
     }
   ]

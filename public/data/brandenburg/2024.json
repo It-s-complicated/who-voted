@@ -107,13 +107,13 @@
   "sources": [
     {
       "id": "results",
-      "url": "https://wahlen.brandenburg.de/sixcms/media.php/9/1.%20Landesergebnis%20gesamt_Internet.pdf",
-      "file": "data/raw/brandenburg/2024/results.pdf",
-      "publisher": "Landeswahlleiter Brandenburg",
-      "location": "PDF-Seite 1, Land Brandenburg, Zweitstimmen",
+      "url": "https://wahlergebnisse.brandenburg.de/12/500/20240922/landtagswahl_land/DL_BB_2_LT2024.xlsx",
+      "file": "data/raw/brandenburg/2024/results.xlsx",
+      "publisher": "Amt für Statistik Berlin-Brandenburg",
+      "location": "Brandenburg_Landtagswahl_A_2, Landeszeile GI9900, Zweitstimmen (Anzahl)",
       "electionDate": "2024-09-22",
-      "retrievedAt": "2026-09-05T21:35:53.462Z",
-      "sha256": "736e85de5af12e8cb0c8e0103667b81c77b01bbc503bc83c05c4090834b55deb"
+      "retrievedAt": "2026-09-14T13:36:34.943Z",
+      "sha256": "a522dd67f31645c4f8f0a5e413f2bcd3cf493e589ccb59734afcec11afc528e9"
     },
     {
       "id": "population",

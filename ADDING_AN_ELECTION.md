@@ -22,6 +22,10 @@ Use statewide figures for the same election and territory. Keep absolute counts;
 
 Prefer the election authority's results and statistical office's population data. A preliminary result is usable when counting is complete for the whole territory and its status is explicit. Do not substitute a partial count, forecast, or projection for a statewide result. Include small parties in the input; the page groups them for display.
 
+Prefer official CSV or structured API exports, then Excel, then HTML tables; use PDF as a fallback. Choose by completeness and meaning first: the source must cover the required figures, election year, territory, vote category, and result status (or population reference date and basis). A complete final Excel result is preferable to a partial or preliminary CSV. Check column definitions, encoding, delimiters, number formats, and totals even for structured exports.
+
+Existing sources can be replaced after verifying equivalent coverage. Update the downloader configuration, parser, retained file, and manifest together, regenerate the output, and compare every imported count against the previous dataset and official totals. Investigate differences and document any official correction; preserve shared population snapshots used by other elections.
+
 ### Vote categories and ballots
 
 `secondVotes` is the existing field name for the displayed vote category, even when that category has another official name. `votesPerVoter` is the maximum number of votes **in that category**, not the number of choices across every ballot.

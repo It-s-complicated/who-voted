@@ -35,8 +35,8 @@ function assertEqual(actual, expected, message) {
   if (actual !== expected) throw new Error(`${message}: ${actual} !== ${expected}`);
 }
 
-// ponytail: regex XLSX/CSV readers instead of a parser dependency; fine for
-// these three fixed files, swap in a library if a sheet layout ever breaks
+// ponytail: regex XLSX reader for the retained official files; use a library
+// if a new workbook needs unsupported XML features.
 function xlsxSheets(file) {
   const entry = (name) =>
     execFileSync('unzip', ['-p', file, name], { maxBuffer: 256 * 1024 * 1024 }).toString('utf8');
@@ -91,58 +91,33 @@ function berlinData() {
   const sourceFiles = {
     structure: `${rawDirectory}/structure.pdf`,
     population: `${rawDirectory}/population.pdf`,
-    results: `${rawDirectory}/results.pdf`,
+    results: `${rawDirectory}/results.xlsx`,
   };
 
-  const resultText = pdfPage(sourceFiles.results, 128);
+  const { shared, sheets } = xlsxSheets(sourceFiles.results);
+  const [headers, ...districts] = xlsxRows(sheets.AGH_W2, shared);
+  assertEqual(districts.length, 3764, 'Berlin voting districts');
+  assertEqual(new Set(districts.map((row) => row[1])).size, 3764, 'Unique Berlin voting districts');
+  for (const row of districts) assertEqual(row[0], 'Zweitstimme', 'Berlin vote category');
+  const sum = (column) => districts.reduce((total, row) => {
+    const value = row[column];
+    if (!Number.isSafeInteger(value) || value < 0) throw new Error(`Invalid Berlin ${headers[column]} count`);
+    return total + value;
+  }, 0);
+  const value = (label) => sum(Object.keys(headers).find((column) => headers[column] === label));
   const populationText = pdfPage(sourceFiles.population, 6);
   const structureText = pdfPage(sourceFiles.structure, 15, 17);
 
-  const parties = [
-    ['SPD', 'SPD'],
-    ['CDU', 'CDU'],
-    ['GRÜNE', 'GRÜNE'],
-    ['DIE LINKE', 'DIE LINKE'],
-    ['AfD', 'AfD'],
-    ['FDP', 'FDP'],
-    ['Die PARTEI', 'Die PARTEI'],
-    ['Tierschutzpartei', 'Tierschutzpartei'],
-    ['PIRATEN', 'PIRATEN'],
-    ['Graue Panther', 'Graue Panther'],
-    ['NPD', 'NPD'],
-    ['Gesundheitsforschung', 'Gesundheitsforschung'],
-    ['LKR', 'LKR'],
-    ['DKP', 'DKP'],
-    ['SGP', 'SGP'],
-    ['BüSo', 'BüSo'],
-    ['MENSCHLICHE WELT', 'MENSCHLICHE WELT'],
-    ['B*', 'B*'],
-    ['ÖDP', 'ÖDP'],
-    ['dieBasis', 'dieBasis'],
-    ['Bildet Berlin!', 'Bildet Berlin!'],
-    ['Deutsche Konservative', 'Deutsche Konservative'],
-    ['Die Grauen', 'Die Grauen'],
-    ['Neue Demokraten', 'Neue Demokraten'],
-    ['REP', 'REP'],
-    ['du.', 'du.'],
-    ['BÜNDNIS21', 'BÜNDNIS21'],
-    ['FREIE WÄHLER', 'FREIE WÄHLER'],
-    ['Klimaliste Berlin', 'Klimaliste Berlin'],
-    ['MIETERPARTEI', 'MIETERPARTEI'],
-    ['Die Humanisten', 'Die Humanisten'],
-    ['Team Todenhöfer', 'Team Todenhöfer'],
-    ['Volt', 'Volt'],
-  ]
-    .map(([sourceLabel, name]) => ({
-      name,
-      votes: firstCount(lineStartingWith(resultText, sourceLabel)),
-    }))
+  const parties = Object.entries(headers)
+    .filter(([column]) => Number(column) >= colIndex('S'))
+    .map(([column, name]) => ({ name, votes: sum(column) }))
+    .filter((party) => party.votes > 0)
     .sort((a, b) => b.votes - a.votes);
 
-  const eligible = firstCount(lineStartingWith(resultText, 'Wahlberechtigte'));
-  const voters = firstCount(lineStartingWith(resultText, 'Wählende'));
-  const invalidSecondVotes = firstCount(lineStartingWith(resultText, 'Ungültige Stimmen'));
-  const validSecondVotes = firstCount(lineStartingWith(resultText, 'Gültige Stimmen'));
+  const eligible = value('Wahlberechtigte insgesamt');
+  const voters = value('Wählende');
+  const invalidSecondVotes = value('Ungültige Stimmen');
+  const validSecondVotes = value('Gültige Stimmen');
 
   const berlinLine = lineStartingWith(populationText, 'Berlin');
   const residents = firstCount(berlinLine);
@@ -575,18 +550,27 @@ async function otherStateData(route, sources) {
       if (!Number.isSafeInteger(votes) || votes < 0) throw new Error('Invalid Sachsen-Anhalt party count');
       return [{ name: label.replaceAll('&shy;', '').replace(/<[^>]*>/g, ''), votes }];
     });
-  } else if (slug === 'brandenburg') {
-    const text = pdfPage(sources.results.file, 1);
-    eligible = firstCount(lineStartingWith(text, 'Wahlberechtigte '));
-    voters = firstCount(lineStartingWith(text, 'Wähler / Wahlbeteiligung'));
-    const secondCount = (label) => {
-      const fields = lineStartingWith(text, label).trim().split(/\s{2,}/);
-      return officialCount(fields.at(-2));
+  } else if (route === 'brandenburg/2024') {
+    const { shared, sheets } = xlsxSheets(sources.results.file);
+    const [headers, units, ...rows] = xlsxRows(sheets.Brandenburg_Landtagswahl_A_2, shared);
+    const statewide = rows.filter((row) => row[1] === 'GI9900');
+    assertEqual(statewide.length, 1, 'Brandenburg statewide row');
+    const [row] = statewide;
+    assertEqual(row[0], 'Zweitstimme', 'Brandenburg vote category');
+    assertEqual(row[3], 'Brandenburg', 'Brandenburg territory');
+    const countAt = (column) => {
+      const value = row[column];
+      if (!Number.isSafeInteger(value) || value < 0) throw new Error(`Invalid Brandenburg ${headers[column]} count`);
+      return value;
     };
-    invalid = secondCount('Ungültige Stimmen insgesamt');
-    valid = secondCount('Gültige Stimmen insgesamt');
-    parties = ['SPD', 'AfD', 'CDU', 'GRÜNE/B 90', 'DIE LINKE', 'BVB / FREIE WÄHLER', 'FDP', 'Tierschutzpartei', 'Plus', 'BSW', 'III. Weg', 'DKP', 'DLW', 'WU']
-      .map((name) => ({ name: name === 'GRÜNE/B 90' ? 'GRÜNE' : name, votes: secondCount(name) }));
+    const value = (label) => countAt(Object.keys(headers).find((column) => headers[column].replace(/\s+/g, ' ') === label && units[column] === 'Anzahl'));
+    eligible = value('Wahlberechtigte insgesamt');
+    voters = value('Wählende');
+    invalid = value('Ungültige Stimmen');
+    valid = value('Gültige Stimmen');
+    parties = Object.entries(headers)
+      .filter(([column]) => Number(column) >= colIndex('U') && units[column] === 'Anzahl')
+      .map(([column, name]) => ({ name: name === 'GRÜNE/B 90' ? 'GRÜNE' : name, votes: countAt(column) }));
   } else if (slug === 'rheinland-pfalz') {
     const { shared, sheets } = xlsxSheets(sources.results.file);
     const rows = xlsxRows(sheets.LW_2026_WK, shared);
