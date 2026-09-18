@@ -1,16 +1,109 @@
 ---
 import RouteIndex from "../components/RouteIndex.astro";
 import { states } from "../data/states";
+
+const elections = Object.entries(states).flatMap(([slug, state]) =>
+  Object.entries(state.elections).map(([year, { electionDate }]) => ({
+    name: state.name,
+    href: `/${slug}/${year}/`,
+    date: electionDate,
+    year: Number(year),
+    month: Number(electionDate.slice(5, 7)),
+  })),
+).toSorted((a, b) => b.date.localeCompare(a.date));
+const newestYear = elections[0].year;
+const oldestYear = elections.at(-1)!.year;
+const years = Array.from({ length: newestYear - oldestYear + 1 }, (_, i) => newestYear - i);
+const dateFormat = new Intl.DateTimeFormat("de-DE", { dateStyle: "long", timeZone: "UTC" });
 ---
 
 <RouteIndex
   title="Wer hat gewählt?"
   description="Wahlbeteiligung im Verhältnis zur Bevölkerung. Wähle ein Bundesland und Wahljahr aus."
-  groups={Object.entries(states).map(([state, { name, years }]) => ({
-    label: name,
-    href: `/${state}/`,
-    links: years
-      .toSorted((a, b) => b - a)
-      .map((year) => ({ href: `/${state}/${year}/`, label: String(year) })),
-  }))}
-/>
+>
+  <section class="timeline" aria-label="Wahlen im Zeitverlauf">
+    {years.map((year) => (
+      <section class="timeline-year" aria-labelledby={`year-${year}`}>
+        <h2 id={`year-${year}`}>{year}</h2>
+        {Array.from({ length: 12 }, (_, i) => 12 - i).map((month) => (
+          <ul class="month" style={`grid-row: ${13 - month}`}>
+            {Object.entries(Object.groupBy(
+              elections.filter((election) => election.year === year && election.month === month),
+              (election) => election.date,
+            )).map(([date, sameDay]) => (
+              <li class="election-date">
+                <div class="election-links">
+                  {sameDay!.map((election) => (
+                    <a href={election.href}><span>{election.name}</span></a>
+                  ))}
+                </div>
+                <time datetime={date}>{dateFormat.format(new Date(date))}</time>
+              </li>
+            ))}
+          </ul>
+        ))}
+      </section>
+    ))}
+  </section>
+  <nav class="states" aria-label="Bundesländer">
+    <h2>Nach Bundesland</h2>
+    <ul>
+      {Object.entries(states).map(([slug, { name }]) => (
+        <li><a href={`/${slug}/`}>{name}</a></li>
+      ))}
+    </ul>
+  </nav>
+</RouteIndex>
+
+<style>
+  .timeline { margin: 2.5rem 0; }
+  .timeline-year {
+    position: relative;
+    display: grid;
+    grid-template-columns: 4.5rem minmax(0, 1fr);
+    grid-template-rows: repeat(12, minmax(1rem, auto));
+  }
+  .timeline-year::before {
+    content: "";
+    position: absolute;
+    left: 4.5rem;
+    top: 0;
+    bottom: 0;
+    border-left: 1px solid var(--divider);
+  }
+  .timeline-year h2 {
+    grid-column: 1;
+    grid-row: 1;
+    margin: 0;
+    font-size: 1.125rem;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .timeline-year h2::after {
+    content: "";
+    position: absolute;
+    left: 4.25rem;
+    top: 0;
+    width: 0.5rem;
+    border-top: 2px solid var(--ink);
+  }
+  ul { list-style: none; margin: 0; padding: 0; }
+  .month { grid-column: 2; padding-left: 1.5rem; }
+  .month li { position: relative; padding-bottom: 0.5rem; }
+  .month li::before {
+    content: "";
+    position: absolute;
+    left: -1.5rem;
+    top: 1rem;
+    width: 0.75rem;
+    border-top: 1px solid var(--divider);
+  }
+  .month a { display: block; width: fit-content; padding: 0.25rem 0; }
+  .election-links { display: flex; flex-wrap: wrap; gap: 0 1.5rem; }
+  .month span { font-size: clamp(1.125rem, 3vw, 1.5rem); font-weight: 600; overflow-wrap: anywhere; }
+  time { display: block; color: var(--text-muted); font-size: 0.875rem; }
+  .states { border-top: 1px solid var(--divider); padding-top: 1.5rem; }
+  .states h2 { margin: 0 0 1rem; font-size: 1.125rem; }
+  .states ul { display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; }
+  .states a { display: inline-block; padding: 0.25rem 0; }
+</style>
