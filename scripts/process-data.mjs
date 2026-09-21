@@ -223,7 +223,7 @@ function hamburgData() {
       votingAge: 16,
       eyebrow: 'Bürgerschaftswahl · Landesstimmen',
       intro:
-        'Von allen gemeldeten Einwohner:innen bis zu den gültigen Landesstimmen bei der Bürgerschaftswahl am 2. März 2025.',
+        'Die Bürgerschaftswahl am 2. März 2025 in Zahlen.',
       population: {
         residents,
         referenceDate: '2024-12-31',
@@ -372,7 +372,7 @@ async function bremenData() {
       votingAge: 16,
       eyebrow: 'Bürgerschaftswahl · Stimmen',
       intro:
-        'Von allen gemeldeten Einwohner:innen bis zu den gültigen Stimmen bei der Bürgerschaftswahl am 14. Mai 2023.',
+        'Die Bürgerschaftswahl am 14. Mai 2023 in Zahlen.',
       population: {
         residents,
         referenceDate: '2022-12-31',
@@ -542,10 +542,10 @@ async function otherStateData(route, sources) {
       resultStatus: sources.results.resultStatus ?? 'final',
       votingAge,
       eyebrow: `${electionName} · ${voteLabel}`,
-      intro: `Von der Bevölkerung über die Wahlbeteiligung bis zu den gültigen ${voteLabel} bei der ${electionName} am ${date}.`,
+      intro: `Die ${electionName} am ${date} in Zahlen.`,
       ...(route === 'berlin/2023' ? {
         title: 'Wiederholungswahl zum Abgeordnetenhaus von Berlin',
-        intro: `Von der Bevölkerung über die Wahlbeteiligung bis zu den gültigen Zweitstimmen bei der Wiederholungswahl am ${date}.`,
+        intro: `Die Wiederholungswahl am ${date} in Zahlen.`,
       } : {}),
       population: {
         residents, referenceDate, basis, sourceId: 'population',
