@@ -41,12 +41,25 @@ assert.equal(electionRules('sachsen-anhalt/2021').resultColumn, 3);
 // Baselines from the PDF imports, independently matched against the official XLSX
 // exports. Lock every non-provenance field, including each party's name and votes.
 for (const [route, expectedHash] of Object.entries({
-  "berlin/2023": "99da6992d97f120f239973ad85a67fcc9b49f229c6f21ba6a18a0cef1972b1d9",
   "brandenburg/2024": "8804d6d8e3e9261d2223388055ab1be128f9dab870bd002f906339b1ad7b9d59"
 })) {
   const { sources, ...data } = JSON.parse(readFileSync(`public/data/${route}.json`, 'utf8'));
   assert.equal(createHash('sha256').update(JSON.stringify(data)).digest('hex'), expectedHash, `${route}: source migration preserves election data`);
 }
+
+// Population-basis migration must preserve every Berlin 2023 election count.
+const berlin2023 = JSON.parse(readFileSync('public/data/berlin/2023.json', 'utf8'));
+const { noValidLabel, ...berlinVotes } = berlin2023.secondVotes;
+assert.equal(createHash('sha256').update(JSON.stringify({
+  eligible: berlin2023.eligibility.eligible, turnout: berlin2023.turnout, secondVotes: berlinVotes,
+})).digest('hex'), 'ee70abc37b6a9abffd39103812e4c37d49bc24d2179571ae2d894d8a5c55f0f6');
+const berlin2026 = JSON.parse(readFileSync('public/data/berlin/2026.json', 'utf8'));
+assert.equal(berlin2023.population.basis, berlin2026.population.basis);
+assert.equal(berlin2023.population.basis, 'Bevölkerungsfortschreibung auf Basis des Zensus 2022');
+assert.equal(berlin2023.population.referenceDate, '2022-12-31');
+assert.equal(berlin2023.population.residents, 3632853);
+assert.equal(berlin2023.population.demographics.underVotingAge, 606468);
+assert.equal(berlin2023.population.demographics.nonGermanVotingAgeOrOlder, 644945);
 
 const expected = {
   'berlin/2026': [2487318, 1846170, 1824514],

@@ -27,6 +27,11 @@ const censusPopulation = {
 };
 
 const stateResults = {
+  'berlin/2023': {
+    file: 'results.xlsx', publisher: 'Amt für Statistik Berlin-Brandenburg',
+    license: 'CC BY 3.0 DE',
+    location: 'AGH_W2, Summe aller 3764 Wahlbezirke (Urnen- und Briefwahl), Zweitstimmen',
+  },
   'berlin/2026': {
     file: 'results.csv', csvHeader: 'Adresse;StimmArt;',
     publisher: 'Amt für Statistik Berlin-Brandenburg', resultStatus: 'preliminary',
@@ -68,7 +73,7 @@ const stateResults = {
 export const stateSources = Object.fromEntries(
   Object.entries(states)
     .filter(([slug]) => !['hamburg', 'bremen'].includes(slug))
-    .flatMap(([slug, state]) => state.years.filter((year) => `${slug}/${year}` !== 'berlin/2023').map((year) => {
+    .flatMap(([slug, state]) => state.years.map((year) => {
       const route = `${slug}/${year}`;
       const result = stateResults[route] ?? {
         file: 'results.html',

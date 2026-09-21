@@ -1,6 +1,6 @@
 # Non-eligible population breakdown
 
-Berlin 2023 is the completeness and presentation benchmark. All 17 election
+Berlin 2023 is the completeness and presentation benchmark. All 19 election
 datasets show demographic Sankey sub-bands. Every dataset carries age and citizenship counts,
 reference dates, population basis, method and source links.
 
@@ -27,7 +27,14 @@ after a historical election is allowed and disclosed. Gaps over 90 days receive
 an additional visible caveat; this is a presentation heuristic, not a quality
 certification. Sachsen-Anhalt 2026 has a 249-day gap and preliminary results.
 
-Berlin keeps its register-based counts. Bremen keeps its census-2022-based
+Both Berlin elections use the same census-2022-based annual series (GENESIS
+12411-0014): 31 December 2022 for the 2023 election and 31 December 2025 for
+2026, with voting-age cutoffs of 18 and 16 respectively. On 21 September 2026,
+Berlin 2023's register counts were replaced with this coherent snapshot:
+3,632,853 residents, 606,468 under 18 and 644,945 non-German residents aged
+18 or older. Its election counts did not change. The former register PDFs
+remain in the raw directory as historical evidence, but are no longer inputs.
+Bremen keeps its census-2022-based
 annual counts. Hamburg uses register totals with an under-16/under-18 ratio from
 population statistics, including an estimate for foreign minors; this is shown
 on the page.

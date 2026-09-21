@@ -26,12 +26,6 @@ function firstCount(line) {
   return count(value);
 }
 
-function lineStartingWith(text, label) {
-  const line = text.split('\n').find((candidate) => candidate.trimStart().startsWith(label));
-  if (!line) throw new Error(`Missing row: ${label}`);
-  return line.trimStart().slice(label.length);
-}
-
 function assertEqual(actual, expected, message) {
   if (actual !== expected) throw new Error(`${message}: ${actual} !== ${expected}`);
 }
@@ -87,15 +81,8 @@ function xlsxRows(xml, shared) {
 
 // --- Berlin ---
 
-function berlinData() {
-  const rawDirectory = 'data/raw/berlin/2023';
-  const sourceFiles = {
-    structure: `${rawDirectory}/structure.pdf`,
-    population: `${rawDirectory}/population.pdf`,
-    results: `${rawDirectory}/results.xlsx`,
-  };
-
-  const { shared, sheets } = xlsxSheets(sourceFiles.results);
+function berlinResults(file) {
+  const { shared, sheets } = xlsxSheets(file);
   const [headers, ...districts] = xlsxRows(sheets.AGH_W2, shared);
   assertEqual(districts.length, 3764, 'Berlin voting districts');
   assertEqual(new Set(districts.map((row) => row[1])).size, 3764, 'Unique Berlin voting districts');
@@ -106,9 +93,6 @@ function berlinData() {
     return total + value;
   }, 0);
   const value = (label) => sum(Object.keys(headers).find((column) => headers[column] === label));
-  const populationText = pdfPage(sourceFiles.population, 6);
-  const structureText = pdfPage(sourceFiles.structure, 15, 17);
-
   const parties = Object.entries(headers)
     .filter(([column]) => Number(column) >= colIndex('S'))
     .map(([column, name]) => ({ name, votes: sum(column) }))
@@ -120,88 +104,7 @@ function berlinData() {
   const invalidSecondVotes = value('Ungültige Stimmen');
   const validSecondVotes = value('Gültige Stimmen');
 
-  const berlinLine = lineStartingWith(populationText, 'Berlin');
-  const residents = firstCount(berlinLine);
-  const under18Rows = populationText
-    .split('\n')
-    .filter((line) => line.trimStart().startsWith('unter 18'));
-  const germanUnder18 = firstCount(under18Rows[0].trimStart().slice('unter 18'.length));
-  const nonGermanUnder18 = firstCount(under18Rows[1].trimStart().slice('unter 18'.length));
-  const underVotingAge = firstCount(under18Rows[2].trimStart().slice('unter 18'.length));
-  const nonGermanTotal = firstCount(
-    populationText
-      .split(/\n\s*Ausländer\s*\n/)[1]
-      .split(/\n\s*insgesamt\s*\n/)[0]
-      .split('\n')
-      .find((line) => line.trimStart().startsWith('Zusammen')),
-  );
-
-  const structureResidents = structureText
-    .split('\n')
-    .filter((line) => line.trimStart().startsWith('Insgesamt'))
-    .reduce((sum, line) => sum + firstCount(line.trimStart().slice('Insgesamt'.length)), 0);
-
-  const partyVotes = parties.reduce((sum, party) => sum + party.votes, 0);
-  const nonGermanVotingAgeOrOlder = nonGermanTotal - nonGermanUnder18;
-  const notEligible = residents - eligible;
-  const otherOrTimingDifference = notEligible - underVotingAge - nonGermanVotingAgeOrOlder;
-  const noValidSecondVote = voters - validSecondVotes;
-  const noSecondVote = noValidSecondVote - invalidSecondVotes;
-
-  assertEqual(germanUnder18 + nonGermanUnder18, underVotingAge, 'Under-18 population');
-  assertEqual(partyVotes, validSecondVotes, 'Party second votes');
-  assertEqual(eligible + notEligible, residents, 'Resident flow');
-  assertEqual(voters + (eligible - voters), eligible, 'Eligible flow');
-  assertEqual(validSecondVotes + noValidSecondVote, voters, 'Voter flow');
-  if (otherOrTimingDifference < 0 || noSecondVote < 0) {
-    throw new Error('Derived residuals must not be negative');
-  }
-
-  return {
-    data: {
-      id: 'berlin-agh-2023',
-      year: 2023,
-      title: 'Wiederholungswahl zum Abgeordnetenhaus von Berlin',
-      electionDate: stateCatalog.berlin.elections[2023].electionDate,
-      resultStatus: 'final',
-      votingAge: 18,
-      eyebrow: 'Abgeordnetenhauswahl · Zweitstimme',
-      intro:
-        'Von allen gemeldeten Einwohner:innen bis zu den gültigen Zweitstimmen bei der Wiederholungswahl am 12. Februar 2023.',
-      population: {
-        residents,
-        referenceDate: '2022-12-31',
-        structureResidents,
-        structureReferenceDate: '2022-06-30',
-      },
-      eligibility: {
-        eligible,
-        notEligible,
-        estimatedBreakdown: {
-          underVotingAge,
-          nonGermanVotingAgeOrOlder,
-          otherOrTimingDifference,
-        },
-      },
-      turnout: {
-        voters,
-        nonVoters: eligible - voters,
-      },
-      secondVotes: {
-        label: 'Gültige Zweitstimmen',
-        valid: validSecondVotes,
-        votesPerVoter: 1,
-        noValidSecondVote,
-        invalid: invalidSecondVotes,
-        noSecondVote,
-        parties,
-      },
-      sources: null, // filled below
-    },
-    sourceFiles,
-    publisher: 'Amt für Statistik Berlin-Brandenburg',
-    license: 'CC BY 3.0 DE',
-  };
+  return { eligible, voters, invalid: invalidSecondVotes, valid: validSecondVotes, parties };
 }
 
 // --- Hamburg ---
@@ -537,7 +440,9 @@ async function otherStateData(route, sources) {
   let eligible, voters, invalid, valid, parties;
   const { votingAge, voteLabel, votesPerVoter, resultColumn, unitNote } = electionRules(route);
 
-  if (['berlin/2026', 'mecklenburg-vorpommern/2026'].includes(route)) {
+  if (route === 'berlin/2023') {
+    ({ eligible, voters, invalid, valid, parties } = berlinResults(sources.results.file));
+  } else if (['berlin/2026', 'mecklenburg-vorpommern/2026'].includes(route)) {
     const text = new TextDecoder(slug === 'berlin' ? 'utf-8' : 'windows-1252').decode(await readFile(sources.results.file));
     const description = sources.description
       ? new TextDecoder('windows-1252').decode(await readFile(sources.description.file)) : '';
@@ -638,6 +543,10 @@ async function otherStateData(route, sources) {
       votingAge,
       eyebrow: `${electionName} · ${voteLabel}`,
       intro: `Von der Bevölkerung über die Wahlbeteiligung bis zu den gültigen ${voteLabel} bei der ${electionName} am ${date}.`,
+      ...(route === 'berlin/2023' ? {
+        title: 'Wiederholungswahl zum Abgeordnetenhaus von Berlin',
+        intro: `Von der Bevölkerung über die Wahlbeteiligung bis zu den gültigen Zweitstimmen bei der Wiederholungswahl am ${date}.`,
+      } : {}),
       population: {
         residents, referenceDate, basis, sourceId: 'population',
         demographics: {
@@ -674,7 +583,6 @@ async function otherStateData(route, sources) {
 // --- assembly ---
 
 const states = {
-  'berlin/2023': berlinData(),
   'hamburg/2025': hamburgData(),
   'bremen/2023': await bremenData(),
 };

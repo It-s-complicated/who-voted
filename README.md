@@ -39,7 +39,7 @@ also include the complete preliminary results from 20 September 2026 alongside
 their previous elections; there are 19 election datasets.
 `years` lists only elections with local diagram datasets.
 
-Every state has a diagram for its latest election. Berlin 2023, Hamburg, Bremen and
+Every state has a diagram for its latest election. Hamburg, Bremen and
 Saarland split the non-eligible population into residents below voting age,
 non-German residents of voting age, and a reconciliation remainder. All other
 datasets preserve these demographic counts in annotations because they exceed
@@ -47,13 +47,15 @@ the non-eligible total derived from the electoral roll.
 
 The import uses coherent population, age and citizenship snapshots: census-day
 2022 data for NRW, Schleswig-Holstein and Saarland; the nearest available annual
-snapshot for other area states; and dedicated sources for Berlin, Hamburg and
+snapshot for Berlin and other area states; and dedicated sources for Hamburg and
 Bremen. Timing gaps and Hamburg's age-ratio estimate are visible on the pages.
 Berlin 2026 and Mecklenburg-Vorpommern 2026 use the coherent GENESIS snapshot
 of 31 December 2025, including exact ages below their new voting age of 16 and
-non-German residents aged 16 or older. The 263-day gap is disclosed. Berlin 2026
-uses population estimates rather than the register basis of Berlin 2023: the
-newer June 2026 register summary groups ages across the age-16 boundary.
+non-German residents aged 16 or older. The 263-day gap is disclosed. Both Berlin
+elections use population estimates based on Zensus 2022 from GENESIS 12411-0014.
+Berlin 2023 uses 31 December 2022 (3,632,853 residents), replacing its former
+register count (3,850,809); Berlin 2026 uses 31 December 2025 (3,700,577).
+The 2023 demographic cutoff remains 18. Election results are unchanged.
 See [NONVOTER_BREAKDOWN.md](NONVOTER_BREAKDOWN.md) for methods and current counts.
 Processed datasets live at `public/data/<state>/<year>.json`, source manifests
 at `data/raw/<state>/<year>/`, and shared exports at `data/raw/population/`.
