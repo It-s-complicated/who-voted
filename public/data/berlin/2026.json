@@ -1,0 +1,163 @@
+{
+  "id": "berlin-agh-2026",
+  "year": 2026,
+  "title": "Abgeordnetenhauswahl in Berlin",
+  "electionDate": "2026-09-20",
+  "resultStatus": "preliminary",
+  "votingAge": 16,
+  "eyebrow": "Abgeordnetenhauswahl · Zweitstimmen",
+  "intro": "Von der Bevölkerung über die Wahlbeteiligung bis zu den gültigen Zweitstimmen bei der Abgeordnetenhauswahl am 20. September 2026.",
+  "population": {
+    "residents": 3700577,
+    "referenceDate": "2025-12-31",
+    "basis": "Bevölkerungsfortschreibung auf Basis des Zensus 2022",
+    "sourceId": "population",
+    "demographics": {
+      "referenceDate": "2025-12-31",
+      "underVotingAge": 538830,
+      "nonGermanVotingAgeOrOlder": 734642,
+      "method": "direct",
+      "sourceIds": [
+        "population"
+      ]
+    },
+    "note": "Der Bevölkerungsstichtag liegt 263 Tage vor der Wahl. Alter und Staatsangehörigkeit beziehen sich auf den demografischen Stichtag, nicht auf den Wahltag. Der zeitliche Abstand schränkt die Vergleichbarkeit mit der Wahl ein; eine nähere, zusammenpassende Aufteilung nach Alter und Staatsangehörigkeit ist hier nicht verfügbar."
+  },
+  "eligibility": {
+    "eligible": 2487318,
+    "notEligible": 1213259,
+    "estimatedBreakdown": {
+      "underVotingAge": 538830,
+      "nonGermanVotingAgeOrOlder": 734642,
+      "otherOrTimingDifference": 0
+    },
+    "note": "Die Bevölkerungsstatistik zählt 538.830 Personen unter 16 Jahren und 734.642 nichtdeutsche Personen ab 16 Jahren. Ihre Summe übersteigt die aus Bevölkerung minus Wahlberechtigten berechnete Gruppe um 60.213 Personen. Bevölkerungsstatistik und Wählerverzeichnis unterscheiden sich in Stichtag, Erhebungsmethode und Revisionsstand."
+  },
+  "turnout": {
+    "voters": 1846170,
+    "nonVoters": 641148
+  },
+  "secondVotes": {
+    "label": "Gültige Zweitstimmen",
+    "valid": 1824514,
+    "votesPerVoter": 1,
+    "noValidSecondVote": 21656,
+    "invalid": 21656,
+    "noSecondVote": 0,
+    "noValidLabel": "Keine gültige Zweitstimme",
+    "parties": [
+      {
+        "name": "Die Linke",
+        "votes": 468060
+      },
+      {
+        "name": "CDU",
+        "votes": 342516
+      },
+      {
+        "name": "AfD",
+        "votes": 296601
+      },
+      {
+        "name": "GRÜNE",
+        "votes": 260700
+      },
+      {
+        "name": "SPD",
+        "votes": 220939
+      },
+      {
+        "name": "BSW",
+        "votes": 86041
+      },
+      {
+        "name": "FDP",
+        "votes": 46341
+      },
+      {
+        "name": "Tierschutzpartei",
+        "votes": 38642
+      },
+      {
+        "name": "Volt",
+        "votes": 37880
+      },
+      {
+        "name": "Die PARTEI",
+        "votes": 13536
+      },
+      {
+        "name": "PdF",
+        "votes": 5760
+      },
+      {
+        "name": "ÖDP",
+        "votes": 2560
+      },
+      {
+        "name": "DKP",
+        "votes": 2070
+      },
+      {
+        "name": "Die Urbane.",
+        "votes": 1551
+      },
+      {
+        "name": "SGP",
+        "votes": 716
+      },
+      {
+        "name": "Die Heimat",
+        "votes": 521
+      },
+      {
+        "name": "Bergpartei",
+        "votes": 80
+      }
+    ]
+  },
+  "sources": [
+    {
+      "id": "results",
+      "file": "data/raw/berlin/2026/results.csv",
+      "csvHeader": "Adresse;StimmArt;",
+      "publisher": "Amt für Statistik Berlin-Brandenburg",
+      "resultStatus": "preliminary",
+      "location": "Zweitstimmen, Landeszeile GI9900; WberIns, Waehler, Gueltig, Unguelt, P01–P120; 4114/4114 Wahlbezirke",
+      "electionDate": "2026-09-20",
+      "url": "https://wahlen-berlin.de/wahlen/BE2026/Afspraes/AGH/Datenexport_AGH2026_Zweitstimme_A_BE.csv",
+      "sha256": "4162984451f8e1c56fd32362336a8efd3ffe4eaad2796fc0b0af07002d33d8dd",
+      "retrievedAt": "2026-09-21T19:46:02.536Z"
+    },
+    {
+      "id": "description",
+      "url": "https://wahlen-berlin.de/wahlen/BE2026/Afspraes/AGH/DSB/DSB_Datenexport_AGH2026_Zweitstimme_A_BE.csv",
+      "file": "data/raw/berlin/2026/description.csv",
+      "csvHeader": "1. Allgemeines;",
+      "publisher": "Amt für Statistik Berlin-Brandenburg",
+      "location": "Datensatzbeschreibung: Datum (JJ.MM.TT), StimmArt, P01–P120",
+      "sha256": "55facaaa60004e82747ba08f1db99f4c70b12f1eb5f1c1050546fe57bef2aeb9",
+      "retrievedAt": "2026-09-21T19:46:02.536Z"
+    },
+    {
+      "id": "summary",
+      "url": "https://wahlen-berlin.de/wahlen/BE2026/Afspraes/AGH/ergebnisse.html",
+      "file": "data/raw/berlin/2026/summary.html",
+      "publisher": "Amt für Statistik Berlin-Brandenburg",
+      "location": "Vorläufiges Ergebnis, Berlin, Zweitstimmen; unabhängiger Abgleich der CSV-Zahlen",
+      "sha256": "1439ef3184e199fa5aa68aa54cfbb07e46ef82d1629a579e180103b15f9f214b",
+      "retrievedAt": "2026-09-21T19:46:02.536Z"
+    },
+    {
+      "id": "population",
+      "url": "https://genesis.destatis.de/genesis/api/rest/tables/12411-0014/download/ffcsv/de",
+      "file": "data/raw/population/genesis-12411-0014-flat-3fd517bbd257e772d59a4884a8c3e347935dcb04ffdf58776ec351fa5451d12e.zip",
+      "publisher": "Statistisches Bundesamt (Destatis)",
+      "location": "Tabelle 12411-0014, Bevölkerung nach Altersjahren und Nationalität, Stichtag 31.12.",
+      "referenceDate": "2025-12-31",
+      "basis": "Bevölkerungsfortschreibung auf Basis des Zensus 2022",
+      "sha256": "3fd517bbd257e772d59a4884a8c3e347935dcb04ffdf58776ec351fa5451d12e",
+      "retrievedAt": "2026-09-21T19:46:02.536Z"
+    }
+  ]
+}

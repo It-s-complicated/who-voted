@@ -34,10 +34,12 @@ official source alternatives, timing gaps, and remaining demographic data needs.
 `src/data/states.ts` lists all 16 states with an explicit date and result source URL
 for each election. Available years, the latest election date and its result link
 are derived from those entries; missing or invalid metadata fails immediately. Sachsen-Anhalt includes
-its preliminary 2026 result as well as 2021; there are 17 election datasets.
+its preliminary 2026 result as well as 2021. Berlin and Mecklenburg-Vorpommern
+also include the complete preliminary results from 20 September 2026 alongside
+their previous elections; there are 19 election datasets.
 `years` lists only elections with local diagram datasets.
 
-Every state has a diagram for its latest election. Berlin, Hamburg, Bremen and
+Every state has a diagram for its latest election. Berlin 2023, Hamburg, Bremen and
 Saarland split the non-eligible population into residents below voting age,
 non-German residents of voting age, and a reconciliation remainder. All other
 datasets preserve these demographic counts in annotations because they exceed
@@ -47,6 +49,11 @@ The import uses coherent population, age and citizenship snapshots: census-day
 2022 data for NRW, Schleswig-Holstein and Saarland; the nearest available annual
 snapshot for other area states; and dedicated sources for Berlin, Hamburg and
 Bremen. Timing gaps and Hamburg's age-ratio estimate are visible on the pages.
+Berlin 2026 and Mecklenburg-Vorpommern 2026 use the coherent GENESIS snapshot
+of 31 December 2025, including exact ages below their new voting age of 16 and
+non-German residents aged 16 or older. The 263-day gap is disclosed. Berlin 2026
+uses population estimates rather than the register basis of Berlin 2023: the
+newer June 2026 register summary groups ages across the age-16 boundary.
 See [NONVOTER_BREAKDOWN.md](NONVOTER_BREAKDOWN.md) for methods and current counts.
 Processed datasets live at `public/data/<state>/<year>.json`, source manifests
 at `data/raw/<state>/<year>/`, and shared exports at `data/raw/population/`.

@@ -4,6 +4,19 @@
 // Add an exact election entry only after checking its rules and source columns.
 // resultColumn is zero-based; non-HTML layouts select columns in their own parser.
 const rules = {
+  'berlin/2026': {
+    votingAge: 16, voteLabel: 'Zweitstimmen', votesPerVoter: 1,
+    sources: [
+      { url: 'https://www.berlin.de/wahlen/wahlen/berliner-wahlen-2026/fragen-und-antwortkatalog/artikel.1646712.php', publisher: 'Landeswahlleiter für Berlin', location: 'Frage- und Antwortkatalog 2026: Wahlberechtigung ab 16, Erst- und Zweitstimme auf einem Stimmzettel' },
+    ],
+  },
+  'mecklenburg-vorpommern/2026': {
+    votingAge: 16, voteLabel: 'Zweitstimmen', votesPerVoter: 1,
+    sources: [
+      { url: 'https://www.laiv-mv.de/Wahlen/FAQ/', publisher: 'Landeswahlleiter Mecklenburg-Vorpommern', location: 'FAQ zur Landtagswahl 2026: Wahlberechtigung, Mindestalter 16' },
+      { url: 'https://wahlen.mvnet.de/dateien/ergebnisse.2026/landtagswahl/html/l_99.html', publisher: 'Landeswahlleiter Mecklenburg-Vorpommern', location: 'Landesergebnis 20.09.2026: Landesliste (Zweitstimme), gültige und ungültige Stimmen ergeben Wählerzahl' },
+    ],
+  },
   'hamburg/2025': {
     votingAge: 16, voteLabel: 'Landesstimmen', votesPerVoter: 5,
     sources: [

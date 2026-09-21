@@ -6,6 +6,7 @@ import { stateSources } from './state-sources.mjs';
 import { electionRules } from './election-rules.mjs';
 import { parsePopulationRows } from './population.mjs';
 import { validateElection } from './validate-election.mjs';
+import { septemberResults } from './september-2026.mjs';
 
 // A newer election must change the summary without changing historical metadata.
 const historical = structuredClone(states['sachsen-anhalt'].elections);
@@ -48,11 +49,13 @@ for (const [route, expectedHash] of Object.entries({
 }
 
 const expected = {
+  'berlin/2026': [2487318, 1846170, 1824514],
   'baden-wuerttemberg/2026': [7764858, 5406737, 5375109],
   'bayern/2023': [9430600, 6895807, 13658782],
   'brandenburg/2024': [2076920, 1513975, 1501619],
   'hessen/2023': [4332235, 2858313, 2813313],
   'mecklenburg-vorpommern/2021': [1312471, 928807, 913863],
+  'mecklenburg-vorpommern/2026': [1311294, 1024251, 1015323],
   'niedersachsen/2022': [6064738, 3657967, 3623886],
   'nordrhein-westfalen/2022': [12965858, 7200293, 7146831],
   'rheinland-pfalz/2026': [2990064, 2046542, 2028230],
@@ -150,4 +153,26 @@ for (const census of [false, true]) {
   malformed[2][census ? 17 : 21] = '-';
   assert.throws(() => parse(malformed));
 }
-console.log('Validated 17 elections across all 16 states, demographic parsing, and rejection of corrupt data.');
+// Independently matched to each official statewide HTML table on 21.09.2026.
+for (const [route, invalid, partyVotes] of [
+  ['berlin/2026', 21656, [342516, 220939, 260700, 468060, 296601, 46341, 38642, 13536, 37880, 1551, 2070, 2560, 521, 80, 716, 86041, 5760]],
+  ['mecklenburg-vorpommern/2026', 8928, [360393, 388026, 49629, 66388, 57587, 10415, 11131, 3823, 2760, 2003, 981, 892, 49036, 4798, 818, 940, 2545, 1909, 1249]],
+]) {
+  const berlin = route.startsWith('berlin/');
+  const text = new TextDecoder(berlin ? 'utf-8' : 'windows-1252').decode(readFileSync(`data/raw/${route}/results.csv`));
+  const description = berlin ? new TextDecoder('windows-1252').decode(readFileSync(`data/raw/${route}/description.csv`)) : '';
+  const parsed = septemberResults(route, text, description);
+  assert.equal(parsed.invalid, invalid);
+  assert.deepEqual(parsed.parties.map((party) => party.votes), partyVotes);
+  const data = JSON.parse(readFileSync(`public/data/${route}.json`, 'utf8'));
+  assert.equal(data.resultStatus, 'preliminary');
+  assert.equal(data.votingAge, 16);
+  const row = text.split(/\r?\n/).find((line) => berlin ? line.startsWith('GI9900;') : line.includes(';A;99;') && line.includes(';2;8928;'));
+  assert.throws(() => septemberResults(route, text.replace(`${row}\r\n`, ''), description), /Unique statewide/);
+  assert.throws(() => septemberResults(route, `${text.trim()}\n${row}`, description), /Unique statewide/);
+  const partial = row.replace(berlin ? ';4114;4114;' : ';1974;1974;', berlin ? ';4114;4113;' : ';1974;1973;');
+  assert.throws(() => septemberResults(route, text.replace(row, partial), description), /Complete count/);
+  const badCount = row.replace(berlin ? ';1824514;' : ';1015323;', ';oops;');
+  assert.throws(() => septemberResults(route, text.replace(row, badCount), description), /Invalid/);
+}
+console.log('Validated 19 elections across all 16 states, demographic parsing, and rejection of corrupt data.');

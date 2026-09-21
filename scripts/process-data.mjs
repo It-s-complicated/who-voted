@@ -6,6 +6,7 @@ import { stateSources } from './state-sources.mjs';
 import { electionRules } from './election-rules.mjs';
 import { validateElection } from './validate-election.mjs';
 import { populationSnapshot } from './population.mjs';
+import { septemberResults } from './september-2026.mjs';
 
 function pdfPage(file, firstPage, lastPage = firstPage) {
   return execFileSync(
@@ -536,7 +537,12 @@ async function otherStateData(route, sources) {
   let eligible, voters, invalid, valid, parties;
   const { votingAge, voteLabel, votesPerVoter, resultColumn, unitNote } = electionRules(route);
 
-  if (route === 'sachsen-anhalt/2026') {
+  if (['berlin/2026', 'mecklenburg-vorpommern/2026'].includes(route)) {
+    const text = new TextDecoder(slug === 'berlin' ? 'utf-8' : 'windows-1252').decode(await readFile(sources.results.file));
+    const description = sources.description
+      ? new TextDecoder('windows-1252').decode(await readFile(sources.description.file)) : '';
+    ({ eligible, voters, invalid, valid, parties } = septemberResults(route, text, description));
+  } else if (route === 'sachsen-anhalt/2026') {
     const html = await readFile(sources.results.file, 'utf8');
     const widgets = [...html.matchAll(/<script[^>]*type="application\/json"[^>]*>([\s\S]*?)<\/script>/g)]
       .map((match) => JSON.parse(match[1]).x?.tag?.attribs);
@@ -622,15 +628,16 @@ async function otherStateData(route, sources) {
     otherOrTimingDifference: Math.max(0, notEligible - underVotingAge - nonGermanVotingAgeOrOlder),
   };
   const format = new Intl.NumberFormat('de-DE');
+  const electionName = slug === 'berlin' ? 'Abgeordnetenhauswahl' : 'Landtagswahl';
   return {
     data: {
-      id: `${slug}-ltw-${year}`, year,
-      title: `Landtagswahl in ${state.name}`,
+      id: `${slug}-${slug === 'berlin' ? 'agh' : 'ltw'}-${year}`, year,
+      title: `${electionName} in ${state.name}`,
       electionDate,
       resultStatus: sources.results.resultStatus ?? 'final',
       votingAge,
-      eyebrow: `Landtagswahl · ${voteLabel}`,
-      intro: `Von der Bevölkerung über die Wahlbeteiligung bis zu den gültigen ${voteLabel} bei der Landtagswahl am ${date}.`,
+      eyebrow: `${electionName} · ${voteLabel}`,
+      intro: `Von der Bevölkerung über die Wahlbeteiligung bis zu den gültigen ${voteLabel} bei der ${electionName} am ${date}.`,
       population: {
         residents, referenceDate, basis, sourceId: 'population',
         demographics: {

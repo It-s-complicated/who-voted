@@ -1,0 +1,152 @@
+{
+  "id": "mecklenburg-vorpommern-ltw-2026",
+  "year": 2026,
+  "title": "Landtagswahl in Mecklenburg-Vorpommern",
+  "electionDate": "2026-09-20",
+  "resultStatus": "preliminary",
+  "votingAge": 16,
+  "eyebrow": "Landtagswahl · Zweitstimmen",
+  "intro": "Von der Bevölkerung über die Wahlbeteiligung bis zu den gültigen Zweitstimmen bei der Landtagswahl am 20. September 2026.",
+  "population": {
+    "residents": 1573685,
+    "referenceDate": "2025-12-31",
+    "basis": "Bevölkerungsfortschreibung auf Basis des Zensus 2022",
+    "sourceId": "population",
+    "demographics": {
+      "referenceDate": "2025-12-31",
+      "underVotingAge": 206950,
+      "nonGermanVotingAgeOrOlder": 84015,
+      "method": "direct",
+      "sourceIds": [
+        "population"
+      ]
+    },
+    "note": "Der Bevölkerungsstichtag liegt 263 Tage vor der Wahl. Alter und Staatsangehörigkeit beziehen sich auf den demografischen Stichtag, nicht auf den Wahltag. Der zeitliche Abstand schränkt die Vergleichbarkeit mit der Wahl ein; eine nähere, zusammenpassende Aufteilung nach Alter und Staatsangehörigkeit ist hier nicht verfügbar."
+  },
+  "eligibility": {
+    "eligible": 1311294,
+    "notEligible": 262391,
+    "estimatedBreakdown": {
+      "underVotingAge": 206950,
+      "nonGermanVotingAgeOrOlder": 84015,
+      "otherOrTimingDifference": 0
+    },
+    "note": "Die Bevölkerungsstatistik zählt 206.950 Personen unter 16 Jahren und 84.015 nichtdeutsche Personen ab 16 Jahren. Ihre Summe übersteigt die aus Bevölkerung minus Wahlberechtigten berechnete Gruppe um 28.574 Personen. Bevölkerungsstatistik und Wählerverzeichnis unterscheiden sich in Stichtag, Erhebungsmethode und Revisionsstand."
+  },
+  "turnout": {
+    "voters": 1024251,
+    "nonVoters": 287043
+  },
+  "secondVotes": {
+    "label": "Gültige Zweitstimmen",
+    "valid": 1015323,
+    "votesPerVoter": 1,
+    "noValidSecondVote": 8928,
+    "invalid": 8928,
+    "noSecondVote": 0,
+    "noValidLabel": "Keine gültige Zweitstimme",
+    "parties": [
+      {
+        "name": "AfD",
+        "votes": 388026
+      },
+      {
+        "name": "SPD",
+        "votes": 360393
+      },
+      {
+        "name": "Die Linke",
+        "votes": 66388
+      },
+      {
+        "name": "GRÜNE",
+        "votes": 57587
+      },
+      {
+        "name": "CDU",
+        "votes": 49629
+      },
+      {
+        "name": "BSW",
+        "votes": 49036
+      },
+      {
+        "name": "Tierschutzpartei",
+        "votes": 11131
+      },
+      {
+        "name": "FDP",
+        "votes": 10415
+      },
+      {
+        "name": "Handwerker Partei Deutschland",
+        "votes": 4798
+      },
+      {
+        "name": "FREIE WÄHLER",
+        "votes": 3823
+      },
+      {
+        "name": "Die PARTEI",
+        "votes": 2760
+      },
+      {
+        "name": "Team Freiheit",
+        "votes": 2545
+      },
+      {
+        "name": "PIRATEN",
+        "votes": 2003
+      },
+      {
+        "name": "Volt",
+        "votes": 1909
+      },
+      {
+        "name": "WLD",
+        "votes": 1249
+      },
+      {
+        "name": "ÖDP",
+        "votes": 981
+      },
+      {
+        "name": "PdF",
+        "votes": 940
+      },
+      {
+        "name": "Bündnis C",
+        "votes": 892
+      },
+      {
+        "name": "KPD",
+        "votes": 818
+      }
+    ]
+  },
+  "sources": [
+    {
+      "id": "results",
+      "file": "data/raw/mecklenburg-vorpommern/2026/results.csv",
+      "csvHeader": "Wahl zum Landtag von Mecklenburg-Vorpommern am 20. September 2026",
+      "publisher": "Landeswahlleiter Mecklenburg-Vorpommern",
+      "resultStatus": "preliminary",
+      "location": "Wahlkreis 99, Ausgabe A, Erst-/Zweitstimme 2; Landesergebnis, 1974/1974 Wahlbezirke",
+      "electionDate": "2026-09-20",
+      "url": "https://wahlen.mvnet.de/dateien/ergebnisse.2026/landtagswahl/csv/l_wahlkreise.csv",
+      "sha256": "df2fea5c1df24dec48b62a60abdf2bd75b1e12a49dc9121dc7b0b2130cb4bb28",
+      "retrievedAt": "2026-09-21T19:46:12.772Z"
+    },
+    {
+      "id": "population",
+      "url": "https://genesis.destatis.de/genesis/api/rest/tables/12411-0014/download/ffcsv/de",
+      "file": "data/raw/population/genesis-12411-0014-flat-3fd517bbd257e772d59a4884a8c3e347935dcb04ffdf58776ec351fa5451d12e.zip",
+      "publisher": "Statistisches Bundesamt (Destatis)",
+      "location": "Tabelle 12411-0014, Bevölkerung nach Altersjahren und Nationalität, Stichtag 31.12.",
+      "referenceDate": "2025-12-31",
+      "basis": "Bevölkerungsfortschreibung auf Basis des Zensus 2022",
+      "sha256": "3fd517bbd257e772d59a4884a8c3e347935dcb04ffdf58776ec351fa5451d12e",
+      "retrievedAt": "2026-09-21T19:46:12.772Z"
+    }
+  ]
+}

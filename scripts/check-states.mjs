@@ -4,6 +4,8 @@ import { states } from '../src/data/states.ts';
 
 assert.equal(Object.keys(states).length, 16);
 const home = readFileSync('dist/index.html', 'utf8');
+const geometry = JSON.parse(readFileSync('src/data/germany-map.json', 'utf8'));
+assert.deepEqual(Object.keys(geometry).sort(), Object.keys(states).sort(), 'map covers every state');
 const timeline = home.split('aria-label="Wahlen im Zeitverlauf"')[1].split('<nav')[0];
 const timelineDates = [...timeline.matchAll(/datetime="([^"]+)"/g)].map((match) => match[1]);
 const expectedDates = Object.values(states).flatMap((state) =>
@@ -18,7 +20,7 @@ for (let year = Number(expectedDates.at(-1).slice(0, 4)); year <= Number(expecte
 for (const [slug, state] of Object.entries(states)) {
   assert.ok(home.includes(`href="/${slug}/"`), `${slug}: homepage link`);
   assert.match(state.latestElection, /^\d{4}-\d{2}-\d{2}$/);
-  assert.ok(state.latestElection <= '2026-09-12', `${slug}: completed election`);
+  assert.ok(state.latestElection <= '2026-09-21', `${slug}: completed election`);
   const page = readFileSync(`dist/${slug}/index.html`, 'utf8');
   assert.ok(page.includes(`/${slug}/${Number(state.latestElection.slice(0, 4))}/`), `${slug}: diagram link`);
   assert.ok(page.includes(String(Number(state.latestElection.slice(0, 4)))), `${slug}: election year`);

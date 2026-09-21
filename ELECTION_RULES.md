@@ -1,6 +1,6 @@
 # Election rules and official evidence
 
-Checked on 2026-09-14 for the 17 elections currently included in the app. These references support the minimum voting age and the vote category used by the diagram. They are election-specific publications or official pages explicitly describing the named election.
+Checked on 2026-09-14, with Berlin and Mecklenburg-Vorpommern 2026 added on 2026-09-21; 19 elections are included in the app. These references support the minimum voting age and the vote category used by the diagram. They are election-specific publications or official pages explicitly describing the named election.
 
 The executable settings and source references live in [scripts/election-rules.mjs](scripts/election-rules.mjs). An unconfigured election is rejected instead of inheriting rules from its state. Berlin, Bremen and Hamburg retain their dedicated election-specific parsers; the data checks compare their output with these settings too.
 
@@ -8,6 +8,8 @@ The executable settings and source references live in [scripts/election-rules.mj
 
 | Election | Minimum age | Displayed vote category | Votes per voter | Official evidence and location |
 | --- | --- | --- | --- | --- |
+| berlin/2026 | 16 | Zweitstimmen | 1 | [Landeswahlleiter für Berlin](https://www.berlin.de/wahlen/wahlen/berliner-wahlen-2026/fragen-und-antwortkatalog/artikel.1646712.php) — FAQ 2026: Wahlberechtigung ab 16, Erst- und Zweitstimme auf einem Stimmzettel |
+| mecklenburg-vorpommern/2026 | 16 | Zweitstimmen | 1 | [Landeswahlleiter Mecklenburg-Vorpommern](https://www.laiv-mv.de/Wahlen/FAQ/) — FAQ 2026: Wahlberechtigung ab 16; [Landesergebnis](https://wahlen.mvnet.de/dateien/ergebnisse.2026/landtagswahl/html/l_99.html) — Landesliste (Zweitstimme) |
 | baden-wuerttemberg/2026 | 16 | Zweitstimmen | 1 | [Statistisches Landesamt Baden-Württemberg](https://www.statistik-bw.de/presse/pressemitteilungen/pressemitteilung/landtagswahl-2026-wahlen-in-zahlen/) — Pressemitteilung 35/2026, 26.02.2026: Mindestalter und Zwei-Stimmen-System |
 | bayern/2023 | 18 | Gesamtstimmen | 2 | [Bayerisches Landesamt für Statistik](https://www.statistik.bayern.de/presse/mitteilungen/2023/pm09/index.html) — Pressemitteilung 09/2023: Stimmberechtigung; [Bayerisches Landesamt für Statistik](https://www.statistik.bayern.de/presse/mitteilungen/2023/pm08/index.html) — Pressemitteilung 08/2023: Erst- und Zweitstimmen, Gesamtstimmen |
 | berlin/2023 | 18 | Zweitstimmen | 1 | [Landeswahlleiter für Berlin](https://www.berlin.de/wahlen/historie/berliner-wahlen/ergebnisberichte/sb_b07-02-03_2023j05_be_79a.pdf) — Erläuterungen A_2 zur Wiederholungswahl 2023, PDF-Seite 174: Wahlberechtigte und Zweitstimme |

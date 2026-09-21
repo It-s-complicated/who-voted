@@ -27,6 +27,16 @@ const censusPopulation = {
 };
 
 const stateResults = {
+  'berlin/2026': {
+    file: 'results.csv', csvHeader: 'Adresse;StimmArt;',
+    publisher: 'Amt für Statistik Berlin-Brandenburg', resultStatus: 'preliminary',
+    location: 'Zweitstimmen, Landeszeile GI9900; WberIns, Waehler, Gueltig, Unguelt, P01–P120; 4114/4114 Wahlbezirke',
+  },
+  'mecklenburg-vorpommern/2026': {
+    file: 'results.csv', csvHeader: 'Wahl zum Landtag von Mecklenburg-Vorpommern am 20. September 2026',
+    publisher: 'Landeswahlleiter Mecklenburg-Vorpommern', resultStatus: 'preliminary',
+    location: 'Wahlkreis 99, Ausgabe A, Erst-/Zweitstimme 2; Landesergebnis, 1974/1974 Wahlbezirke',
+  },
   'sachsen-anhalt/2021': {
     file: 'results.html',
     publisher: 'Die Bundeswahlleiterin',
@@ -57,8 +67,8 @@ const stateResults = {
 
 export const stateSources = Object.fromEntries(
   Object.entries(states)
-    .filter(([slug]) => !['berlin', 'hamburg', 'bremen'].includes(slug))
-    .flatMap(([slug, state]) => state.years.map((year) => {
+    .filter(([slug]) => !['hamburg', 'bremen'].includes(slug))
+    .flatMap(([slug, state]) => state.years.filter((year) => `${slug}/${year}` !== 'berlin/2023').map((year) => {
       const route = `${slug}/${year}`;
       const result = stateResults[route] ?? {
         file: 'results.html',
@@ -70,6 +80,18 @@ export const stateSources = Object.fromEntries(
       const referenceDate = census ? '2022-05-15' : `${Math.min(2025, Number(electionDate.slice(5, 7)) >= 7 ? year : year - 1)}-12-31`;
       return [route, {
         results: { ...result, electionDate, url, file: `data/raw/${route}/${result.file}` },
+        ...(route === 'berlin/2026' ? {
+          description: {
+            url: 'https://wahlen-berlin.de/wahlen/BE2026/Afspraes/AGH/DSB/DSB_Datenexport_AGH2026_Zweitstimme_A_BE.csv',
+            file: `data/raw/${route}/description.csv`, csvHeader: '1. Allgemeines;',
+            publisher: result.publisher, location: 'Datensatzbeschreibung: Datum (JJ.MM.TT), StimmArt, P01–P120',
+          },
+          summary: {
+            url: 'https://wahlen-berlin.de/wahlen/BE2026/Afspraes/AGH/ergebnisse.html',
+            file: `data/raw/${route}/summary.html`, publisher: result.publisher,
+            location: 'Vorläufiges Ergebnis, Berlin, Zweitstimmen; unabhängiger Abgleich der CSV-Zahlen',
+          },
+        } : {}),
         population: {
           ...(census ? censusPopulation : annualPopulation),
           referenceDate,

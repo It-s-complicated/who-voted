@@ -53,6 +53,10 @@ const catalog: Record<string, StateEntry> = {
       2023: {
         electionDate: "2023-02-12",
         url: "https://download.statistik-berlin-brandenburg.de/c6fffa8361dd1404/a8cc1bc593d9/DL_BE_AGHBVV2023.xlsx"
+      },
+      2026: {
+        electionDate: "2026-09-20",
+        url: "https://wahlen-berlin.de/wahlen/BE2026/Afspraes/AGH/Datenexport_AGH2026_Zweitstimme_A_BE.csv"
       }
     }
   },
@@ -98,6 +102,10 @@ const catalog: Record<string, StateEntry> = {
       2021: {
         electionDate: "2021-09-26",
         url: "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-13.html"
+      },
+      2026: {
+        electionDate: "2026-09-20",
+        url: "https://wahlen.mvnet.de/dateien/ergebnisse.2026/landtagswahl/csv/l_wahlkreise.csv"
       }
     }
   },

@@ -72,7 +72,7 @@ for (const [directory, files] of Object.entries(sources)) {
       if (!response.ok) throw new Error(`${source.url}: ${response.status} ${response.statusText}`);
       bytes = new Uint8Array(await response.arrayBuffer());
       const head = new TextDecoder().decode(bytes.subarray(0, 500)).trimStart();
-      const valid = source.file.endsWith('.csv') ? head.replace('\uFEFF', '').startsWith('Tabelle:')
+      const valid = source.file.endsWith('.csv') ? head.replace('\uFEFF', '').startsWith(source.csvHeader ?? 'Tabelle:')
         : source.file.endsWith('.html') ? /<!doctype html|<html/i.test(head)
         : source.file.endsWith('.pdf') ? head.startsWith('%PDF-') : head.startsWith('PK');
       if (!valid) throw new Error(`${source.url}: unexpected file type`);

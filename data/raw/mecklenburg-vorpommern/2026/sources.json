@@ -1,0 +1,26 @@
+{
+  "retrievedAt": "2026-09-21T19:46:12.772Z",
+  "sources": [
+    {
+      "id": "results",
+      "file": "data/raw/mecklenburg-vorpommern/2026/results.csv",
+      "csvHeader": "Wahl zum Landtag von Mecklenburg-Vorpommern am 20. September 2026",
+      "publisher": "Landeswahlleiter Mecklenburg-Vorpommern",
+      "resultStatus": "preliminary",
+      "location": "Wahlkreis 99, Ausgabe A, Erst-/Zweitstimme 2; Landesergebnis, 1974/1974 Wahlbezirke",
+      "electionDate": "2026-09-20",
+      "url": "https://wahlen.mvnet.de/dateien/ergebnisse.2026/landtagswahl/csv/l_wahlkreise.csv",
+      "sha256": "df2fea5c1df24dec48b62a60abdf2bd75b1e12a49dc9121dc7b0b2130cb4bb28"
+    },
+    {
+      "id": "population",
+      "url": "https://genesis.destatis.de/genesis/api/rest/tables/12411-0014/download/ffcsv/de",
+      "file": "data/raw/population/genesis-12411-0014-flat-3fd517bbd257e772d59a4884a8c3e347935dcb04ffdf58776ec351fa5451d12e.zip",
+      "publisher": "Statistisches Bundesamt (Destatis)",
+      "location": "Tabelle 12411-0014, Bevölkerung nach Altersjahren und Nationalität, Stichtag 31.12.",
+      "referenceDate": "2025-12-31",
+      "basis": "Bevölkerungsfortschreibung auf Basis des Zensus 2022",
+      "sha256": "3fd517bbd257e772d59a4884a8c3e347935dcb04ffdf58776ec351fa5451d12e"
+    }
+  ]
+}
