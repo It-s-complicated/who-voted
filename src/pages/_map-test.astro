@@ -1,0 +1,90 @@
+---
+import RouteIndex from "../components/RouteIndex.astro";
+import { states } from "../data/states";
+import geometry from "../data/germany-map.json";
+
+const entries = Object.entries(geometry).map(([slug, shape]) => ({
+  slug, ...shape, ...states[slug],
+  latestYear: Number(states[slug].latestElection.slice(0, 4)),
+})).toSorted((a, b) => a.name.localeCompare(b.name, "de"));
+---
+
+<RouteIndex
+  title="Wo wurde gewählt?"
+  description="Ein Bundesland, ein Klick: zur neuesten verfügbaren Wahl. Frühere Wahljahre findest du in der Liste."
+  breadcrumbs={[{ label: "Startseite", href: "/", home: true }, { label: "Kartenansicht" }]}
+>
+  <div class="map-layout">
+    <figure>
+      <svg viewBox="0 0 520 690" role="group" aria-labelledby="map-title map-description">
+        <title id="map-title">Bundesländer in Deutschland</title>
+        <desc id="map-description">Jedes Bundesland verlinkt auf seine neueste verfügbare Wahl. Alle Links stehen auch in der Liste neben der Karte.</desc>
+        {entries.toSorted((a, b) =>
+          Number(["BE", "HB", "HH", "SL"].includes(a.code)) - Number(["BE", "HB", "HH", "SL"].includes(b.code))
+        ).map(({ slug, name, d, code, label, latestYear }) => (
+          <a href={`/${slug}/${latestYear}/`} aria-label={`${name}: Wahl ${latestYear}`}>
+            <title>{name} · {latestYear}</title>
+            <path d={d} fill-rule="evenodd" />
+            <g class="map-label" aria-hidden="true">
+              <rect x={label[0] - 18} y={label[1] - 18} width="36" height="36" rx="18" />
+              <text x={label[0]} y={label[1]}>{code}</text>
+            </g>
+          </a>
+        ))}
+      </svg>
+      <figcaption>
+        Neueste verfügbare Wahl je Bundesland · keine einheitliche Wahlperiode
+        <span>Kartengrundlage: <a href="https://github.com/isellsoap/deutschlandGeoJSON">deutschlandGeoJSON</a> (gemeinfrei), vereinfacht und projiziert.</span>
+      </figcaption>
+    </figure>
+    <nav aria-label="Bundesländer und Wahljahre">
+      <div class="list-heading"><h2>Bundesland</h2><span>Wahljahr</span></div>
+      <ul>
+        {entries.map(({ slug, name, code, latestYear, years }) => (
+          <li>
+            <a class="state-link" href={`/${slug}/${latestYear}/`}>
+              <span class="code">{code}</span><span class="state-name">{name}</span><span class="year">{latestYear}</span>
+            </a>
+            {years.length > 1 && (
+              <div class="older">Frühere Wahl:
+                {years.toSorted((a, b) => b - a).filter((year) => year !== latestYear).map((year) => (
+                  <a href={`/${slug}/${year}/`} aria-label={`${name}: Wahl ${year}`}>{year}</a>
+                ))}
+              </div>
+            )}
+          </li>
+        ))}
+      </ul>
+    </nav>
+  </div>
+</RouteIndex>
+
+<style>
+  .map-layout { display: grid; grid-template-columns: 1.2fr 1fr; gap: 3rem; margin-top: 2rem; align-items: start; }
+  figure { margin: 0; }
+  svg { display: block; width: 100%; height: auto; }
+  path { fill: var(--table-divider); stroke: var(--paper); stroke-width: 1.5; stroke-linejoin: round; }
+  svg a:hover path, svg a:focus-visible path { fill: var(--primary); }
+  svg a:focus-visible { outline: none; }
+  svg a:focus-visible path { stroke: var(--ink); stroke-width: 3; }
+  .map-label rect { fill: var(--paper); stroke: var(--divider); stroke-width: 1; }
+  .map-label text { fill: var(--ink); font-size: 13px; font-weight: 650; text-anchor: middle; dominant-baseline: central; pointer-events: none; }
+  figcaption { margin-top: 1rem; color: var(--text-muted); font-size: 0.8rem; }
+  figcaption span { display: block; margin-top: 0.4rem; }
+  .list-heading { display: flex; justify-content: space-between; align-items: baseline; padding-bottom: 0.75rem; border-bottom: 1px solid var(--ink); }
+  h2 { margin: 0; font-size: 1rem; }
+  .list-heading > span { font-size: 0.8rem; color: var(--text-muted); }
+  ul { list-style: none; padding: 0; margin: 0; }
+  li { border-bottom: 1px solid var(--table-divider); }
+  .state-link { display: grid; grid-template-columns: 2rem 1fr auto; align-items: baseline; gap: 0.5rem; padding: 0.7rem 0; text-decoration: none; }
+  .state-link:hover .state-name { text-decoration: underline; text-underline-offset: 0.2em; }
+  .state-name { font-weight: 550; }
+  .code { color: var(--text-muted); font-size: 0.75rem; }
+  .year { font-variant-numeric: tabular-nums; color: var(--text-muted); }
+  .older { display: flex; align-items: center; gap: 0.75rem; padding: 0 0 0.4rem 2.5rem; color: var(--text-muted); font-size: 0.85rem; }
+  .older a { padding: 0.4rem 0; }
+  @media (max-width: 48rem) {
+    .map-layout { grid-template-columns: 1fr; gap: 2rem; }
+    figure { width: min(100%, 30rem); margin-inline: auto; }
+  }
+</style>
