@@ -546,7 +546,6 @@ const tableRows = [
 
             <g class="labels" aria-hidden="true">
               {
-                // bottom node of its column: label below the bar;
                 // thin adjacent bars: stagger the second label a row higher
                 graph.nodes
                   .filter(
@@ -556,11 +555,9 @@ const tableRows = [
                     <text
                       text-anchor={node.id === "nonGerman" ? "end" : "start"}
                       y={
-                        node.id === "nonVoters"
-                          ? node.x1 + 18
-                          : node.id === "nonGerman"
-                            ? node.x0 - 54
-                            : node.x0 - 24
+                        node.id === "nonGerman"
+                          ? node.x0 - 54
+                          : node.x0 - 24
                       }
                     >
                       <tspan x={node.id === "nonGerman" ? node.y1 - 3 : node.y0 + 3}>{node.label}</tspan>
