@@ -51,7 +51,8 @@ for (const route of routes) {
   assert.ok(!svg.includes('Statistische Differenz') && !svg.includes('Sonstige Differenz'), `${route}: no reconciliation ribbons`);
   assert.ok(!svg.includes('Geschätzte Aufteilung'), `${route}: no extra estimate heading`);
   assert.ok(html.includes('* Geschätzte Aufteilung:'), `${route}: asterisks explained in caption`);
-  assert.ok(html.includes('proportional an die rechnerische Zahl'), `${route}: estimation explained`);
+  assert.match(html, /proportional\s+auf die rechnerisch nicht Wahlberechtigten verteilt/, `${route}: estimation explained`);
+  assert.ok(html.includes('Hinweise zur Datengrundlage'), `${route}: detailed source notes available`);
   const difference = data.eligibility.notEligible - total;
   if (difference !== 0) assert.ok(html.includes(`${new Intl.NumberFormat('de-DE').format(difference)} Personen`), `${route}: signed source discrepancy retained`);
   if (data.ballots) {

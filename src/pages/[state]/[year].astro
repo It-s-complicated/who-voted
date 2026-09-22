@@ -606,42 +606,42 @@ const tableRows = [
           </svg>
         </div>
         <figcaption>
-          {breakdown && (
-            <p><strong>* Geschätzte Aufteilung:</strong> Die Anteile für Alter und Staatsangehörigkeit
-              wurden aus Bevölkerungsdaten abgeleitet und proportional an die rechnerische Zahl
-              der nicht Wahlberechtigten angepasst. Dabei nehmen wir an, dass das Verhältnis
-              der beiden Gruppen übertragbar ist und sie die Gruppe vollständig abdecken.
-              Unterschiedliche Stichtage und Erhebungsgrundlagen verhindern eine exakte Aufteilung.
-              Die Prozentwerte beziehen sich auf alle Einwohner:innen und sind auf ganze Prozent
-              gerundet. Die geschätzten Personenzahlen sind mit „ca.“ gekennzeichnet und auf Tausender
-              gerundet; die Bandbreiten verwenden die ungerundeten Schätzwerte.
-              Die Tabelle enthält die ursprünglichen Bevölkerungszahlen.</p>
-          )}
-          {breakdown && demographicDifference !== 0 && (
-            <p>Abweichung der Ausgangsdaten: Bevölkerung minus Wahlberechtigte minus beide
-              Bevölkerungsgruppen = {format.format(demographicDifference)} Personen.
-              Diese Differenz ist keine zusätzliche Bevölkerungsgruppe.</p>
-          )}
-          {data.eligibility.note && <p>{data.eligibility.note}</p>}
-          {data.population.basis && <p>Bevölkerungsgrundlage: {data.population.basis}, Stand {populationDate}.</p>}
-          <p>{data.population.note}</p>
-          {data.population.demographics.note && <p>{data.population.demographics.note}</p>}
-          <p>
-            Parteien unter 5 % außer der FDP sind als „Sonstige“
-            zusammengefasst.
-          </p>
-          {multiVote && !ballots && <p>** {data.unitNote} Die Prozentwerte entsprechen Stimmen ÷ ({votesPerVoter} × Einwohnerzahl) × 100, keinen Personenanteilen.</p>}
+          <ul class="caption-points">
+            {breakdown && (
+              <li><strong>* Geschätzte Aufteilung:</strong> Anteile aus Bevölkerungsdaten proportional
+                auf die rechnerisch nicht Wahlberechtigten verteilt. Annahme: Beide Gruppen decken
+                diese vollständig ab.</li>
+            )}
+            {breakdown && (
+              <li><strong>Rundung:</strong> Schätzanteile an allen Einwohner:innen auf ganze Prozent,
+                „ca.“-Zahlen auf Tausender. Bänder nutzen ungerundete Werte; Ausgangszahlen stehen
+                in der Tabelle.</li>
+            )}
+            {breakdown && demographicDifference !== 0 && (
+              <li><strong>Datenabgleich:</strong> Bevölkerung − Wahlberechtigte − beide Gruppen =
+                {" "}{format.format(demographicDifference)} Personen; keine zusätzliche Gruppe.</li>
+            )}
+            <li><strong>Bevölkerungsdaten:</strong> {data.population.basis}, Stand {populationDate}.
+              Alter und Staatsangehörigkeit gelten für diesen Stichtag.</li>
+            <li><strong>Parteien:</strong> Unter 5 % außer FDP als „Sonstige“ zusammengefasst.</li>
+            {multiVote && !ballots && <li><strong>** Stimmen:</strong> {data.unitNote} Prozentwerte: Stimmen ÷ ({votesPerVoter} × Einwohnerzahl) × 100; keine Personenanteile.</li>}
           {
             ballots && (
-              <p>
-                ** Pro Stimmzettel sind bis zu {votesPerVoter} Stimmen möglich.
-                Ab „{data.secondVotes.label}“ zeigen die Prozentwerte Stimmen ÷
-                ({votesPerVoter} × Einwohnerzahl) × 100, keine Personenanteile.
-                Nicht ausgeschöpfte Stimmen sind die Differenz zwischen
-                möglichen und gültigen Stimmen auf gültigen Stimmzetteln.
-              </p>
+              <li><strong>** Stimmen:</strong> Bis zu {votesPerVoter} je Stimmzettel.
+                Ab „{data.secondVotes.label}“: Stimmen ÷ ({votesPerVoter} × Einwohnerzahl) × 100,
+                keine Personenanteile. Nicht ausgeschöpft = mögliche − gültige Stimmen auf
+                gültigen Stimmzetteln.</li>
             )
           }
+          </ul>
+          <details class="caption-details">
+            <summary>Hinweise zur Datengrundlage</summary>
+            <div>
+              <p>{data.population.note}</p>
+              {data.eligibility.note && <p>{data.eligibility.note}</p>}
+              {data.population.demographics.note && <p>{data.population.demographics.note}</p>}
+            </div>
+          </details>
         </figcaption>
       </figure>
 
@@ -850,6 +850,25 @@ const tableRows = [
   }
   figcaption p + p {
     margin-top: 0.5rem;
+  }
+  .caption-points {
+    margin: 0;
+    padding-left: 1.2rem;
+  }
+  .caption-points li + li {
+    margin-top: 0.35rem;
+  }
+  .caption-details {
+    margin-top: 0.6rem;
+    border: 0;
+    border-top: 1px solid var(--table-divider);
+    background: transparent;
+  }
+  .caption-details summary {
+    padding: 0.5rem 0 0;
+  }
+  .caption-details div {
+    padding-top: 0.5rem;
   }
 
   details {
