@@ -58,7 +58,12 @@ function nodeValue(
     ? percentage(value)
     : `${format.format(value)} · ${percentage(value)}`;
 }
+// ponytail: 5% identifies new seat winners in current datasets; add seat metadata
+// if a future newcomer enters parliament below the threshold.
 const threshold = 0.05;
+const previousParliament = new Set(
+  state.elections[data.year].previousParliament.map((party: string) => party.toLocaleLowerCase("de-DE")),
+);
 const partyColors: Record<string, string> = {
   cdu: "#202831",
   csu: "#202831",
@@ -74,7 +79,8 @@ const partyColors: Record<string, string> = {
 };
 const displayedParties = data.secondVotes.parties.filter(
   (party) =>
-    party.name === "FDP" || party.votes / data.secondVotes.valid >= threshold,
+    previousParliament.has(party.name.toLocaleLowerCase("de-DE")) ||
+    party.votes / data.secondVotes.valid >= threshold,
 );
 if (
   displayedParties.some(
@@ -623,7 +629,8 @@ const tableRows = [
             )}
             <li><strong>Bevölkerungsdaten:</strong> {data.population.basis}, Stand {populationDate}.
               Alter und Staatsangehörigkeit gelten für diesen Stichtag.</li>
-            <li><strong>Parteien:</strong> Unter 5 % außer FDP als „Sonstige“ zusammengefasst.</li>
+            <li><strong>Parteien:</strong> Mit Mandaten nach voriger oder aktueller Wahl einzeln;
+              übrige als „Sonstige“.</li>
             {multiVote && !ballots && <li><strong>** Stimmen:</strong> {data.unitNote} Prozentwerte: Stimmen ÷ ({votesPerVoter} × Einwohnerzahl) × 100; keine Personenanteile.</li>}
           {
             ballots && (

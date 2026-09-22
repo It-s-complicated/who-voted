@@ -11,7 +11,10 @@ import { septemberResults } from './september-2026.mjs';
 // A newer election must change the summary without changing historical metadata.
 const historical = structuredClone(states['sachsen-anhalt'].elections);
 const extended = { name: 'Sachsen-Anhalt', elections: structuredClone(historical) };
-extended.elections[2031] = { electionDate: '2031-09-07', url: 'https://example.org/2031/results.html' };
+extended.elections[2031] = {
+  electionDate: '2031-09-07', url: 'https://example.org/2031/results.html',
+  previousParliament: ['CDU'],
+};
 const summary = summarizeState(extended);
 assert.equal(summary.latestElection, '2031-09-07');
 assert.equal(summary.resultsUrl, extended.elections[2031].url);
@@ -20,10 +23,11 @@ for (const year of [2021, 2026]) assert.deepEqual(summary.elections[year], histo
 for (const patch of [
   { electionDate: undefined }, { electionDate: '2026-02-30' },
   { electionDate: '2030-09-07' }, { url: undefined }, { url: 'not-a-url' },
+  { previousParliament: [] },
 ]) {
   const broken = structuredClone(extended);
   Object.assign(broken.elections[2026], patch);
-  assert.throws(() => summarizeState(broken), /Sachsen-Anhalt\/2026: missing or invalid/);
+  assert.throws(() => summarizeState(broken), /Sachsen-Anhalt\/2026: (missing|invalid)/);
 }
 assert.throws(() => summarizeState({ name: 'Empty', elections: {} }), /no elections configured/);
 

@@ -1,4 +1,4 @@
-type ElectionMetadata = { electionDate: string; url: string };
+type ElectionMetadata = { electionDate: string; url: string; previousParliament: string[] };
 type StateEntry = { name: string; elections: Record<number, ElectionMetadata> };
 
 // Dates and result URLs belong to individual elections, never to a moving "latest" entry.
@@ -16,6 +16,10 @@ export function summarizeState(state: StateEntry) {
       || new URL(election.url).protocol !== 'https:') {
       throw new Error(`${state.name}/${year}: missing or invalid results URL`);
     }
+    if (!Array.isArray(election.previousParliament) || !election.previousParliament.length
+      || election.previousParliament.some((party) => typeof party !== 'string' || !party.trim())) {
+      throw new Error(`${state.name}/${year}: missing previous parliament parties`);
+    }
   }
   const latest = entries.map(([, election]) => election)
     .toSorted((a, b) => b.electionDate.localeCompare(a.electionDate))[0];
@@ -27,14 +31,15 @@ export function summarizeState(state: StateEntry) {
   };
 }
 
-// Only elections with local diagram datasets are listed.
+// Only elections with local diagram datasets are listed. Use current ballot names where available.
 const catalog: Record<string, StateEntry> = {
   "baden-wuerttemberg": {
     name: "Baden-Württemberg",
     elections: {
       2026: {
         electionDate: "2026-03-08",
-        url: "https://wahlen.statistik-bw.de/ltw26/"
+        url: "https://wahlen.statistik-bw.de/ltw26/",
+        previousParliament: ["GRÜNE", "CDU", "AfD", "SPD", "FDP"],
       }
     }
   },
@@ -43,7 +48,8 @@ const catalog: Record<string, StateEntry> = {
     elections: {
       2023: {
         electionDate: "2023-10-08",
-        url: "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-9.html"
+        url: "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-9.html",
+        previousParliament: ["CSU", "FREIE WÄHLER", "AfD", "GRÜNE", "SPD", "FDP"],
       }
     }
   },
@@ -52,11 +58,13 @@ const catalog: Record<string, StateEntry> = {
     elections: {
       2023: {
         electionDate: "2023-02-12",
-        url: "https://download.statistik-berlin-brandenburg.de/c6fffa8361dd1404/a8cc1bc593d9/DL_BE_AGHBVV2023.xlsx"
+        url: "https://download.statistik-berlin-brandenburg.de/c6fffa8361dd1404/a8cc1bc593d9/DL_BE_AGHBVV2023.xlsx",
+        previousParliament: ["CDU", "SPD", "GRÜNE", "DIE LINKE", "AfD", "FDP"],
       },
       2026: {
         electionDate: "2026-09-20",
-        url: "https://wahlen-berlin.de/wahlen/BE2026/Afspraes/AGH/Datenexport_AGH2026_Zweitstimme_A_BE.csv"
+        url: "https://wahlen-berlin.de/wahlen/BE2026/Afspraes/AGH/Datenexport_AGH2026_Zweitstimme_A_BE.csv",
+        previousParliament: ["CDU", "SPD", "GRÜNE", "Die Linke", "AfD"],
       }
     }
   },
@@ -65,7 +73,8 @@ const catalog: Record<string, StateEntry> = {
     elections: {
       2024: {
         electionDate: "2024-09-22",
-        url: "https://wahlergebnisse.brandenburg.de/12/500/20240922/landtagswahl_land/DL_BB_2_LT2024.xlsx"
+        url: "https://wahlergebnisse.brandenburg.de/12/500/20240922/landtagswahl_land/DL_BB_2_LT2024.xlsx",
+        previousParliament: ["SPD", "AfD", "CDU", "GRÜNE", "DIE LINKE", "BVB / FREIE WÄHLER"],
       }
     }
   },
@@ -74,7 +83,8 @@ const catalog: Record<string, StateEntry> = {
     elections: {
       2023: {
         electionDate: "2023-05-14",
-        url: "https://www.statistik.bremen.de/sixcms/media.php/13/Statistische%20Mitteilungen_126_pdfa_Auflage2.pdf"
+        url: "https://www.statistik.bremen.de/sixcms/media.php/13/Statistische%20Mitteilungen_126_pdfa_Auflage2.pdf",
+        previousParliament: ["SPD", "CDU", "GRÜNE", "DIE LINKE", "BIW", "FDP", "AfD"],
       }
     }
   },
@@ -83,7 +93,8 @@ const catalog: Record<string, StateEntry> = {
     elections: {
       2025: {
         electionDate: "2025-03-02",
-        url: "https://www.statistik-nord.de/fileadmin/Dokumente/BUE2025_e_05.pdf"
+        url: "https://www.statistik-nord.de/fileadmin/Dokumente/BUE2025_e_05.pdf",
+        previousParliament: ["SPD", "CDU", "GRÜNE", "Die Linke", "AfD", "FDP"],
       }
     }
   },
@@ -92,7 +103,8 @@ const catalog: Record<string, StateEntry> = {
     elections: {
       2023: {
         electionDate: "2023-10-08",
-        url: "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-6.html"
+        url: "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-6.html",
+        previousParliament: ["CDU", "AfD", "SPD", "GRÜNE", "FDP", "DIE LINKE"],
       }
     }
   },
@@ -101,11 +113,13 @@ const catalog: Record<string, StateEntry> = {
     elections: {
       2021: {
         electionDate: "2021-09-26",
-        url: "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-13.html"
+        url: "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-13.html",
+        previousParliament: ["SPD", "AfD", "CDU", "DIE LINKE"],
       },
       2026: {
         electionDate: "2026-09-20",
-        url: "https://wahlen.mvnet.de/dateien/ergebnisse.2026/landtagswahl/csv/l_wahlkreise.csv"
+        url: "https://wahlen.mvnet.de/dateien/ergebnisse.2026/landtagswahl/csv/l_wahlkreise.csv",
+        previousParliament: ["SPD", "AfD", "CDU", "Die Linke", "GRÜNE", "FDP"],
       }
     }
   },
@@ -114,7 +128,8 @@ const catalog: Record<string, StateEntry> = {
     elections: {
       2022: {
         electionDate: "2022-10-09",
-        url: "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-3.html"
+        url: "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-3.html",
+        previousParliament: ["SPD", "CDU", "GRÜNE", "AfD", "FDP"],
       }
     }
   },
@@ -123,7 +138,8 @@ const catalog: Record<string, StateEntry> = {
     elections: {
       2022: {
         electionDate: "2022-05-15",
-        url: "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-5.html"
+        url: "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-5.html",
+        previousParliament: ["CDU", "SPD", "GRÜNE", "FDP", "AfD"],
       }
     }
   },
@@ -132,7 +148,8 @@ const catalog: Record<string, StateEntry> = {
     elections: {
       2026: {
         electionDate: "2026-03-22",
-        url: "https://www.wahlen.rlp.de/fileadmin/wahlen.rlp.de/dokumente-wahlen/ltw/Ergebnisdateien/2026/Endgueltiges_Ergebnis_LW_2026_Wahlkreise.xlsx"
+        url: "https://www.wahlen.rlp.de/fileadmin/wahlen.rlp.de/dokumente-wahlen/ltw/Ergebnisdateien/2026/Endgueltiges_Ergebnis_LW_2026_Wahlkreise.xlsx",
+        previousParliament: ["CDU", "SPD", "AfD", "GRÜNE", "FREIE WÄHLER", "FDP"],
       }
     }
   },
@@ -141,7 +158,8 @@ const catalog: Record<string, StateEntry> = {
     elections: {
       2022: {
         electionDate: "2022-03-27",
-        url: "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-10.html"
+        url: "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-10.html",
+        previousParliament: ["SPD", "CDU", "AfD", "DIE LINKE"],
       }
     }
   },
@@ -150,7 +168,8 @@ const catalog: Record<string, StateEntry> = {
     elections: {
       2024: {
         electionDate: "2024-09-01",
-        url: "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-14.html"
+        url: "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-14.html",
+        previousParliament: ["CDU", "AfD", "SPD", "GRÜNE", "DIE LINKE"],
       }
     }
   },
@@ -159,11 +178,13 @@ const catalog: Record<string, StateEntry> = {
     elections: {
       2021: {
         electionDate: "2021-06-06",
-        url: "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-15.html"
+        url: "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-15.html",
+        previousParliament: ["CDU", "AfD", "DIE LINKE", "SPD", "GRÜNE"],
       },
       2026: {
         electionDate: "2026-09-06",
-        url: "https://wahlergebnisse.sachsen-anhalt.de/wahlen/lt26/erg_land.html"
+        url: "https://wahlergebnisse.sachsen-anhalt.de/wahlen/lt26/erg_land.html",
+        previousParliament: ["CDU", "AfD", "DIE LINKE", "SPD", "FDP", "GRÜNE"],
       }
     }
   },
@@ -172,7 +193,8 @@ const catalog: Record<string, StateEntry> = {
     elections: {
       2022: {
         electionDate: "2022-05-08",
-        url: "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-1.html"
+        url: "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-1.html",
+        previousParliament: ["CDU", "GRÜNE", "SPD", "FDP", "SSW", "AfD"],
       }
     }
   },
@@ -181,7 +203,8 @@ const catalog: Record<string, StateEntry> = {
     elections: {
       2024: {
         electionDate: "2024-09-01",
-        url: "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-16.html"
+        url: "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-16.html",
+        previousParliament: ["AfD", "CDU", "DIE LINKE", "SPD", "GRÜNE", "FDP"],
       }
     }
   }

@@ -15,12 +15,15 @@ Use statewide figures for the same election and territory. Keep absolute counts;
 | Participation | Number of people who voted, including people with invalid ballots | `turnout.voters` |
 | Displayed vote category | Valid votes, invalid votes, and any uncast votes in that category | `secondVotes` |
 | Party results | Absolute votes for every party/list and relevant independent candidate in the displayed category | `secondVotes.parties`; the full sum must equal valid votes |
+| Previous parliament | Parties that won seats at the preceding election, checked against its official seat distribution | `previousParliament` in `src/data/states.ts`; keeps those parties visible even below 5% |
 | Residents | Total population, reference date, and statistical basis, such as a census, population estimate, or population register | `population` |
 | Age and citizenship | Residents below voting age, and non-German residents at or above voting age; reference date and method | `population.demographics` |
 | Election rules | Official evidence for minimum voting age, vote category and label, and votes per voter in that category | `scripts/election-rules.mjs` |
 | Source provenance | Publisher, URL, local file, retrieval time, checksum, and exact table/page/sheet/column location | Raw source manifest and output sources |
 
 Prefer the election authority's results and statistical office's population data. A preliminary result is usable when counting is complete for the whole territory and its status is explicit. Do not substitute a partial count, forecast, or projection for a statewide result. Include small parties in the input; the page groups them for display.
+
+The chart shows parties from the preceding parliament plus parties with at least 5% of current votes. Before adding an election, check whether a new party won seats below 5%; that case needs an explicit seat-based selection rule.
 
 Prefer official CSV or structured API exports, then Excel, then HTML tables; use PDF as a fallback. Choose by completeness and meaning first: the source must cover the required figures, election year, territory, vote category, and result status (or population reference date and basis). A complete final Excel result is preferable to a partial or preliminary CSV. Check column definitions, encoding, delimiters, number formats, and totals even for structured exports.
 
@@ -67,7 +70,7 @@ Before downloading, inspect the configured population file paths. Even a downloa
 
 | File | Change |
 | --- | --- |
-| [src/data/states.ts](src/data/states.ts) | Add `elections[year]` with `electionDate` and the official result `url`. Years and latest-election links are derived automatically. |
+| [src/data/states.ts](src/data/states.ts) | Add `elections[year]` with `electionDate`, the official result `url`, and `previousParliament` from the preceding election's seat distribution. Years and latest-election links are derived automatically. |
 | [scripts/election-rules.mjs](scripts/election-rules.mjs) | Add the exact `state/year` key, voting age, official vote label, votes per voter, references, and any unit note. For the shared HTML parser, supply a zero-based `resultColumn` checked against that retained table. Unknown routes have no rule fallback. |
 | [scripts/state-sources.mjs](scripts/state-sources.mjs) | For states using the shared import, configure the result filename, publisher, location, and status. Verify the selected population source, reference date, and basis. Set `resultStatus: 'preliminary'` explicitly when applicable; the shared parser otherwise defaults to final. |
 | [scripts/download-data.mjs](scripts/download-data.mjs) | Hamburg and Bremen currently have separate, exact-election source entries here. Add a new entry for their new election and any required additional sources. Other states, including both Berlin elections, inherit their source configuration from `stateSources`. |

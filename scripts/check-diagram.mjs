@@ -11,6 +11,14 @@ for (const route of routes) {
   if (data.population.demographics.note) assert.ok(html.includes(data.population.demographics.note), `${route}: demographic method annotation`);
   const svg = html.match(/<svg\b[^>]*role="img"[\s\S]*?<\/svg>/)[0];
   const rects = [...svg.matchAll(/<rect\b([^>]*)>\s*<title>([\s\S]*?)<\/title>/g)];
+  const [state, year] = route.split('/');
+  const previousParliament = new Set(states[state].elections[year].previousParliament.map((party) => party.toLocaleLowerCase('de-DE')));
+  const displayedParties = data.secondVotes.parties.filter((party) =>
+    previousParliament.has(party.name.toLocaleLowerCase('de-DE')) || party.votes / data.secondVotes.valid >= 0.05);
+  if (route === 'mecklenburg-vorpommern/2026') {
+    assert.ok(displayedParties.some((party) => party.name === 'CDU'), `${route}: previous CDU seats retain its band`);
+    assert.ok(!displayedParties.some((party) => party.name === 'BSW'), `${route}: BSW remains in Sonstige`);
+  }
   const node = (label) => {
     const match = rects.find((rect) => rect[2].trim().startsWith(`${label}:`));
     assert.ok(match, `${route}: missing ${label}`);
@@ -21,12 +29,15 @@ for (const route of routes) {
   const valid = node(validLabel);
   assert.ok(Math.abs(valid.height / node('Einwohner:innen').height - data.secondVotes.valid / data.secondVotes.votesPerVoter / data.population.residents) < 1e-10);
   assert.ok(!/NaN|Infinity|undefined/.test(svg), `${route}: finite geometry and colors`);
-  for (const party of data.secondVotes.parties.filter((party) => party.name === 'FDP' || party.votes / data.secondVotes.valid >= 0.05)) {
+  for (const party of displayedParties) {
     const band = node(party.name);
     assert.ok(band.title.includes(percent(party.votes)), `${route}: ${party.name} population share`);
     assert.ok(Math.abs(band.height / node('Einwohner:innen').height - party.votes / data.secondVotes.votesPerVoter / data.population.residents) < 1e-10);
     assert.match(band.attrs, /fill="#[a-f0-9]{6}"/i);
     if (party.name.toLowerCase() === 'die linke') assert.ok(band.attrs.includes('fill="#bd4598"'));
+  }
+  for (const party of data.secondVotes.parties.filter((party) => !displayedParties.includes(party))) {
+    assert.ok(!rects.some((rect) => rect[2].trim().startsWith(`${party.name}:`)), `${route}: ${party.name} belongs in Sonstige`);
   }
   if (data.eligibility.note) assert.ok(html.includes(data.eligibility.note), `${route}: split overhang annotation`);
   const breakdown = data.eligibility.estimatedBreakdown;
