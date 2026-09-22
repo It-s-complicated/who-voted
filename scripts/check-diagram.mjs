@@ -22,8 +22,14 @@ for (const route of routes) {
   const node = (label) => {
     const match = rects.find((rect) => rect[2].trim().startsWith(`${label}:`));
     assert.ok(match, `${route}: missing ${label}`);
-    return { height: Number(match[1].match(/height="([^"]+)"/)[1]), title: match[2].trim(), attrs: match[1] };
+    return { y: Number(match[1].match(/y="([^"]+)"/)[1]), height: Number(match[1].match(/height="([^"]+)"/)[1]), title: match[2].trim(), attrs: match[1] };
   };
+  if (route === 'mecklenburg-vorpommern/2026' || route === 'berlin/2023') {
+    const bands = [...displayedParties.map((party) => node(party.name)), node('Sonstige')];
+    const expectedGaps = route === 'mecklenburg-vorpommern/2026' ? [18, 18, 26, 26, 26, 26] : [18, 18, 18, 18, 18, 18];
+    for (let i = 1; i < bands.length; i++)
+      assert.ok(Math.abs(bands[i].y - bands[i - 1].y - bands[i - 1].height - expectedGaps[i - 1]) < 1e-10, `${route}: only narrow party bands get extra spacing`);
+  }
   const percent = (votes) => `${(votes / data.secondVotes.votesPerVoter / data.population.residents * 100).toFixed(1).replace('.', ',')} %`;
   const validLabel = `${data.secondVotes.label}${data.secondVotes.votesPerVoter > 1 ? "**" : ""}`;
   const valid = node(validLabel);

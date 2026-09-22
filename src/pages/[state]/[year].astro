@@ -93,6 +93,9 @@ if (
 const otherVotes =
   data.secondVotes.valid -
   displayedParties.reduce((sum, party) => sum + party.votes, 0);
+const partyValues = [...displayedParties.map((party) => party.votes), otherVotes];
+const narrowPartyBands = partyValues
+  .filter((votes) => votes / data.secondVotes.valid < 0.1).length;
 const ballots = data.ballots;
 const votesPerVoter = data.secondVotes.votesPerVoter;
 const multiVote = votesPerVoter > 1;
@@ -322,7 +325,7 @@ const sankeyNodes = nodes.map((node) => ({
   ...node,
   value: node.value / (node.voteUnit ? votesPerVoter : 1),
 }));
-const graph = sankey<DiagramNode, DiagramLink>()
+const layout = sankey<DiagramNode, DiagramLink>()
   .nodeId((node) => node.id)
   .nodeAlign(sankeyLeft)
   .nodeSort((a, b) => a.order - b.order)
@@ -331,7 +334,8 @@ const graph = sankey<DiagramNode, DiagramLink>()
   .extent([
     [66, 24],
     [850, 696],
-  ])({
+  ]);
+const graph = layout({
   // Vote capacity shares keep all stages on the population scale; these are not person counts.
   nodes: sankeyNodes,
   links: links
@@ -345,6 +349,15 @@ const graph = sankey<DiagramNode, DiagramLink>()
           : 1),
     })),
 }) as { nodes: LayoutNode[]; links: LayoutLink[] };
+if (narrowPartyBands >= 4) {
+  let offset = 0;
+  graph.nodes.filter((node) => node.id.startsWith("party-")).forEach((node, index) => {
+    if (index && partyValues[index - 1] / data.secondVotes.valid < 0.1) offset += 8;
+    node.y0 += offset;
+    node.y1 += offset;
+  });
+  layout.update(graph);
+}
 const path = sankeyLinkHorizontal<DiagramNode, DiagramLink>();
 // ponytail: 210px is a rough label-width estimate for "fits right of the node";
 // end-anchored callouts stack top-down with a fixed 44px gap
