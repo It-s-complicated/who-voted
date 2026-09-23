@@ -1,0 +1,137 @@
+---
+import type { CardOptions } from "astro-cards";
+import { Font } from "astro:assets";
+
+export interface Band {
+  color: string;
+  /** Share of residents (0–1); the vertical size of the band. */
+  share: number;
+}
+
+interface Props {
+  heading: string;
+  sub?: string;
+  /** Simplified sankey: one column per flow stage, bands top-aligned like the real chart. */
+  flow?: Band[][];
+}
+
+export const card = {
+  width: 1200,
+  height: 630,
+  format: "png",
+} satisfies CardOptions;
+
+const { heading, sub, flow } = Astro.props;
+// Generic flow for pages without a chart of their own (home + state overview).
+const columns = flow ?? [
+  [{ color: "#2a3861", share: 1 }],
+  [
+    { color: "#5b84bb", share: 0.76 },
+    { color: "#918e8e", share: 0.24 },
+  ],
+  [
+    { color: "#7c9dc9", share: 0.66 },
+    { color: "#b5b4b4", share: 0.34 },
+  ],
+  [
+    { color: "#202831", share: 0.28 },
+    { color: "#e54040", share: 0.16 },
+    { color: "#30a84b", share: 0.12 },
+    { color: "#2996cc", share: 0.1 },
+    { color: "#bd4598", share: 0.09 },
+    { color: "#b2b2b2", share: 0.05 },
+  ],
+];
+// 630 card height − 72px top/bottom margins, capped in px so tiny shares stay visible.
+const bands = columns.map((column) =>
+  column.map(({ color, share }) => ({
+    color,
+    height: Math.max(4, Math.round(share * (630 - 2 * 72))),
+  })),
+);
+---
+
+<div class="card">
+  <Font cssVariable="--font-display" preload={false} />
+  <div class="chart">
+    {bands.map((column) => (
+      <div class="column">
+        {column.map((band) => (
+          <div
+            class="band"
+            style={`background-color: ${band.color}; height: ${band.height}px;`}
+          />
+        ))}
+      </div>
+    ))}
+  </div>
+  <div class="text">
+    <p class="eyebrow">{`Wer hat gewählt?`.toUpperCase()}</p>
+    <h1>{heading}</h1>
+    {sub && <p class="sub">{sub}</p>}
+  </div>
+</div>
+
+<style is:inline>
+  * {
+    margin: 0;
+    box-sizing: border-box;
+  }
+  .card {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    background-color: #fdfcfa;
+    font-family: Fraunces, Georgia, serif;
+    color: #1c1b1a;
+  }
+  .chart {
+    position: absolute;
+    top: 72px;
+    bottom: 72px;
+    left: 64px;
+    right: 64px;
+    display: flex;
+    gap: 56px;
+    opacity: 0.35;
+  }
+  .column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .band {
+    width: 48px;
+    flex: none;
+  }
+  .text {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    max-width: 660px;
+    margin-left: 72px;
+  }
+  .eyebrow {
+    color: #c8102e;
+    font-size: 30px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+  }
+  h1 {
+    margin-top: 18px;
+    font-size: 104px;
+    font-weight: 640;
+    line-height: 1.02;
+    letter-spacing: -0.015em;
+  }
+  .sub {
+    margin-top: 16px;
+    font-size: 64px;
+    font-weight: 500;
+    color: #55524d;
+  }
+</style>

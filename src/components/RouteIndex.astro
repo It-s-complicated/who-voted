@@ -1,6 +1,7 @@
 ---
 import { ClientRouter } from "astro:transitions";
-import "@fontsource-variable/fraunces";
+import { Font } from "astro:assets";
+import { renderCard } from "astro-cards/runtime";
 import "../styles/global.css";
 import Breadcrumbs from "./Breadcrumbs.astro";
 
@@ -19,6 +20,7 @@ interface Props {
 }
 
 const { title, description, links, groups, breadcrumbs } = Astro.props;
+const ogCard = await renderCard("og", { heading: title });
 ---
 
 <!doctype html>
@@ -28,6 +30,20 @@ const { title, description, links, groups, breadcrumbs } = Astro.props;
     <meta name="viewport" content="width=device-width" />
     <meta name="description" content={description} />
     <title>{title} · Wer hat gewählt?</title>
+    <Font cssVariable="--font-display" />
+    <meta property="og:title" content={`${title} · Wer hat gewählt?`} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:url"
+      content={new URL(Astro.url.pathname, Astro.site ?? Astro.url).href}
+    />
+    <meta property="og:image" content={new URL(ogCard.src, Astro.site ?? Astro.url).href} />
+    <meta property="og:image:width" content={String(ogCard.width)} />
+    <meta property="og:image:height" content={String(ogCard.height)} />
+    <meta property="og:image:type" content={ogCard.type} />
+    <meta property="og:image:alt" content={description} />
+    <meta name="twitter:card" content="summary_large_image" />
     <ClientRouter />
   </head>
   <body>

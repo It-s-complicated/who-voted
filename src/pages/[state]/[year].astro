@@ -1,8 +1,9 @@
 ---
 import { ClientRouter } from "astro:transitions";
-import "@fontsource-variable/fraunces";
+import { Font } from "astro:assets";
 import "../../styles/global.css";
 import Breadcrumbs from "../../components/Breadcrumbs.astro";
+import { renderCard } from "astro-cards/runtime";
 import { states } from "../../data/states";
 import type { ElectionData } from "../../data/election";
 import { readFileSync } from "node:fs";
@@ -127,6 +128,31 @@ const topParties = displayedParties
   .slice(0, 5)
   .map((party) => party.name)
   .join(", ");
+
+// OG card: simplified sankey on the residents scale (votes normalize by votesPerVoter).
+const ogFlow = [
+  [{ color: "#2a3861", share: 1 }],
+  [
+    { color: "#5b84bb", share: data.eligibility.eligible / data.population.residents },
+    { color: "#918e8e", share: data.eligibility.notEligible / data.population.residents },
+  ],
+  [
+    { color: "#7c9dc9", share: data.turnout.voters / data.population.residents },
+    { color: "#b5b4b4", share: data.turnout.nonVoters / data.population.residents },
+  ],
+  [
+    ...displayedParties.map((party) => ({
+      color: partyColors[party.name.toLowerCase()] ?? "#76716b",
+      share: party.votes / (data.population.residents * votesPerVoter),
+    })),
+    { color: "#b2b2b2", share: otherVotes / (data.population.residents * votesPerVoter) },
+  ],
+];
+const ogCard = await renderCard("og", {
+  heading: state.name,
+  sub: String(Astro.params.year),
+  flow: ogFlow,
+});
 
 const nodes: DiagramNode[] = [
   {
@@ -461,6 +487,29 @@ const tableRows = [
       content={`Wie ${state.name} bei der Wahl ${Astro.params.year} gewählt hat.`}
     />
     <title>{`Wer hat gewählt? ${state.name} ${Astro.params.year}`}</title>
+    <Font cssVariable="--font-display" />
+    <meta
+      property="og:title"
+      content={`Wer hat gewählt? ${state.name} ${Astro.params.year}`}
+    />
+    <meta
+      property="og:description"
+      content={`Wie ${state.name} bei der Wahl ${Astro.params.year} gewählt hat.`}
+    />
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:url"
+      content={new URL(Astro.url.pathname, Astro.site ?? Astro.url).href}
+    />
+    <meta property="og:image" content={new URL(ogCard.src, Astro.site ?? Astro.url).href} />
+    <meta property="og:image:width" content={String(ogCard.width)} />
+    <meta property="og:image:height" content={String(ogCard.height)} />
+    <meta property="og:image:type" content={ogCard.type} />
+    <meta
+      property="og:image:alt"
+      content={`Sankey-Diagramm der Wahlbeteiligung und Zweitstimmenverteilung in ${state.name} ${Astro.params.year}`}
+    />
+    <meta name="twitter:card" content="summary_large_image" />
     <ClientRouter />
   </head>
   <body>
