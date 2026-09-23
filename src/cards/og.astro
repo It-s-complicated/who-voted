@@ -66,7 +66,7 @@ const bands = columns.map((column) =>
     ))}
   </div>
   <div class="text">
-    <p class="eyebrow">{`Wer hat gewählt?`.toUpperCase()}</p>
+    <p class="eyebrow">Wer hat gewählt?</p>
     <h1>{heading}</h1>
     {sub && <p class="sub">{sub}</p>}
   </div>
@@ -84,6 +84,10 @@ const bands = columns.map((column) =>
     display: flex;
     align-items: center;
     background-color: #fdfcfa;
+    /* Monochrome fractal noise, repeated as a fine grain over the paper. */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23g)' opacity='0.07'/%3E%3C/svg%3E");
+    background-size: 200px 200px;
+    background-repeat: repeat;
     font-family: Fraunces, Georgia, serif;
     color: #1c1b1a;
   }
@@ -114,23 +118,27 @@ const bands = columns.map((column) =>
     flex-direction: column;
     width: 660px;
     margin-left: 72px;
+    /* Subtle lift so type separates from the grain and chart. */
+    text-shadow: 0 2px 12px rgba(28, 27, 26, 0.15);
   }
   .eyebrow {
+    /* Only Fraunces is loaded in the card renderer; system sans silently
+       falls back, so the kicker stays in the display face by design. */
     color: #c8102e;
     font-size: 30px;
-    font-weight: 600;
-    letter-spacing: 0.16em;
+    font-weight: 620;
   }
   h1 {
     margin-top: 18px;
-    font-size: 104px;
-    font-weight: 640;
+    font-size: 96px;
+    font-weight: 620;
+    font-variation-settings: "opsz" 14, "SOFT" 0, "WONK" 0;
     line-height: 1.02;
     letter-spacing: -0.015em;
   }
   .sub {
     margin-top: 16px;
-    font-size: 64px;
+    font-size: 58px;
     font-weight: 500;
     color: #55524d;
   }
