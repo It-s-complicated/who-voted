@@ -20,6 +20,7 @@ interface Props {
 }
 
 const { title, description, links, groups, breadcrumbs } = Astro.props;
+const pageTitle = Astro.url.pathname === "/" ? title : `${title} · Wer hat gewählt?`;
 const ogCard = await renderCard("og", { heading: title });
 ---
 
@@ -29,9 +30,9 @@ const ogCard = await renderCard("og", { heading: title });
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <meta name="description" content={description} />
-    <title>{title} · Wer hat gewählt?</title>
+    <title>{pageTitle}</title>
     <Font cssVariable="--font-display" />
-    <meta property="og:title" content={`${title} · Wer hat gewählt?`} />
+    <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
     <meta
