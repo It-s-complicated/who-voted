@@ -1,0 +1,278 @@
+---
+import { sankey, sankeyLeft, sankeyLinkHorizontal } from "d3-sankey";
+import ChartExport from "./ChartExport.astro";
+import type { SankeyLink, SankeyNode } from "d3-sankey";
+import type { DiagramNode, DiagramLink } from "../data/chart";
+import type { ElectionData } from "../data/election";
+
+type LayoutNode = SankeyNode<DiagramNode, DiagramLink> &
+  Required<Pick<SankeyNode<DiagramNode, DiagramLink>, "x0" | "x1" | "y0" | "y1">>;
+type LayoutLink = SankeyLink<DiagramNode, DiagramLink> & {
+  source: LayoutNode;
+  target: LayoutNode;
+  width: number;
+};
+
+interface Props {
+  data: ElectionData;
+  stateName: string;
+  filename: string;
+  nodes: DiagramNode[];
+  links: DiagramLink[];
+  nodeValue: (node: DiagramNode, value?: number) => string;
+}
+
+const { data, stateName, filename, nodes, links, nodeValue } = Astro.props as Props;
+const format = new Intl.NumberFormat("de-DE");
+const votesPerVoter = data.secondVotes.votesPerVoter;
+const partyNodes = nodes.filter((node) => node.id.startsWith("party-"));
+const partyValues = partyNodes.map((node) => node.value);
+const narrowPartyBands = partyValues.filter((votes) => votes / data.secondVotes.valid < 0.1).length;
+const topParties = partyNodes.filter((node) => node.id !== "party-Other").slice(0, 5).map((node) => node.label).join(", ");
+
+// zero-value links (e.g. Bremen's "Kein Stimmzettel") are dropped with their nodes
+const sankeyNodes = nodes.map((node) => ({
+  ...node,
+  value: node.value / (node.voteUnit ? votesPerVoter : 1),
+}));
+const layout = sankey<DiagramNode, DiagramLink>()
+  .nodeId((node) => node.id)
+  .nodeAlign(sankeyLeft)
+  .nodeSort((a, b) => a.order - b.order)
+  .nodeWidth(14)
+  .nodePadding(18)
+  .extent([
+    [66, 24],
+    [850, 696],
+  ]);
+const graph = layout({
+  // Vote capacity shares keep all stages on the population scale; these are not person counts.
+  nodes: sankeyNodes,
+  links: links
+    .filter((link) => link.value > 0)
+    .map((link) => ({
+      ...link,
+      value:
+        link.value /
+        (nodes.find((node) => node.id === link.target)?.voteUnit
+          ? votesPerVoter
+          : 1),
+    })),
+}) as { nodes: LayoutNode[]; links: LayoutLink[] };
+if (narrowPartyBands >= 4) {
+  let offset = 0;
+  graph.nodes.filter((node) => node.id.startsWith("party-")).forEach((node, index) => {
+    if (index && partyValues[index - 1] / data.secondVotes.valid < 0.1) offset += 8;
+    node.y0 += offset;
+    node.y1 += offset;
+  });
+  layout.update(graph);
+}
+const path = sankeyLinkHorizontal<DiagramNode, DiagramLink>();
+// ponytail: 210px is a rough label-width estimate for "fits right of the node";
+// end-anchored callouts stack top-down with a fixed 44px gap
+let calloutY = -Infinity;
+let startCalloutY = -Infinity;
+const callouts = [
+  ...graph.nodes
+    .filter((node) => node.callout && node.y1 + 210 <= 708)
+    .map((node) => {
+      const y = Math.max(node.x0 + 7, startCalloutY + 44);
+      startCalloutY = y;
+      return {
+        node,
+        anchor: "start" as const,
+        x: node.y1 + 12,
+        y,
+        line: {
+          x1: node.y1,
+          y1: node.x0 + 3,
+          x2: node.y1 + 8,
+          y2: y - 4,
+        },
+      };
+    }),
+  // ponytail: 210px is a rough label-width estimate for "fits right of the node";
+  // end-anchored callouts stack top-down with a fixed 44px gap
+  ...graph.nodes
+    .filter((node) => node.callout && node.y1 + 210 > 708)
+    .sort((a, b) => a.x0 - b.x0)
+    .map((node, index) => {
+      // place below the previous callout's text, at least 44px apart
+      const fallbackY = node.x0 + 34;
+      const y = index === 0 ? fallbackY : Math.max(fallbackY, calloutY + 44);
+      calloutY = y;
+      return {
+        node,
+        anchor: "end" as const,
+        x: 690,
+        y,
+        line: {
+          x1: (node.y0 + node.y1) / 2,
+          y1: node.x0,
+          x2: 690,
+          y2: y - 6,
+        },
+      };
+    }),
+];
+---
+
+<div class="diagram-scroll">
+  <svg
+    id="election-chart"
+    data-filename={filename}
+    viewBox="0 0 720 940"
+    role="img"
+    tabindex="0"
+    aria-labelledby="diagram-title"
+    aria-describedby="diagram-description"
+  >
+    <title id="diagram-title">
+      {
+        `Wahlbeteiligung und ${data.secondVotes.label.toLowerCase()} in ${stateName} ${data.year}`
+      }
+    </title>
+    <desc id="diagram-description">
+      {
+        `Sankey-Diagramm von ${format.format(data.population.residents)} Einwohner:innen über Wahlberechtigung, Wahlbeteiligung und ${data.secondVotes.label.toLowerCase()} bis zu den Parteien ${topParties} sowie Sonstige.`
+      }
+    </desc>
+
+    <g transform="matrix(0 1 1 0 0 0)" class="links">
+      {
+        graph.links.map((link) => (
+          <path
+            d={path(link)}
+            stroke={link.target.color}
+            stroke-width={Math.max(1, link.width)}
+          >
+            <title>
+              {link.source.label} → {link.target.label}:{" "}
+              {nodeValue(link.target, link.value)}
+            </title>
+          </path>
+        ))
+      }
+    </g>
+
+    <g transform="matrix(0 1 1 0 0 0)" class="nodes">
+      {
+        graph.nodes.map((node) => (
+          <rect
+            x={node.x0}
+            y={node.y0}
+            width={node.x1 - node.x0}
+            height={Math.max(1, node.y1 - node.y0)}
+            fill={node.color}
+          >
+            <title>
+              {node.label}: {nodeValue(node)}
+            </title>
+          </rect>
+        ))
+      }
+    </g>
+
+    <g class="labels" aria-hidden="true">
+      {
+        // thin adjacent bars: stagger the second label a row higher
+        graph.nodes
+          .filter(
+            (node) => !node.callout && !node.id.startsWith("party-"),
+          )
+          .map((node) => (
+            <text
+              text-anchor={node.id === "nonGerman" ? "end" : "start"}
+              y={
+                node.id === "nonGerman"
+                  ? node.x0 - 54
+                  : node.x0 - 24
+              }
+            >
+              <tspan x={node.id === "nonGerman" ? node.y1 - 3 : node.y0 + 3}>{node.label}</tspan>
+              <tspan x={node.id === "nonGerman" ? node.y1 - 3 : node.y0 + 3} dy="15">
+                {nodeValue(node)}
+              </tspan>
+            </text>
+          ))
+      }
+      {
+        graph.nodes
+          .filter((node) => node.id.startsWith("party-"))
+          .map((node) => (
+            <text
+              x={node.y0 + 3}
+              y={node.x1 + 18}
+              transform={`rotate(35 ${node.y0 + 3} ${node.x1 + 18})`}
+            >
+              <tspan x={node.y0 + 3}>{node.label}</tspan>
+              <tspan x={node.y0 + 3} dy="15">
+                {nodeValue(node)}
+              </tspan>
+            </text>
+          ))
+      }
+      {
+        callouts.map((callout) => (
+          <g>
+            <line
+              x1={callout.line.x1}
+              y1={callout.line.y1}
+              x2={callout.line.x2}
+              y2={callout.line.y2}
+            />
+            <text
+              x={callout.x}
+              y={callout.y}
+              text-anchor={callout.anchor}
+            >
+              <tspan x={callout.x}>{callout.node.label}</tspan>
+              <tspan x={callout.x} dy="17">
+                {nodeValue(callout.node)}
+              </tspan>
+            </text>
+          </g>
+        ))
+      }
+    </g>
+  </svg>
+</div>
+<ChartExport />
+
+<style>
+.diagram-scroll {
+  overflow-x: auto;
+}
+svg {
+  display: block;
+  width: 100%;
+  min-width: 38rem;
+  height: auto;
+  background: var(--surface);
+}
+.links path {
+  fill: none;
+  stroke-opacity: 0.55;
+}
+.nodes rect {
+  stroke: var(--surface);
+  stroke-width: 1.5;
+}
+.labels text {
+  fill: var(--ink);
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+}
+.labels tspan + tspan {
+  fill: var(--text-secondary);
+  font-size: 10.5px;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+.labels line {
+  stroke: var(--callout-line);
+  stroke-width: 1;
+}
+</style>

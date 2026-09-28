@@ -3,12 +3,12 @@ import { ClientRouter } from "astro:transitions";
 import { Font } from "astro:assets";
 import "../../styles/global.css";
 import Breadcrumbs from "../../components/Breadcrumbs.astro";
+import ElectionChart from "../../components/ElectionChart.astro";
+import type { DiagramNode, DiagramLink } from "../../data/chart";
 import { renderCard } from "astro-cards/runtime";
 import { states } from "../../data/states";
 import type { ElectionData } from "../../data/election";
 import { readFileSync } from "node:fs";
-import { sankey, sankeyLeft, sankeyLinkHorizontal } from "d3-sankey";
-import type { SankeyLink, SankeyNode } from "d3-sankey";
 
 export function getStaticPaths() {
   return Object.entries(states).flatMap(([state, { years }]) =>
@@ -18,27 +18,6 @@ export function getStaticPaths() {
 
 const state = states[Astro.params.state ?? ""];
 if (!state) throw new Error(`Unknown state: ${Astro.params.state}`);
-
-type DiagramNode = {
-  id: string;
-  label: string;
-  value: number;
-  voteUnit?: boolean;
-  sourceValue?: number;
-  color: string;
-  order: number;
-  callout?: boolean;
-};
-type DiagramLink = { source: string; target: string; value: number };
-type LayoutNode = SankeyNode<DiagramNode, DiagramLink> &
-  Required<
-    Pick<SankeyNode<DiagramNode, DiagramLink>, "x0" | "x1" | "y0" | "y1">
-  >;
-type LayoutLink = SankeyLink<DiagramNode, DiagramLink> & {
-  source: LayoutNode;
-  target: LayoutNode;
-  width: number;
-};
 
 const data = JSON.parse(
   readFileSync(
@@ -94,9 +73,6 @@ if (
 const otherVotes =
   data.secondVotes.valid -
   displayedParties.reduce((sum, party) => sum + party.votes, 0);
-const partyValues = [...displayedParties.map((party) => party.votes), otherVotes];
-const narrowPartyBands = partyValues
-  .filter((votes) => votes / data.secondVotes.valid < 0.1).length;
 const ballots = data.ballots;
 const votesPerVoter = data.secondVotes.votesPerVoter;
 const multiVote = votesPerVoter > 1;
@@ -124,11 +100,6 @@ const populationDate = new Intl.DateTimeFormat("de-DE", {
   month: "long",
   year: "numeric",
 }).format(new Date(data.population.referenceDate));
-const topParties = displayedParties
-  .slice(0, 5)
-  .map((party) => party.name)
-  .join(", ");
-
 // OG card: simplified sankey on the residents scale (votes normalize by votesPerVoter).
 const ogFlow = [
   [{ color: "#2a3861", share: 1 }],
@@ -346,92 +317,6 @@ const links: DiagramLink[] = [
   { source: "valid", target: "party-Other", value: otherVotes },
 ];
 
-// zero-value links (e.g. Bremen's "Kein Stimmzettel") are dropped with their nodes
-const sankeyNodes = nodes.map((node) => ({
-  ...node,
-  value: node.value / (node.voteUnit ? votesPerVoter : 1),
-}));
-const layout = sankey<DiagramNode, DiagramLink>()
-  .nodeId((node) => node.id)
-  .nodeAlign(sankeyLeft)
-  .nodeSort((a, b) => a.order - b.order)
-  .nodeWidth(14)
-  .nodePadding(18)
-  .extent([
-    [66, 24],
-    [850, 696],
-  ]);
-const graph = layout({
-  // Vote capacity shares keep all stages on the population scale; these are not person counts.
-  nodes: sankeyNodes,
-  links: links
-    .filter((link) => link.value > 0)
-    .map((link) => ({
-      ...link,
-      value:
-        link.value /
-        (nodes.find((node) => node.id === link.target)?.voteUnit
-          ? votesPerVoter
-          : 1),
-    })),
-}) as { nodes: LayoutNode[]; links: LayoutLink[] };
-if (narrowPartyBands >= 4) {
-  let offset = 0;
-  graph.nodes.filter((node) => node.id.startsWith("party-")).forEach((node, index) => {
-    if (index && partyValues[index - 1] / data.secondVotes.valid < 0.1) offset += 8;
-    node.y0 += offset;
-    node.y1 += offset;
-  });
-  layout.update(graph);
-}
-const path = sankeyLinkHorizontal<DiagramNode, DiagramLink>();
-// ponytail: 210px is a rough label-width estimate for "fits right of the node";
-// end-anchored callouts stack top-down with a fixed 44px gap
-let calloutY = -Infinity;
-let startCalloutY = -Infinity;
-const callouts = [
-  ...graph.nodes
-    .filter((node) => node.callout && node.y1 + 210 <= 708)
-    .map((node) => {
-      const y = Math.max(node.x0 + 7, startCalloutY + 44);
-      startCalloutY = y;
-      return {
-        node,
-        anchor: "start" as const,
-        x: node.y1 + 12,
-        y,
-        line: {
-          x1: node.y1,
-          y1: node.x0 + 3,
-          x2: node.y1 + 8,
-          y2: y - 4,
-        },
-      };
-    }),
-  // ponytail: 210px is a rough label-width estimate for "fits right of the node";
-  // end-anchored callouts stack top-down with a fixed 44px gap
-  ...graph.nodes
-    .filter((node) => node.callout && node.y1 + 210 > 708)
-    .sort((a, b) => a.x0 - b.x0)
-    .map((node, index) => {
-      // place below the previous callout's text, at least 44px apart
-      const fallbackY = node.x0 + 34;
-      const y = index === 0 ? fallbackY : Math.max(fallbackY, calloutY + 44);
-      calloutY = y;
-      return {
-        node,
-        anchor: "end" as const,
-        x: 690,
-        y,
-        line: {
-          x1: (node.y0 + node.y1) / 2,
-          y1: node.x0,
-          x2: 690,
-          y2: y - 6,
-        },
-      };
-    }),
-];
 const sourceLabels: Record<string, string> = {
   results: data.resultStatus === "preliminary" ? "vorläufiges Wahlergebnis" : "endgültiges Wahlergebnis",
   population: "Bevölkerungsstand",
@@ -554,130 +439,14 @@ const tableRows = [
       </section>
 
       <figure>
-        <div class="diagram-scroll">
-          <svg
-            id="election-chart"
-            data-filename={`${Astro.params.state}-${Astro.params.year}`}
-            viewBox="0 0 720 940"
-            role="img"
-            tabindex="0"
-            aria-labelledby="diagram-title"
-            aria-describedby="diagram-description"
-          >
-            <title id="diagram-title">
-              {
-                `Wahlbeteiligung und ${data.secondVotes.label.toLowerCase()} in ${state.name} ${Astro.params.year}`
-              }
-            </title>
-            <desc id="diagram-description">
-              {
-                `Sankey-Diagramm von ${format.format(data.population.residents)} Einwohner:innen über Wahlberechtigung, Wahlbeteiligung und ${data.secondVotes.label.toLowerCase()} bis zu den Parteien ${topParties} sowie Sonstige.`
-              }
-            </desc>
-
-            <g transform="matrix(0 1 1 0 0 0)" class="links">
-              {
-                graph.links.map((link) => (
-                  <path
-                    d={path(link)}
-                    stroke={link.target.color}
-                    stroke-width={Math.max(1, link.width)}
-                  >
-                    <title>
-                      {link.source.label} → {link.target.label}:{" "}
-                      {nodeValue(link.target, link.value)}
-                    </title>
-                  </path>
-                ))
-              }
-            </g>
-
-            <g transform="matrix(0 1 1 0 0 0)" class="nodes">
-              {
-                graph.nodes.map((node) => (
-                  <rect
-                    x={node.x0}
-                    y={node.y0}
-                    width={node.x1 - node.x0}
-                    height={Math.max(1, node.y1 - node.y0)}
-                    fill={node.color}
-                  >
-                    <title>
-                      {node.label}: {nodeValue(node)}
-                    </title>
-                  </rect>
-                ))
-              }
-            </g>
-
-            <g class="labels" aria-hidden="true">
-              {
-                // thin adjacent bars: stagger the second label a row higher
-                graph.nodes
-                  .filter(
-                    (node) => !node.callout && !node.id.startsWith("party-"),
-                  )
-                  .map((node) => (
-                    <text
-                      text-anchor={node.id === "nonGerman" ? "end" : "start"}
-                      y={
-                        node.id === "nonGerman"
-                          ? node.x0 - 54
-                          : node.x0 - 24
-                      }
-                    >
-                      <tspan x={node.id === "nonGerman" ? node.y1 - 3 : node.y0 + 3}>{node.label}</tspan>
-                      <tspan x={node.id === "nonGerman" ? node.y1 - 3 : node.y0 + 3} dy="15">
-                        {nodeValue(node)}
-                      </tspan>
-                    </text>
-                  ))
-              }
-              {
-                graph.nodes
-                  .filter((node) => node.id.startsWith("party-"))
-                  .map((node) => (
-                    <text
-                      x={node.y0 + 3}
-                      y={node.x1 + 18}
-                      transform={`rotate(35 ${node.y0 + 3} ${node.x1 + 18})`}
-                    >
-                      <tspan x={node.y0 + 3}>{node.label}</tspan>
-                      <tspan x={node.y0 + 3} dy="15">
-                        {nodeValue(node)}
-                      </tspan>
-                    </text>
-                  ))
-              }
-              {
-                callouts.map((callout) => (
-                  <g>
-                    <line
-                      x1={callout.line.x1}
-                      y1={callout.line.y1}
-                      x2={callout.line.x2}
-                      y2={callout.line.y2}
-                    />
-                    <text
-                      x={callout.x}
-                      y={callout.y}
-                      text-anchor={callout.anchor}
-                    >
-                      <tspan x={callout.x}>{callout.node.label}</tspan>
-                      <tspan x={callout.x} dy="17">
-                        {nodeValue(callout.node)}
-                      </tspan>
-                    </text>
-                  </g>
-                ))
-              }
-            </g>
-          </svg>
-        </div>
-        <div id="chart-menu" popover="auto" role="menu" aria-label="Diagramm herunterladen">
-          <button type="button" role="menuitem" data-format="svg">SVG herunterladen</button>
-          <button type="button" role="menuitem" data-format="png">PNG herunterladen</button>
-        </div>
+        <ElectionChart
+          data={data}
+          stateName={state.name}
+          filename={`${Astro.params.state}-${Astro.params.year}`}
+          nodes={nodes}
+          links={links}
+          nodeValue={nodeValue}
+        />
         <figcaption>
           <ul class="caption-points">
             {breakdown && (
@@ -796,105 +565,6 @@ const tableRows = [
     <script>
       import { navigate } from "astro:transitions/client";
 
-      const svgNS = "http://www.w3.org/2000/svg";
-
-      function chartExport(svg: SVGSVGElement) {
-        const copy = svg.cloneNode(true) as SVGSVGElement;
-        copy.setAttribute("xmlns", svgNS);
-        copy.setAttribute("width", "720");
-        copy.setAttribute("height", "940");
-        copy.removeAttribute("id");
-        const background = document.createElementNS(svgNS, "rect");
-        background.setAttribute("width", "100%");
-        background.setAttribute("height", "100%");
-        background.setAttribute("fill", "#ffffff");
-        copy.insertBefore(background, copy.querySelector(".links"));
-        const style = document.createElementNS(svgNS, "style");
-        style.textContent = `
-          .links path { fill: none; stroke-opacity: .55 }
-          .nodes rect { stroke: #ffffff; stroke-width: 1.5 }
-          .labels text { fill: #1c1b1a; font: 600 12px system-ui, sans-serif }
-          .labels tspan + tspan { fill: #6b6760; font-size: 10.5px; font-weight: 400; font-variant-numeric: tabular-nums }
-          .labels line { stroke: #8f8b84; stroke-width: 1 }
-        `;
-        copy.insertBefore(style, background);
-        return new Blob([new XMLSerializer().serializeToString(copy)], { type: "image/svg+xml;charset=utf-8" });
-      }
-
-      function download(blob: Blob, name: string) {
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = name;
-        link.click();
-        setTimeout(() => URL.revokeObjectURL(url), 1000);
-      }
-
-      function showChartMenu(x: number, y: number) {
-        const menu = document.querySelector<HTMLDivElement>("#chart-menu");
-        if (!menu) return;
-        menu.showPopover();
-        menu.style.left = `${Math.max(8, Math.min(x, innerWidth - menu.offsetWidth - 8))}px`;
-        menu.style.top = `${Math.max(8, Math.min(y, innerHeight - menu.offsetHeight - 8))}px`;
-        menu.querySelector("button")?.focus();
-      }
-
-      document.addEventListener("contextmenu", (event) => {
-        const chart = (event.target as Element).closest("#election-chart");
-        if (!chart) return;
-        event.preventDefault();
-        showChartMenu(event.clientX, event.clientY);
-      });
-
-      document.addEventListener("click", async (event) => {
-        const button = (event.target as Element).closest<HTMLButtonElement>("#chart-menu button");
-        if (!button) return;
-        const menu = button.closest<HTMLDivElement>("#chart-menu")!;
-        menu.hidePopover();
-        const svg = document.querySelector<SVGSVGElement>("#election-chart");
-        if (!svg) return;
-        const format = button.dataset.format;
-        const blob = chartExport(svg);
-        const name = `wahlbeteiligung-${svg.dataset.filename}.${format}`;
-        try {
-          if (format === "svg") {
-            download(blob, name);
-          } else {
-            const image = new Image();
-            const url = URL.createObjectURL(blob);
-            image.src = url;
-            try {
-              await image.decode();
-            } finally {
-              URL.revokeObjectURL(url);
-            }
-            const canvas = document.createElement("canvas");
-            canvas.width = 1440;
-            canvas.height = 1880;
-            canvas.getContext("2d")!.drawImage(image, 0, 0, canvas.width, canvas.height);
-            canvas.toBlob((png) => png ? download(png, name) : alert("PNG konnte nicht erstellt werden."), "image/png");
-          }
-        } catch {
-          alert("Diagramm konnte nicht heruntergeladen werden.");
-        }
-      });
-
-      document.addEventListener("keydown", (event) => {
-        if (event.target instanceof SVGSVGElement && event.target.id === "election-chart" &&
-          (event.key === "ContextMenu" || (event.shiftKey && event.key === "F10"))) {
-          event.preventDefault();
-          const rect = event.target.getBoundingClientRect();
-          showChartMenu(rect.left + 16, rect.top + 16);
-          return;
-        }
-        const menu = document.querySelector<HTMLDivElement>("#chart-menu:popover-open");
-        if (!menu || !["ArrowDown", "ArrowUp"].includes(event.key)) return;
-        event.preventDefault();
-        const buttons = [...menu.querySelectorAll("button")];
-        const next = buttons.indexOf(document.activeElement as HTMLButtonElement) + (event.key === "ArrowDown" ? 1 : -1);
-        buttons[(next + buttons.length) % buttons.length].focus();
-      });
-
       // Delegated: the select is replaced on every view-transition swap,
       // and this script does not re-run after a swap.
       document.addEventListener("change", (event) => {
@@ -974,68 +644,6 @@ const tableRows = [
     background: var(--surface);
     border: 1px solid var(--ink);
     overflow: hidden;
-  }
-  .diagram-scroll {
-    overflow-x: auto;
-  }
-  #chart-menu {
-    position: fixed;
-    inset: auto;
-    width: max-content;
-    min-width: 12rem;
-    margin: 0;
-    padding: 0.35rem;
-    color: var(--ink);
-    background: var(--surface);
-    border: 1px solid var(--divider);
-    box-shadow: 0 6px 18px #1c1b1a26;
-    font: 0.85rem var(--font-body);
-  }
-  #chart-menu button {
-    display: block;
-    width: 100%;
-    padding: 0.55rem 0.65rem;
-    color: inherit;
-    background: transparent;
-    border: 0;
-    text-align: left;
-    font: inherit;
-    cursor: pointer;
-  }
-  #chart-menu button:hover,
-  #chart-menu button:focus-visible {
-    background: var(--caption-surface);
-  }
-  svg {
-    display: block;
-    width: 100%;
-    min-width: 38rem;
-    height: auto;
-    background: var(--surface);
-  }
-  .links path {
-    fill: none;
-    stroke-opacity: 0.55;
-  }
-  .nodes rect {
-    stroke: var(--surface);
-    stroke-width: 1.5;
-  }
-  .labels text {
-    fill: var(--ink);
-    font-family: ui-sans-serif, system-ui, sans-serif;
-    font-size: 12px;
-    font-weight: 600;
-  }
-  .labels tspan + tspan {
-    fill: var(--text-secondary);
-    font-size: 10.5px;
-    font-weight: 400;
-    font-variant-numeric: tabular-nums;
-  }
-  .labels line {
-    stroke: var(--callout-line);
-    stroke-width: 1;
   }
   figcaption {
     padding: 0.9rem 1.1rem 1rem;
