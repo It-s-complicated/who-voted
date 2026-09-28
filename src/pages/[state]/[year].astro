@@ -556,8 +556,11 @@ const tableRows = [
       <figure>
         <div class="diagram-scroll">
           <svg
+            id="election-chart"
+            data-filename={`${Astro.params.state}-${Astro.params.year}`}
             viewBox="0 0 720 940"
             role="img"
+            tabindex="0"
             aria-labelledby="diagram-title"
             aria-describedby="diagram-description"
           >
@@ -670,6 +673,10 @@ const tableRows = [
               }
             </g>
           </svg>
+        </div>
+        <div id="chart-menu" popover="auto" role="menu" aria-label="Diagramm herunterladen">
+          <button type="button" role="menuitem" data-format="svg">SVG herunterladen</button>
+          <button type="button" role="menuitem" data-format="png">PNG herunterladen</button>
         </div>
         <figcaption>
           <ul class="caption-points">
@@ -789,6 +796,105 @@ const tableRows = [
     <script>
       import { navigate } from "astro:transitions/client";
 
+      const svgNS = "http://www.w3.org/2000/svg";
+
+      function chartExport(svg: SVGSVGElement) {
+        const copy = svg.cloneNode(true) as SVGSVGElement;
+        copy.setAttribute("xmlns", svgNS);
+        copy.setAttribute("width", "720");
+        copy.setAttribute("height", "940");
+        copy.removeAttribute("id");
+        const background = document.createElementNS(svgNS, "rect");
+        background.setAttribute("width", "100%");
+        background.setAttribute("height", "100%");
+        background.setAttribute("fill", "#ffffff");
+        copy.insertBefore(background, copy.querySelector(".links"));
+        const style = document.createElementNS(svgNS, "style");
+        style.textContent = `
+          .links path { fill: none; stroke-opacity: .55 }
+          .nodes rect { stroke: #ffffff; stroke-width: 1.5 }
+          .labels text { fill: #1c1b1a; font: 600 12px system-ui, sans-serif }
+          .labels tspan + tspan { fill: #6b6760; font-size: 10.5px; font-weight: 400; font-variant-numeric: tabular-nums }
+          .labels line { stroke: #8f8b84; stroke-width: 1 }
+        `;
+        copy.insertBefore(style, background);
+        return new Blob([new XMLSerializer().serializeToString(copy)], { type: "image/svg+xml;charset=utf-8" });
+      }
+
+      function download(blob: Blob, name: string) {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = name;
+        link.click();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      }
+
+      function showChartMenu(x: number, y: number) {
+        const menu = document.querySelector<HTMLDivElement>("#chart-menu");
+        if (!menu) return;
+        menu.showPopover();
+        menu.style.left = `${Math.max(8, Math.min(x, innerWidth - menu.offsetWidth - 8))}px`;
+        menu.style.top = `${Math.max(8, Math.min(y, innerHeight - menu.offsetHeight - 8))}px`;
+        menu.querySelector("button")?.focus();
+      }
+
+      document.addEventListener("contextmenu", (event) => {
+        const chart = (event.target as Element).closest("#election-chart");
+        if (!chart) return;
+        event.preventDefault();
+        showChartMenu(event.clientX, event.clientY);
+      });
+
+      document.addEventListener("click", async (event) => {
+        const button = (event.target as Element).closest<HTMLButtonElement>("#chart-menu button");
+        if (!button) return;
+        const menu = button.closest<HTMLDivElement>("#chart-menu")!;
+        menu.hidePopover();
+        const svg = document.querySelector<SVGSVGElement>("#election-chart");
+        if (!svg) return;
+        const format = button.dataset.format;
+        const blob = chartExport(svg);
+        const name = `wahlbeteiligung-${svg.dataset.filename}.${format}`;
+        try {
+          if (format === "svg") {
+            download(blob, name);
+          } else {
+            const image = new Image();
+            const url = URL.createObjectURL(blob);
+            image.src = url;
+            try {
+              await image.decode();
+            } finally {
+              URL.revokeObjectURL(url);
+            }
+            const canvas = document.createElement("canvas");
+            canvas.width = 1440;
+            canvas.height = 1880;
+            canvas.getContext("2d")!.drawImage(image, 0, 0, canvas.width, canvas.height);
+            canvas.toBlob((png) => png ? download(png, name) : alert("PNG konnte nicht erstellt werden."), "image/png");
+          }
+        } catch {
+          alert("Diagramm konnte nicht heruntergeladen werden.");
+        }
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (event.target instanceof SVGSVGElement && event.target.id === "election-chart" &&
+          (event.key === "ContextMenu" || (event.shiftKey && event.key === "F10"))) {
+          event.preventDefault();
+          const rect = event.target.getBoundingClientRect();
+          showChartMenu(rect.left + 16, rect.top + 16);
+          return;
+        }
+        const menu = document.querySelector<HTMLDivElement>("#chart-menu:popover-open");
+        if (!menu || !["ArrowDown", "ArrowUp"].includes(event.key)) return;
+        event.preventDefault();
+        const buttons = [...menu.querySelectorAll("button")];
+        const next = buttons.indexOf(document.activeElement as HTMLButtonElement) + (event.key === "ArrowDown" ? 1 : -1);
+        buttons[(next + buttons.length) % buttons.length].focus();
+      });
+
       // Delegated: the select is replaced on every view-transition swap,
       // and this script does not re-run after a swap.
       document.addEventListener("change", (event) => {
@@ -871,6 +977,34 @@ const tableRows = [
   }
   .diagram-scroll {
     overflow-x: auto;
+  }
+  #chart-menu {
+    position: fixed;
+    inset: auto;
+    width: max-content;
+    min-width: 12rem;
+    margin: 0;
+    padding: 0.35rem;
+    color: var(--ink);
+    background: var(--surface);
+    border: 1px solid var(--divider);
+    box-shadow: 0 6px 18px #1c1b1a26;
+    font: 0.85rem var(--font-body);
+  }
+  #chart-menu button {
+    display: block;
+    width: 100%;
+    padding: 0.55rem 0.65rem;
+    color: inherit;
+    background: transparent;
+    border: 0;
+    text-align: left;
+    font: inherit;
+    cursor: pointer;
+  }
+  #chart-menu button:hover,
+  #chart-menu button:focus-visible {
+    background: var(--caption-surface);
   }
   svg {
     display: block;
