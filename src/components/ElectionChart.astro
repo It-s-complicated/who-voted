@@ -6,7 +6,9 @@ import type { DiagramNode, DiagramLink } from "../data/chart";
 import type { ElectionData } from "../data/election";
 
 type LayoutNode = SankeyNode<DiagramNode, DiagramLink> &
-  Required<Pick<SankeyNode<DiagramNode, DiagramLink>, "x0" | "x1" | "y0" | "y1">>;
+  Required<
+    Pick<SankeyNode<DiagramNode, DiagramLink>, "x0" | "x1" | "y0" | "y1">
+  >;
 type LayoutLink = SankeyLink<DiagramNode, DiagramLink> & {
   source: LayoutNode;
   target: LayoutNode;
@@ -22,13 +24,19 @@ interface Props {
   nodeValue: (node: DiagramNode, value?: number) => string;
 }
 
-const { data, stateName, filename, nodes, links, nodeValue } = Astro.props as Props;
+const { data, stateName, filename, nodes, links, nodeValue } = Astro.props;
 const format = new Intl.NumberFormat("de-DE");
 const votesPerVoter = data.secondVotes.votesPerVoter;
 const partyNodes = nodes.filter((node) => node.id.startsWith("party-"));
 const partyValues = partyNodes.map((node) => node.value);
-const narrowPartyBands = partyValues.filter((votes) => votes / data.secondVotes.valid < 0.1).length;
-const topParties = partyNodes.filter((node) => node.id !== "party-Other").slice(0, 5).map((node) => node.label).join(", ");
+const narrowPartyBands = partyValues.filter(
+  (votes) => votes / data.secondVotes.valid < 0.1,
+).length;
+const topParties = partyNodes
+  .filter((node) => node.id !== "party-Other")
+  .slice(0, 5)
+  .map((node) => node.label)
+  .join(", ");
 
 // zero-value links (e.g. Bremen's "Kein Stimmzettel") are dropped with their nodes
 const sankeyNodes = nodes.map((node) => ({
@@ -61,11 +69,14 @@ const graph = layout({
 }) as { nodes: LayoutNode[]; links: LayoutLink[] };
 if (narrowPartyBands >= 4) {
   let offset = 0;
-  graph.nodes.filter((node) => node.id.startsWith("party-")).forEach((node, index) => {
-    if (index && partyValues[index - 1] / data.secondVotes.valid < 0.1) offset += 8;
-    node.y0 += offset;
-    node.y1 += offset;
-  });
+  graph.nodes
+    .filter((node) => node.id.startsWith("party-"))
+    .forEach((node, index) => {
+      if (index && partyValues[index - 1] / data.secondVotes.valid < 0.1)
+        offset += 8;
+      node.y0 += offset;
+      node.y1 += offset;
+    });
   layout.update(graph);
 }
 const path = sankeyLinkHorizontal<DiagramNode, DiagramLink>();
@@ -134,145 +145,130 @@ const callouts = [
       }
     </title>
     <desc id="diagram-description">
-      {
-        `Sankey-Diagramm von ${format.format(data.population.residents)} Einwohner:innen über Wahlberechtigung, Wahlbeteiligung und ${data.secondVotes.label.toLowerCase()} bis zu den Parteien ${topParties} sowie Sonstige.`
-      }
+      {`Sankey-Diagramm von ${format.format(data.population.residents)} Einwohner:innen über Wahlberechtigung, Wahlbeteiligung und ${data.secondVotes.label.toLowerCase()} bis zu den Parteien ${topParties} sowie Sonstige.`}
     </desc>
 
     <g transform="matrix(0 1 1 0 0 0)" class="links">
-      {
-        graph.links.map((link) => (
-          <path
-            d={path(link)}
-            stroke={link.target.color}
-            stroke-width={Math.max(1, link.width)}
-          >
-            <title>
+      {graph.links.map((link) => (
+        <path
+          d={path(link)}
+          stroke={link.target.color}
+          stroke-width={Math.max(1, link.width)}
+        >
+          <title>
               {link.source.label} → {link.target.label}:{" "}
               {nodeValue(link.target, link.value)}
             </title>
-          </path>
-        ))
-      }
+        </path>
+      ))}
     </g>
 
     <g transform="matrix(0 1 1 0 0 0)" class="nodes">
-      {
-        graph.nodes.map((node) => (
-          <rect
-            x={node.x0}
-            y={node.y0}
-            width={node.x1 - node.x0}
-            height={Math.max(1, node.y1 - node.y0)}
-            fill={node.color}
-          >
-            <title>
+      {graph.nodes.map((node) => (
+        <rect
+          x={node.x0}
+          y={node.y0}
+          width={node.x1 - node.x0}
+          height={Math.max(1, node.y1 - node.y0)}
+          fill={node.color}
+        >
+          <title>
               {node.label}: {nodeValue(node)}
             </title>
-          </rect>
-        ))
-      }
+        </rect>
+      ))}
     </g>
 
     <g class="labels" aria-hidden="true">
       {
         // thin adjacent bars: stagger the second label a row higher
         graph.nodes
-          .filter(
-            (node) => !node.callout && !node.id.startsWith("party-"),
-          )
+          .filter((node) => !node.callout && !node.id.startsWith("party-"))
           .map((node) => (
             <text
               text-anchor={node.id === "nonGerman" ? "end" : "start"}
-              y={
-                node.id === "nonGerman"
-                  ? node.x0 - 54
-                  : node.x0 - 24
-              }
+              y={node.id === "nonGerman" ? node.x0 - 54 : node.x0 - 24}
             >
-              <tspan x={node.id === "nonGerman" ? node.y1 - 3 : node.y0 + 3}>{node.label}</tspan>
-              <tspan x={node.id === "nonGerman" ? node.y1 - 3 : node.y0 + 3} dy="15">
+              <tspan x={node.id === "nonGerman" ? node.y1 - 3 : node.y0 + 3}>
+                {node.label}
+              </tspan>
+              <tspan
+                x={node.id === "nonGerman" ? node.y1 - 3 : node.y0 + 3}
+                dy="15"
+              >
                 {nodeValue(node)}
               </tspan>
             </text>
           ))
       }
-      {
-        graph.nodes
-          .filter((node) => node.id.startsWith("party-"))
-          .map((node) => (
-            <text
-              x={node.y0 + 3}
-              y={node.x1 + 18}
-              transform={`rotate(35 ${node.y0 + 3} ${node.x1 + 18})`}
-            >
-              <tspan x={node.y0 + 3}>{node.label}</tspan>
-              <tspan x={node.y0 + 3} dy="15">
-                {nodeValue(node)}
-              </tspan>
-            </text>
-          ))
-      }
-      {
-        callouts.map((callout) => (
-          <g>
-            <line
-              x1={callout.line.x1}
-              y1={callout.line.y1}
-              x2={callout.line.x2}
-              y2={callout.line.y2}
-            />
-            <text
-              x={callout.x}
-              y={callout.y}
-              text-anchor={callout.anchor}
-            >
-              <tspan x={callout.x}>{callout.node.label}</tspan>
-              <tspan x={callout.x} dy="17">
-                {nodeValue(callout.node)}
-              </tspan>
-            </text>
-          </g>
-        ))
-      }
+      {graph.nodes
+        .filter((node) => node.id.startsWith("party-"))
+        .map((node) => (
+          <text
+            x={node.y0 + 3}
+            y={node.x1 + 18}
+            transform={`rotate(35 ${node.y0 + 3} ${node.x1 + 18})`}
+          >
+            <tspan x={node.y0 + 3}>{node.label}</tspan>
+            <tspan x={node.y0 + 3} dy="15">
+              {nodeValue(node)}
+            </tspan>
+          </text>
+        ))}
+      {callouts.map((callout) => (
+        <g>
+          <line
+            x1={callout.line.x1}
+            y1={callout.line.y1}
+            x2={callout.line.x2}
+            y2={callout.line.y2}
+          />
+          <text x={callout.x} y={callout.y} text-anchor={callout.anchor}>
+            <tspan x={callout.x}>{callout.node.label}</tspan>
+            <tspan x={callout.x} dy="17">
+              {nodeValue(callout.node)}
+            </tspan>
+          </text>
+        </g>
+      ))}
     </g>
   </svg>
 </div>
 <ChartExport />
 
 <style>
-.diagram-scroll {
-  overflow-x: auto;
-}
-svg {
-  display: block;
-  width: 100%;
-  min-width: 38rem;
-  height: auto;
-  background: var(--surface);
-}
-.links path {
-  fill: none;
-  stroke-opacity: 0.55;
-}
-.nodes rect {
-  stroke: var(--surface);
-  stroke-width: 1.5;
-}
-.labels text {
-  fill: var(--ink);
-  font-family: ui-sans-serif, system-ui, sans-serif;
-  font-size: 12px;
-  font-weight: 600;
-}
-.labels tspan + tspan {
-  fill: var(--text-secondary);
-  font-size: 10.5px;
-  font-weight: 400;
-  font-variant-numeric: tabular-nums;
-}
-.labels line {
-  stroke: var(--callout-line);
-  stroke-width: 1;
-}
+  .diagram-scroll {
+    overflow-x: auto;
+  }
+  svg {
+    display: block;
+    width: 100%;
+    min-width: 38rem;
+    height: auto;
+    background: var(--surface);
+  }
+  .links path {
+    fill: none;
+    stroke-opacity: 0.55;
+  }
+  .nodes rect {
+    stroke: var(--surface);
+    stroke-width: 1.5;
+  }
+  .labels text {
+    fill: var(--ink);
+    font-family: ui-sans-serif, system-ui, sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .labels tspan + tspan {
+    fill: var(--text-secondary);
+    font-size: 10.5px;
+    font-weight: 400;
+    font-variant-numeric: tabular-nums;
+  }
+  .labels line {
+    stroke: var(--callout-line);
+    stroke-width: 1;
+  }
 </style>
