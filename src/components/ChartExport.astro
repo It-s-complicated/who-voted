@@ -10,21 +10,13 @@ function chartExport(svg: SVGSVGElement) {
   copy.setAttribute("xmlns", svgNS);
   copy.setAttribute("width", "720");
   copy.setAttribute("height", "940");
+  copy.setAttribute("font-family", "Arial, sans-serif");
   copy.removeAttribute("id");
   const background = document.createElementNS(svgNS, "rect");
   background.setAttribute("width", "100%");
   background.setAttribute("height", "100%");
   background.setAttribute("fill", "#ffffff");
-  copy.insertBefore(background, copy.querySelector(".links"));
-  const style = document.createElementNS(svgNS, "style");
-  style.textContent = `
-    .links path { fill: none; stroke-opacity: .55 }
-    .nodes rect { stroke: #ffffff; stroke-width: 1.5 }
-    .labels text { fill: #1c1b1a; font: 600 12px system-ui, sans-serif }
-    .labels tspan + tspan { fill: #6b6760; font-size: 10.5px; font-weight: 400; font-variant-numeric: tabular-nums }
-    .labels line { stroke: #8f8b84; stroke-width: 1 }
-  `;
-  copy.insertBefore(style, background);
+  copy.insertBefore(background, copy.firstChild);
   return new Blob([new XMLSerializer().serializeToString(copy)], { type: "image/svg+xml;charset=utf-8" });
 }
 
