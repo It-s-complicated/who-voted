@@ -79,7 +79,7 @@ const expected = {
   'saarland/2022': [746307, 458113, 452411],
   'sachsen/2024': [3182683, 2367607, 2347973],
   'sachsen-anhalt/2021': [1788930, 1079045, 1063697],
-  'sachsen-anhalt/2026': [1706851, 1328211, 1315315],
+  'sachsen-anhalt/2026': [1706852, 1327991, 1315282],
   'schleswig-holstein/2022': [2314417, 1396747, 1387398],
   'thueringen/2024': [1655670, 1218089, 1207883],
 };
@@ -89,6 +89,7 @@ for (const [slug, state] of Object.entries(states)) {
   for (const year of state.years) {
     const data = JSON.parse(readFileSync(`public/data/${slug}/${year}.json`, 'utf8'));
     validateElection(data);
+    if (slug === 'sachsen-anhalt' && year === 2026) assert.equal(data.resultStatus, 'final');
     const metadata = state.elections[year];
     const rules = electionRules(`${slug}/${year}`);
     assert.equal(data.votingAge, rules.votingAge);

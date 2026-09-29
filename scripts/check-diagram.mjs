@@ -22,23 +22,24 @@ for (const route of routes) {
   const node = (label) => {
     const match = rects.find((rect) => rect[2].trim().startsWith(`${label}:`));
     assert.ok(match, `${route}: missing ${label}`);
-    return { y: Number(match[1].match(/y="([^"]+)"/)[1]), height: Number(match[1].match(/height="([^"]+)"/)[1]), title: match[2].trim(), attrs: match[1] };
+    // TanStack renders the portrait bands directly and rounds SVG coordinates to 0.01px.
+    return { y: Number(match[1].match(/\sx="([^"]+)"/)[1]), height: Number(match[1].match(/\swidth="([^"]+)"/)[1]), title: match[2].trim(), attrs: match[1] };
   };
   if (route === 'mecklenburg-vorpommern/2026' || route === 'berlin/2023') {
     const bands = [...displayedParties.map((party) => node(party.name)), node('Sonstige')];
     const expectedGaps = route === 'mecklenburg-vorpommern/2026' ? [18, 18, 26, 26, 26, 26] : [18, 18, 18, 18, 18, 18];
     for (let i = 1; i < bands.length; i++)
-      assert.ok(Math.abs(bands[i].y - bands[i - 1].y - bands[i - 1].height - expectedGaps[i - 1]) < 1e-10, `${route}: only narrow party bands get extra spacing`);
+      assert.ok(Math.abs(bands[i].y - bands[i - 1].y - bands[i - 1].height - expectedGaps[i - 1]) < 0.03, `${route}: only narrow party bands get extra spacing`);
   }
   const percent = (votes) => `${(votes / data.secondVotes.votesPerVoter / data.population.residents * 100).toFixed(1).replace('.', ',')} %`;
   const validLabel = `${data.secondVotes.label}${data.secondVotes.votesPerVoter > 1 ? "**" : ""}`;
   const valid = node(validLabel);
-  assert.ok(Math.abs(valid.height / node('Einwohner:innen').height - data.secondVotes.valid / data.secondVotes.votesPerVoter / data.population.residents) < 1e-10);
+  assert.ok(Math.abs(valid.height - node('Einwohner:innen').height * data.secondVotes.valid / data.secondVotes.votesPerVoter / data.population.residents) < 0.03);
   assert.ok(!/NaN|Infinity|undefined/.test(svg), `${route}: finite geometry and colors`);
   for (const party of displayedParties) {
     const band = node(party.name);
     assert.ok(band.title.includes(percent(party.votes)), `${route}: ${party.name} population share`);
-    assert.ok(Math.abs(band.height / node('Einwohner:innen').height - party.votes / data.secondVotes.votesPerVoter / data.population.residents) < 1e-10);
+    assert.ok(Math.abs(band.height - node('Einwohner:innen').height * party.votes / data.secondVotes.votesPerVoter / data.population.residents) < 0.03);
     assert.match(band.attrs, /fill="#[a-f0-9]{6}"/i);
     if (party.name.toLowerCase() === 'die linke') assert.ok(band.attrs.includes('fill="#bd4598"'));
   }
@@ -55,16 +56,16 @@ for (const route of routes) {
     [`Nichtdeutsch, ${data.votingAge}+*`, breakdown.nonGermanVotingAgeOrOlder],
   ]) {
     const estimate = data.eligibility.notEligible * count / total;
-    assert.ok(Math.abs(node(label).height - estimate * scale) < 1e-10, `${route}: proportional demographic estimate`);
+    assert.ok(Math.abs(node(label).height - estimate * scale) < 0.03, `${route}: proportional demographic estimate`);
     assert.equal(node(label).title, `${label}: ca. ${new Intl.NumberFormat('de-DE').format(Math.round(estimate / 1000) * 1000)} · ~${Math.round(estimate / data.population.residents * 100)} %`, `${route}: rounded estimate label`);
     assert.ok(html.includes(`${label.replace(/\*$/, "")} (Bevölkerungsstatistik)`), `${route}: original data identified in table`);
     assert.ok(html.includes(new Intl.NumberFormat('de-DE').format(count)), `${route}: source count retained`);
   }
   const nonEligible = node('Nicht wahlberechtigt');
   assert.ok(nonEligible.title.includes(new Intl.NumberFormat('de-DE').format(data.eligibility.notEligible)), `${route}: unchanged non-eligible count`);
-  assert.ok(Math.abs(nonEligible.height - data.eligibility.notEligible * scale) < 1e-10, `${route}: truthful non-eligible width`);
-  assert.ok(Math.abs(nonEligible.height - node(`Unter ${data.votingAge}*`).height - node(`Nichtdeutsch, ${data.votingAge}+*`).height) < 1e-10, `${route}: estimated flow balances`);
-  assert.ok(Math.abs(node('Einwohner:innen').height - node('Wahlberechtigt').height - nonEligible.height) < 1e-10, `${route}: population is 100 percent`);
+  assert.ok(Math.abs(nonEligible.height - data.eligibility.notEligible * scale) < 0.03, `${route}: truthful non-eligible width`);
+  assert.ok(Math.abs(nonEligible.height - node(`Unter ${data.votingAge}*`).height - node(`Nichtdeutsch, ${data.votingAge}+*`).height) < 0.03, `${route}: estimated flow balances`);
+  assert.ok(Math.abs(node('Einwohner:innen').height - node('Wahlberechtigt').height - nonEligible.height) < 0.03, `${route}: population is 100 percent`);
   assert.ok(!svg.includes('Statistische Differenz') && !svg.includes('Sonstige Differenz'), `${route}: no reconciliation ribbons`);
   assert.ok(!svg.includes('Geschätzte Aufteilung'), `${route}: no extra estimate heading`);
   assert.ok(html.includes('* Geschätzte Aufteilung:'), `${route}: asterisks explained in caption`);
@@ -75,12 +76,12 @@ for (const route of routes) {
   if (data.ballots) {
     assert.equal(valid.title, `${validLabel}: ${percent(data.secondVotes.valid)}`);
     const unused = node('Nicht ausgeschöpfte Stimmen');
-    assert.ok(Math.abs(node('Gültige Stimmzettel').height - valid.height - unused.height) < 1e-10);
+    assert.ok(Math.abs(node('Gültige Stimmzettel').height - valid.height - unused.height) < 0.03);
     assert.ok(!svg.includes('221,5 %'));
   } else if (data.secondVotes.votesPerVoter > 1) {
     assert.equal(valid.title, `${validLabel}: ${percent(data.secondVotes.valid)}`);
     const missing = node(data.secondVotes.noValidLabel);
-    assert.ok(Math.abs(node('Wähler:innen').height - valid.height - missing.height) < 1e-10);
+    assert.ok(Math.abs(node('Wähler:innen').height - valid.height - missing.height) < 0.03);
     assert.ok(html.includes(data.unitNote));
   } else {
     assert.ok(valid.title.includes(new Intl.NumberFormat('de-DE').format(data.secondVotes.valid)));

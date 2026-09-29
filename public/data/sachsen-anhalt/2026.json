@@ -3,7 +3,7 @@
   "year": 2026,
   "title": "Landtagswahl in Sachsen-Anhalt",
   "electionDate": "2026-09-06",
-  "resultStatus": "preliminary",
+  "resultStatus": "final",
   "votingAge": 18,
   "eyebrow": "Landtagswahl · Zweitstimmen",
   "intro": "Die Landtagswahl am 6. September 2026 in Zahlen.",
@@ -24,75 +24,75 @@
     "note": "Der Bevölkerungsstichtag liegt 249 Tage vor der Wahl. Alter und Staatsangehörigkeit beziehen sich auf den demografischen Stichtag, nicht auf den Wahltag. Der zeitliche Abstand schränkt die Vergleichbarkeit mit der Wahl ein; eine nähere, zusammenpassende Aufteilung nach Alter und Staatsangehörigkeit ist hier nicht verfügbar."
   },
   "eligibility": {
-    "eligible": 1706851,
-    "notEligible": 413401,
+    "eligible": 1706852,
+    "notEligible": 413400,
     "estimatedBreakdown": {
       "underVotingAge": 313614,
       "nonGermanVotingAgeOrOlder": 130492,
       "otherOrTimingDifference": 0
     },
-    "note": "Die Bevölkerungsstatistik zählt 313.614 Personen unter 18 Jahren und 130.492 nichtdeutsche Personen ab 18 Jahren. Ihre Summe übersteigt die aus Bevölkerung minus Wahlberechtigten berechnete Gruppe um 30.705 Personen. Bevölkerungsstatistik und Wählerverzeichnis unterscheiden sich in Stichtag, Erhebungsmethode und Revisionsstand."
+    "note": "Die Bevölkerungsstatistik zählt 313.614 Personen unter 18 Jahren und 130.492 nichtdeutsche Personen ab 18 Jahren. Ihre Summe übersteigt die aus Bevölkerung minus Wahlberechtigten berechnete Gruppe um 30.706 Personen. Bevölkerungsstatistik und Wählerverzeichnis unterscheiden sich in Stichtag, Erhebungsmethode und Revisionsstand."
   },
   "turnout": {
-    "voters": 1328211,
-    "nonVoters": 378640
+    "voters": 1327991,
+    "nonVoters": 378861
   },
   "secondVotes": {
     "label": "Gültige Zweitstimmen",
-    "valid": 1315315,
+    "valid": 1315282,
     "votesPerVoter": 1,
-    "noValidSecondVote": 12896,
-    "invalid": 12896,
+    "noValidSecondVote": 12709,
+    "invalid": 12709,
     "noSecondVote": 0,
     "noValidLabel": "Keine gültige Zweitstimme",
     "parties": [
       {
         "name": "AfD",
-        "votes": 576037
+        "votes": 575971
       },
       {
         "name": "CDU",
-        "votes": 226622
+        "votes": 226605
       },
       {
         "name": "SPD",
-        "votes": 122303
+        "votes": 122296
       },
       {
         "name": "GRÜNE",
-        "votes": 117498
+        "votes": 117494
       },
       {
         "name": "Die Linke",
-        "votes": 112541
+        "votes": 112558
       },
       {
         "name": "BSW",
-        "votes": 69291
+        "votes": 69355
       },
       {
         "name": "FDP",
-        "votes": 33969
+        "votes": 33986
       },
       {
         "name": "FREIE WÄHLER",
-        "votes": 15430
+        "votes": 15391
       },
       {
         "name": "Tierschutzpartei",
-        "votes": 14356
+        "votes": 14354
       },
       {
         "name": "Gartenpartei",
-        "votes": 7482
+        "votes": 7479
       },
       {
         "name": "TIERSCHUTZALLIANZ",
-        "votes": 7283
+        "votes": 7296
       },
       {
         "name": "Volt",
-        "votes": 4339
+        "votes": 4340
       },
       {
         "name": "Die PARTEI",
@@ -100,11 +100,11 @@
       },
       {
         "name": "PdF",
-        "votes": 2778
+        "votes": 2773
       },
       {
         "name": "dieBasis",
-        "votes": 1899
+        "votes": 1897
       }
     ]
   },
@@ -114,11 +114,11 @@
       "url": "https://wahlergebnisse.sachsen-anhalt.de/wahlen/lt26/erg_land.html",
       "file": "data/raw/sachsen-anhalt/2026/results.html",
       "publisher": "Statistisches Landesamt Sachsen-Anhalt",
-      "resultStatus": "preliminary",
-      "location": "Landesergebnis, eingebettete Tabelle ergtable, Zweitstimmen (anzahl.wj.x)",
+      "resultStatus": "final",
+      "location": "Endgültiges Landesergebnis vom 22.09.2026, eingebettete Tabelle ergtable, Zweitstimmen (anzahl.wj.x)",
       "electionDate": "2026-09-06",
-      "retrievedAt": "2026-09-12T20:47:32.392Z",
-      "sha256": "2309c8f7cbffcd0a9865674801a4367c47ba38427675de5ea31201981f4f9e04"
+      "retrievedAt": "2026-09-29T16:53:21Z",
+      "sha256": "673be3022e2eb2349834540a09ee8a9beca829ddc9164cc7b1e17fa125e8d3b8"
     },
     {
       "id": "population",

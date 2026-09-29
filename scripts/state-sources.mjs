@@ -50,8 +50,8 @@ const stateResults = {
   'sachsen-anhalt/2026': {
     file: 'results.html',
     publisher: 'Statistisches Landesamt Sachsen-Anhalt',
-    resultStatus: 'preliminary',
-    location: 'Landesergebnis, eingebettete Tabelle ergtable, Zweitstimmen (anzahl.wj.x)',
+    resultStatus: 'final',
+    location: 'Endgültiges Landesergebnis vom 22.09.2026, eingebettete Tabelle ergtable, Zweitstimmen (anzahl.wj.x)',
   },
   'baden-wuerttemberg/2026': {
     file: 'state-results.html',

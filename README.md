@@ -34,7 +34,7 @@ official source alternatives, timing gaps, and remaining demographic data needs.
 `src/data/states.ts` lists all 16 states with an explicit date and result source URL
 for each election. Available years, the latest election date and its result link
 are derived from those entries; missing or invalid metadata fails immediately. Sachsen-Anhalt includes
-its preliminary 2026 result as well as 2021. Berlin and Mecklenburg-Vorpommern
+its final 2026 result as well as 2021. Berlin and Mecklenburg-Vorpommern
 also include the complete preliminary results from 20 September 2026 alongside
 their previous elections; there are 19 election datasets.
 `years` lists only elections with local diagram datasets.
