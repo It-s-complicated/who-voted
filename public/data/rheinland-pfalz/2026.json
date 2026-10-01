@@ -99,13 +99,16 @@
   "sources": [
     {
       "id": "results",
-      "url": "https://www.wahlen.rlp.de/fileadmin/wahlen.rlp.de/dokumente-wahlen/ltw/Ergebnisdateien/2026/Endgueltiges_Ergebnis_LW_2026_Wahlkreise.xlsx",
-      "file": "data/raw/rheinland-pfalz/2026/results.xlsx",
+      "file": "data/raw/rheinland-pfalz/2026/results.csv",
+      "csvHeader": "Endergebnis der Landtagswahl vom 22. März 2026 (Stimmbezirksebene);",
+      "encoding": "windows-1252",
       "publisher": "Landeswahlleiter Rheinland-Pfalz",
-      "location": "LW_2026_WK, Summe der 52 Wahlkreise (KZ G), Landesstimmen",
+      "resultStatus": "final",
+      "location": "Identifikationsschlüssel 0, Stimmbezirkskennzeichen LD, GUW G; Landesstimmen",
       "electionDate": "2026-03-22",
-      "retrievedAt": "2026-09-05T21:35:54.268Z",
-      "sha256": "1b715439a37538650e4d1bdac9d904380b7579eb3af19c9658b1163fcd81c7bf"
+      "url": "https://www.wahlen.rlp.de/fileadmin/wahlen.rlp.de/dokumente-wahlen/ltw/Ergebnisdateien/2026/LW_2026_Endergebnis_Stimmbezirksebene.csv",
+      "sha256": "788eb62584181bc559b8dbc042788ef79a351ab5d4c3cc6c68bff89f3ce085a2",
+      "retrievedAt": "2026-10-01T18:07:55.422968Z"
     },
     {
       "id": "population",

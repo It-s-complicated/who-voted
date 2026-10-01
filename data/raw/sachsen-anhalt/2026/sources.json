@@ -3,14 +3,16 @@
   "sources": [
     {
       "id": "results",
-      "url": "https://wahlergebnisse.sachsen-anhalt.de/wahlen/lt26/erg_land.html",
-      "file": "data/raw/sachsen-anhalt/2026/results.html",
+      "file": "data/raw/sachsen-anhalt/2026/results.csv",
+      "csvHeader": "\"Ergebnisart\";",
+      "encoding": "utf-8",
       "publisher": "Statistisches Landesamt Sachsen-Anhalt",
       "resultStatus": "final",
-      "location": "Endgültiges Landesergebnis vom 22.09.2026, eingebettete Tabelle ergtable, Zweitstimmen (anzahl.wj.x)",
+      "location": "Ergebnisart E, Satzart LAN, Schlüsselnummer 15, Wahllokal leer; Zweitstimmen",
       "electionDate": "2026-09-06",
-      "retrievedAt": "2026-09-29T16:53:21Z",
-      "sha256": "673be3022e2eb2349834540a09ee8a9beca829ddc9164cc7b1e17fa125e8d3b8"
+      "url": "https://wahlergebnisse.sachsen-anhalt.de/wahlen/lt26/downloads/Ergebnisse_Land_RKR_WKR_LT_2026.csv",
+      "sha256": "17d87d956c1b9da7a7b1b113875497f5a5f781a1b89e0c0aed157aae09217c85",
+      "retrievedAt": "2026-10-01T18:07:55.423873Z"
     },
     {
       "id": "population",

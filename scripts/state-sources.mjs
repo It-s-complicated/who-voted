@@ -27,6 +27,41 @@ const censusPopulation = {
 };
 
 const stateResults = {
+  'schleswig-holstein/2022': {
+    file: 'results.csv', csvHeader: "Wahlkreis;", encoding: 'utf-8',
+    publisher: 'Statistisches Amt für Hamburg und Schleswig-Holstein', resultStatus: 'final',
+    location: 'Summe aller 2909 eindeutigen STIMMBEZIRK/BRIEFWAHLBEZIRK-Zeilen, Listenstimmen F/F1–F16; Endergebnis-Abgleich mit supplementary-results',
+  },
+  'saarland/2022': {
+    file: 'results.csv', csvHeader: "Landtagswahl 2022;", encoding: 'utf-8',
+    publisher: 'Landeswahlleiterin Saarland', resultStatus: 'final',
+    location: 'Region 10 Saarland; Endgültig-Spalten, Stimmen; ÖDP und Partei der Humanisten',
+  },
+  'nordrhein-westfalen/2022': {
+    file: 'results.csv', csvHeader: "Landtagswahl am 15.05.2022 in NRW", encoding: 'utf-8',
+    publisher: 'Landeswahlleiter Nordrhein-Westfalen', resultStatus: 'final',
+    location: 'Endgültige Ergebnisse, Wahlkreisnr. 000, Zweitstimmen E/F/F1–F29',
+  },
+  'niedersachsen/2022': {
+    file: 'results.csv', csvHeader: "Wahlkreis;", encoding: 'utf-8',
+    publisher: 'Landesamt für Statistik Niedersachsen', resultStatus: 'final',
+    location: 'Summe der Wahlkreise 1–87, Zweitstimmen II; ungültige Stimmen aus supplementary-results',
+  },
+  'mecklenburg-vorpommern/2021': {
+    file: 'results.csv', csvHeader: "Wahl zum Landtag von Mecklenburg-Vorpommern am 26. September 2021", encoding: 'windows-1252',
+    publisher: 'Landeswahlleiterin Mecklenburg-Vorpommern', resultStatus: 'final',
+    location: 'Wahlkreis 99, Ausgabe A, Erst-/Zweitstimme 2; 2003/2003 Wahlbezirke',
+  },
+  'hessen/2023': {
+    file: 'results.csv', csvHeader: "Landtagswahl 2023;", encoding: 'utf-8',
+    publisher: 'Hessisches Statistisches Landesamt', resultStatus: 'final',
+    location: 'Gebietsschlüssel 00000000000, Gebietstyp LD; Landesstimmen; 6889/6889 Wahlbezirke',
+  },
+  'bayern/2023': {
+    file: 'results.csv', csvHeader: "Schlüsselnummer;", encoding: 'windows-1252',
+    publisher: 'Bayerisches Landesamt für Statistik', resultStatus: 'final',
+    location: 'Region 990 Bayern, Gesamtstimmen 2023; 91/91 Stimmkreise',
+  },
   'berlin/2023': {
     file: 'results.xlsx', publisher: 'Amt für Statistik Berlin-Brandenburg',
     license: 'CC BY 3.0 DE',
@@ -43,20 +78,19 @@ const stateResults = {
     location: 'Wahlkreis 99, Ausgabe A, Erst-/Zweitstimme 2; Landesergebnis, 1974/1974 Wahlbezirke',
   },
   'sachsen-anhalt/2021': {
-    file: 'results.html',
-    publisher: 'Die Bundeswahlleiterin',
-    location: 'Landtagswahl 2021, Landesergebnis',
+    file: 'results.csv', csvHeader: "Ergebnisart;", encoding: 'windows-1252',
+    publisher: 'Statistisches Landesamt Sachsen-Anhalt', resultStatus: 'final',
+    location: 'Ergebnisart E, Satzart LAN, Schlüsselnummer 15; Zweitstimmen',
   },
   'sachsen-anhalt/2026': {
-    file: 'results.html',
-    publisher: 'Statistisches Landesamt Sachsen-Anhalt',
-    resultStatus: 'final',
-    location: 'Endgültiges Landesergebnis vom 22.09.2026, eingebettete Tabelle ergtable, Zweitstimmen (anzahl.wj.x)',
+    file: 'results.csv', csvHeader: "\"Ergebnisart\";", encoding: 'utf-8',
+    publisher: 'Statistisches Landesamt Sachsen-Anhalt', resultStatus: 'final',
+    location: 'Ergebnisart E, Satzart LAN, Schlüsselnummer 15, Wahllokal leer; Zweitstimmen',
   },
   'baden-wuerttemberg/2026': {
-    file: 'state-results.html',
-    publisher: 'Statistisches Landesamt Baden-Württemberg',
-    location: 'Ergebnistabelle, Land Baden-Württemberg, Zweitstimmen',
+    file: 'results.csv', csvHeader: "Wahlkreisnummer;", encoding: 'utf-8',
+    publisher: 'Statistisches Landesamt Baden-Württemberg', resultStatus: 'final',
+    location: 'LAND BW, Zweitstimmen F/F1–F21; 11570/11570 Wahlbezirke',
   },
   'brandenburg/2024': {
     file: 'results.xlsx',
@@ -64,9 +98,9 @@ const stateResults = {
     location: 'Brandenburg_Landtagswahl_A_2, Landeszeile GI9900, Zweitstimmen (Anzahl)',
   },
   'rheinland-pfalz/2026': {
-    file: 'results.xlsx',
-    publisher: 'Landeswahlleiter Rheinland-Pfalz',
-    location: 'LW_2026_WK, Summe der 52 Wahlkreise (KZ G), Landesstimmen',
+    file: 'results.csv', csvHeader: "Endergebnis der Landtagswahl vom 22. März 2026 (Stimmbezirksebene);", encoding: 'windows-1252',
+    publisher: 'Landeswahlleiter Rheinland-Pfalz', resultStatus: 'final',
+    location: 'Identifikationsschlüssel 0, Stimmbezirkskennzeichen LD, GUW G; Landesstimmen',
   },
 };
 
@@ -95,6 +129,14 @@ export const stateSources = Object.fromEntries(
             url: 'https://wahlen-berlin.de/wahlen/BE2026/Afspraes/AGH/ergebnisse.html',
             file: `data/raw/${route}/summary.html`, publisher: result.publisher,
             location: 'Vorläufiges Ergebnis, Berlin, Zweitstimmen; unabhängiger Abgleich der CSV-Zahlen',
+          },
+        } : {}),
+        ...(['niedersachsen/2022', 'schleswig-holstein/2022'].includes(route) ? {
+          'supplementary-results': {
+            url: `https://www.bundeswahlleiterin.de/service/landtagswahlen/land-${slug === 'niedersachsen' ? '3' : '1'}.html`,
+            file: `data/raw/${route}/supplementary-results.html`,
+            publisher: 'Die Bundeswahlleiterin',
+            location: 'Amtliches Endergebnis; unabhängiger Abgleich aller CSV-Zahlen und ungültiger Zweitstimmen',
           },
         } : {}),
         population: {

@@ -168,13 +168,16 @@
   "sources": [
     {
       "id": "results",
-      "url": "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-5.html",
-      "file": "data/raw/nordrhein-westfalen/2022/results.html",
-      "publisher": "Die Bundeswahlleiterin",
-      "location": "Ergebnis der Landtagswahl, Landesergebnis",
+      "file": "data/raw/nordrhein-westfalen/2022/results.csv",
+      "csvHeader": "Landtagswahl am 15.05.2022 in NRW",
+      "encoding": "utf-8",
+      "publisher": "Landeswahlleiter Nordrhein-Westfalen",
+      "resultStatus": "final",
+      "location": "Endgültige Ergebnisse, Wahlkreisnr. 000, Zweitstimmen E/F/F1–F29",
       "electionDate": "2022-05-15",
-      "retrievedAt": "2026-09-05T21:35:54.233Z",
-      "sha256": "6fcfdf6fe0d3c092164f7da255321fa52f11d5f9fd84468fe3e11ad4bfba1431"
+      "url": "https://www.wahlergebnisse.nrw/landtagswahlen/2022/LW22_WK_insgesamt.txt",
+      "sha256": "2b8c74f583b7b0cbd8e45be166087fb55932a5c04f4079481c990892997efd13",
+      "retrievedAt": "2026-10-01T18:07:55.420567Z"
     },
     {
       "id": "population",

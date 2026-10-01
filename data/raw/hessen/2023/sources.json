@@ -3,13 +3,16 @@
   "sources": [
     {
       "id": "results",
-      "url": "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-6.html",
-      "file": "data/raw/hessen/2023/results.html",
-      "publisher": "Die Bundeswahlleiterin",
-      "location": "Ergebnis der Landtagswahl, Landesergebnis",
+      "file": "data/raw/hessen/2023/results.csv",
+      "csvHeader": "Landtagswahl 2023;",
+      "encoding": "utf-8",
+      "publisher": "Hessisches Statistisches Landesamt",
+      "resultStatus": "final",
+      "location": "Gebietsschlüssel 00000000000, Gebietstyp LD; Landesstimmen; 6889/6889 Wahlbezirke",
       "electionDate": "2023-10-08",
-      "retrievedAt": "2026-09-05T21:35:53.655Z",
-      "sha256": "c7b5f1d6af968626032d38a8a00e069e93b4f3d7092d4e84cd22b99894759df7"
+      "url": "https://wahlen.hessen-ltw23.23degrees.eu/assets/Wahlergebnisse_Landtagswahl.csv",
+      "sha256": "9cdc9c8ea341e1de1756f0936e03ac92e784d898bece08b2e3580e77178dc823",
+      "retrievedAt": "2026-10-01T18:07:55.419532Z"
     },
     {
       "id": "population",

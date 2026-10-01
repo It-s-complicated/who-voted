@@ -45,6 +45,9 @@ verified column definitions, encoding, delimiters, missing-value conventions,
 number formats, and totals. Document any source-specific parsing exceptions as
 described in section 3.
 
+See the [CSV availability and comparison review](CSV_AVAILABILITY_REVIEW.md) for
+official alternatives for existing elections, verified counts, and coverage limits.
+
 Existing sources can be replaced after verifying equivalent coverage. Update the downloader configuration, parser, retained file, and manifest together, regenerate the output, and compare every imported count against the previous dataset and official totals. Investigate differences and document any official correction; preserve shared population snapshots used by other elections.
 
 ### Vote categories and ballots
@@ -72,13 +75,13 @@ The schema permits a null estimated breakdown with an explanation, but the curre
 Keep election inputs and their manifest under:
 
 ```text
-data/raw/<state>/<year>/results.<html|pdf|xlsx|csv>
+data/raw/<state>/<year>/results.<html|pdf|xlsx|csv|zip>
 data/raw/<state>/<year>/<additional-source-files>
 data/raw/<state>/<year>/sources.json
 public/data/<state>/<year>.json                  # generated output
 ```
 
-The downloader records a manifest-level `retrievedAt` and each source's `id`, `url`, `file`, and `sha256`, plus configured metadata. Supply a publisher and a precise source location; record licence information when available. Keep the IDs consistent with the parser's `sourceFiles`, `population.sourceId`, and `demographics.sourceIds`. Output validation requires sources named `results` and `population`, as well as every referenced source ID. The build verifies the input bytes against manifest checksums.
+The downloader records a manifest-level `retrievedAt` and each source's `id`, `url`, `file`, and `sha256`, plus configured metadata. CSV entries also specify the expected first-line prefix (`csvHeader`) and encoding when needed. Supply a publisher and a precise source location; record licence information when available. Keep the IDs consistent with the parser's `sourceFiles`, `population.sourceId`, and `demographics.sourceIds`. Output validation requires sources named `results` and `population`, as well as every referenced source ID. The build verifies the input bytes against manifest checksums.
 
 Rule references live separately in `scripts/election-rules.mjs`, with URL, publisher, and relevant page or section. Update [ELECTION_RULES.md](ELECTION_RULES.md) with the election's evidence too. These references currently remain links; the downloader does not archive them automatically.
 
@@ -99,13 +102,17 @@ Check PDF pages, table headers, year headings, party lists, spreadsheet sheets/c
 
 Document exceptional data handling next to the parser: why the shared path cannot
 read the source, which elections and formats the exception covers, and which
-source assumptions must be reviewed when refreshing it. For example,
-[`parseCsvResults`](scripts/csv-results.mjs) handles Berlin 2026 and
-Mecklenburg-Vorpommern 2026 because their CSV exports use different headers and
-statewide second-vote identifiers, and Berlin needs a party-code dictionary.
-The parser checks the retained snapshot dates and complete district counts to
-prevent an unreviewed or partial export from silently replacing verified data.
-Its separate module lets regression checks import it without rebuilding datasets.
+source assumptions must be reviewed when refreshing it.
+[`parseCsvResults`](scripts/csv-results.mjs) handles the official CSV layouts,
+including Hamburg's CSV inside its published ZIP. It uses `csv-parse` for quoted
+and multiline fields, then election-specific selectors and count checks; CSV
+does not imply one shared table layout. Berlin 2026 needs a party-code dictionary.
+The preliminary Berlin and Mecklenburg-Vorpommern imports additionally pin
+snapshot dates and complete district counts. Niedersachsen's missing invalid
+counts come from `supplementary-results.html`; Schleswig-Holstein's CSV is
+compared with the retained official final-results HTML. Neither exception relies
+on assuming missing values or status. The separate parser module lets regression
+checks import these assumptions without rebuilding datasets.
 
 Review the shared population-date selection too: it currently chooses between census data and annual snapshots using hardcoded routes and a year-selection heuristic capped at 2025. Adding a newer election does not automatically select a newer export. The census parser also identifies its format through `1000A-2012` in the filename; preserve that marker when naming a versioned census file.
 

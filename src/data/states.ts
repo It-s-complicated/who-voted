@@ -38,7 +38,7 @@ const catalog: Record<string, StateEntry> = {
     elections: {
       2026: {
         electionDate: "2026-03-08",
-        url: "https://wahlen.statistik-bw.de/ltw26/",
+        url: "https://wahlen.statistik-bw.de/ltw26/ltw26-ergebnisse.csv",
         previousParliament: ["GRÜNE", "CDU", "AfD", "SPD", "FDP"],
       }
     }
@@ -48,7 +48,7 @@ const catalog: Record<string, StateEntry> = {
     elections: {
       2023: {
         electionDate: "2023-10-08",
-        url: "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-9.html",
+        url: "https://www.landtagswahl2023.bayern.de/08_10_2023_Landtagswahl_2023_Wahlkreise_Bayern.csv",
         previousParliament: ["CSU", "FREIE WÄHLER", "AfD", "GRÜNE", "SPD", "FDP"],
       }
     }
@@ -93,7 +93,7 @@ const catalog: Record<string, StateEntry> = {
     elections: {
       2025: {
         electionDate: "2025-03-02",
-        url: "https://www.statistik-nord.de/fileadmin/Dokumente/BUE2025_e_05.pdf",
+        url: "https://suche.transparenz.hamburg.de/localresources/StaNord_CMS/StaNord_CMS66886/BUE2025_e_05.zip",
         previousParliament: ["SPD", "CDU", "GRÜNE", "Die Linke", "AfD", "FDP"],
       }
     }
@@ -103,7 +103,7 @@ const catalog: Record<string, StateEntry> = {
     elections: {
       2023: {
         electionDate: "2023-10-08",
-        url: "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-6.html",
+        url: "https://wahlen.hessen-ltw23.23degrees.eu/assets/Wahlergebnisse_Landtagswahl.csv",
         previousParliament: ["CDU", "AfD", "SPD", "GRÜNE", "FDP", "DIE LINKE"],
       }
     }
@@ -113,7 +113,7 @@ const catalog: Record<string, StateEntry> = {
     elections: {
       2021: {
         electionDate: "2021-09-26",
-        url: "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-13.html",
+        url: "https://www.laiv-mv.de/static/LAIV/Wahlen/2-Landtagswahlen/2021/Ergebnisse/l_wahlkreise.csv",
         previousParliament: ["SPD", "AfD", "CDU", "DIE LINKE"],
       },
       2026: {
@@ -128,7 +128,7 @@ const catalog: Record<string, StateEntry> = {
     elections: {
       2022: {
         electionDate: "2022-10-09",
-        url: "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-3.html",
+        url: "https://wahlen.statistik.niedersachsen.de/LW2022/wahlergebnis.csv",
         previousParliament: ["SPD", "CDU", "GRÜNE", "AfD", "FDP"],
       }
     }
@@ -138,7 +138,7 @@ const catalog: Record<string, StateEntry> = {
     elections: {
       2022: {
         electionDate: "2022-05-15",
-        url: "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-5.html",
+        url: "https://www.wahlergebnisse.nrw/landtagswahlen/2022/LW22_WK_insgesamt.txt",
         previousParliament: ["CDU", "SPD", "GRÜNE", "FDP", "AfD"],
       }
     }
@@ -148,7 +148,7 @@ const catalog: Record<string, StateEntry> = {
     elections: {
       2026: {
         electionDate: "2026-03-22",
-        url: "https://www.wahlen.rlp.de/fileadmin/wahlen.rlp.de/dokumente-wahlen/ltw/Ergebnisdateien/2026/Endgueltiges_Ergebnis_LW_2026_Wahlkreise.xlsx",
+        url: "https://www.wahlen.rlp.de/fileadmin/wahlen.rlp.de/dokumente-wahlen/ltw/Ergebnisdateien/2026/LW_2026_Endergebnis_Stimmbezirksebene.csv",
         previousParliament: ["CDU", "SPD", "AfD", "GRÜNE", "FREIE WÄHLER", "FDP"],
       }
     }
@@ -158,7 +158,7 @@ const catalog: Record<string, StateEntry> = {
     elections: {
       2022: {
         electionDate: "2022-03-27",
-        url: "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-10.html",
+        url: "https://wahlergebnis.saarland.de/LTW/KERG_SAARLAND.csv",
         previousParliament: ["SPD", "CDU", "AfD", "DIE LINKE"],
       }
     }
@@ -178,12 +178,12 @@ const catalog: Record<string, StateEntry> = {
     elections: {
       2021: {
         electionDate: "2021-06-06",
-        url: "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-15.html",
+        url: "https://wahlergebnisse.sachsen-anhalt.de/wahlen/lt21/erg/csv/lt21dat1.csv",
         previousParliament: ["CDU", "AfD", "DIE LINKE", "SPD", "GRÜNE"],
       },
       2026: {
         electionDate: "2026-09-06",
-        url: "https://wahlergebnisse.sachsen-anhalt.de/wahlen/lt26/erg_land.html",
+        url: "https://wahlergebnisse.sachsen-anhalt.de/wahlen/lt26/downloads/Ergebnisse_Land_RKR_WKR_LT_2026.csv",
         previousParliament: ["CDU", "AfD", "DIE LINKE", "SPD", "FDP", "GRÜNE"],
       }
     }
@@ -193,7 +193,7 @@ const catalog: Record<string, StateEntry> = {
     elections: {
       2022: {
         electionDate: "2022-05-08",
-        url: "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-1.html",
+        url: "https://www.wahlen-sh.de/ltw_2022/ergebnis-download.csv",
         previousParliament: ["CDU", "GRÜNE", "SPD", "FDP", "SSW", "AfD"],
       }
     }

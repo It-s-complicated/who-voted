@@ -20,12 +20,6 @@ function count(value) {
   return Number(value.replaceAll(' ', ''));
 }
 
-function firstCount(line) {
-  const value = line.match(/\d+(?: \d{3})*/)?.[0];
-  if (!value) throw new Error(`No count found in: ${line}`);
-  return count(value);
-}
-
 function assertEqual(actual, expected, message) {
   if (actual !== expected) throw new Error(`${message}: ${actual} !== ${expected}`);
 }
@@ -112,51 +106,16 @@ function berlinResults(file) {
 function hamburgData() {
   const rawDirectory = 'data/raw/hamburg/2025';
   const sourceFiles = {
-    results: `${rawDirectory}/results.pdf`,
+    results: `${rawDirectory}/results.zip`,
     population: `${rawDirectory}/population.xlsx`,
     register: `${rawDirectory}/register.xlsx`,
     foreign: `${rawDirectory}/foreign.xlsx`,
   };
 
-  const resultText = pdfPage(sourceFiles.results, 1);
-  const lines = resultText.split('\n');
-  const hhCount = (label, { nextLine = false } = {}) => {
-    const index = lines.findIndex((line) => line.trimStart().startsWith(label));
-    if (index < 0) throw new Error(`Missing row: ${label}`);
-    const line = nextLine
-      ? lines.slice(index + 1).find((candidate) => /\d/.test(candidate))
-      : lines[index];
-    return firstCount(line);
-  };
-
-  const partyLabels = [
-    'SPD',
-    'CDU',
-    'FDP',
-    'GRÜNE',
-    'Volt',
-    'Die Linke',
-    'AfD',
-    'DieWahl - WFG',
-    'DAVA-Hamburg',
-    'FREIE WÄHLER',
-    'Die PARTEI',
-    'ÖDP',
-    'Tierschutzpartei',
-    'BÜNDNIS DEUTSCHLAND',
-    'BSW',
-    'NPD',
-  ];
-  const parties = partyLabels
-    .map((name) => ({ name, votes: hhCount(name) }))
-    .sort((a, b) => b.votes - a.votes);
-
-  const eligible = hhCount('Wahlberechtigte');
-  const voters = hhCount('Wählende / Wahlbeteiligung', { nextLine: true });
-  const ballotsTotal = hhCount('abgegebene Stimmzettel');
-  const ballotsInvalid = hhCount('ungültige Stimmzettel');
-  const ballotsValid = hhCount('gültige Stimmzettel');
-  const validVotes = hhCount('gültige Stimmen / Mandate');
+  const csv = execFileSync('unzip', ['-p', sourceFiles.results, 'BUE2025_e_05/Tabelle1.csv'], { encoding: 'utf8' });
+  const { eligible, voters, valid: validVotes, parties, ballots } = parseCsvResults('hamburg/2025', csv);
+  parties.sort((a, b) => b.votes - a.votes);
+  const { total: ballotsTotal, valid: ballotsValid, invalid: ballotsInvalid } = ballots;
 
   // Melderegister counts (primary population basis)
   const { shared: registerShared, sheets: registerSheets } = xlsxSheets(sourceFiles.register);
@@ -432,37 +391,53 @@ function officialCount(value) {
   return Number(value.replace(/[. ]/g, ''));
 }
 
+function htmlResults(route, html) {
+  const table = html.match(/<table\b[^>]*>[\s\S]*?Wahlberechtigte[\s\S]*?<\/table>/)?.[0];
+  if (!table || !html.includes(route.split('/')[1])) throw new Error(`${route}: missing results table`);
+  const rows = htmlRows(table).filter((row) => row.length > 1);
+  const col = electionRules(route).resultColumn;
+  const value = (label) => officialCount(rows.find((row) => row[0].startsWith(label))?.[col]);
+  const eligible = value('Wahlberechtigte');
+  const voters = value('Wähl');
+  const invalid = value('Ungültige');
+  const valid = value('Gültige');
+  const start = rows.findIndex((row) => row[0].startsWith('Gültige')) + 1;
+  const parties = rows.slice(start).filter((row) => !(row[0].startsWith('Einzelbewerb') && row[col] === '')).map((row) => ({
+    name: row[0].replace(/ \(.*\)$/, ''), votes: officialCount(row[col]),
+  })).filter((party) => party.votes > 0);
+  return { eligible, voters, invalid, valid, parties };
+}
+
 async function otherStateData(route, sources) {
   const [slug, yearText] = route.split('/');
   const year = Number(yearText);
   const state = stateCatalog[slug];
   const electionDate = sources.results.electionDate;
   let eligible, voters, invalid, valid, parties;
-  const { votingAge, voteLabel, votesPerVoter, resultColumn, unitNote } = electionRules(route);
+  const { votingAge, voteLabel, votesPerVoter, unitNote } = electionRules(route);
 
   if (route === 'berlin/2023') {
     ({ eligible, voters, invalid, valid, parties } = berlinResults(sources.results.file));
-  } else if (['berlin/2026', 'mecklenburg-vorpommern/2026'].includes(route)) {
-    // These retained exports use different encodings; Berlin's party dictionary
-    // is Windows-1252 even though its results are UTF-8. See csv-results.mjs.
-    const text = new TextDecoder(slug === 'berlin' ? 'utf-8' : 'windows-1252').decode(await readFile(sources.results.file));
+  } else if (sources.results.file.endsWith('.csv')) {
+    // Encoding is publisher-specific; Berlin's separate party dictionary is
+    // Windows-1252. Each CSV layout and selection is documented in csv-results.mjs.
+    const text = new TextDecoder(sources.results.encoding ?? (slug === 'mecklenburg-vorpommern' ? 'windows-1252' : 'utf-8')).decode(await readFile(sources.results.file));
     const description = sources.description
       ? new TextDecoder('windows-1252').decode(await readFile(sources.description.file)) : '';
     ({ eligible, voters, invalid, valid, parties } = parseCsvResults(route, text, description));
-  } else if (route === 'sachsen-anhalt/2026') {
-    const html = await readFile(sources.results.file, 'utf8');
-    const widgets = [...html.matchAll(/<script[^>]*type="application\/json"[^>]*>([\s\S]*?)<\/script>/g)]
-      .map((match) => JSON.parse(match[1]).x?.tag?.attribs);
-    const table = widgets.find((widget) => widget?.elementId === 'ergtable')?.data;
-    if (!table || !/2661\s+von\s+2661\s+Wahlbezirken/.test(html)) throw new Error('Incomplete Sachsen-Anhalt 2026 results');
-    const counts = table['anzahl.wj.x'];
-    [eligible, voters, , invalid, valid] = counts;
-    parties = table.merkmal.slice(5).flatMap((label, index) => {
-      const votes = counts[index + 5];
-      if (votes === 'NA') return [];
-      if (!Number.isSafeInteger(votes) || votes < 0) throw new Error('Invalid Sachsen-Anhalt party count');
-      return [{ name: label.replaceAll('&shy;', '').replace(/<[^>]*>/g, ''), votes }];
-    });
+    if (sources['supplementary-results']) {
+      // Niedersachsen's CSV omits invalid votes; Schleswig-Holstein's export
+      // lacks an explicit final-status label. Retain the official published
+      // results and compare every party/count before using their omitted evidence.
+      const reference = htmlResults(route, await readFile(sources['supplementary-results'].file, 'utf8'));
+      for (const key of ['eligible', 'voters', 'valid']) {
+        assertEqual({ eligible, voters, valid }[key], reference[key], `${route} CSV ${key}`);
+      }
+      if (invalid !== undefined) assertEqual(invalid, reference.invalid, `${route} CSV invalid`);
+      const canonical = (values) => JSON.stringify(values.toSorted((a, b) => a.name.localeCompare(b.name)));
+      assertEqual(canonical(parties), canonical(reference.parties), `${route} CSV parties`);
+      invalid = reference.invalid;
+    }
   } else if (route === 'brandenburg/2024') {
     const { shared, sheets } = xlsxSheets(sources.results.file);
     const [headers, units, ...rows] = xlsxRows(sheets.Brandenburg_Landtagswahl_A_2, shared);
@@ -484,42 +459,9 @@ async function otherStateData(route, sources) {
     parties = Object.entries(headers)
       .filter(([column]) => Number(column) >= colIndex('U') && units[column] === 'Anzahl')
       .map(([column, name]) => ({ name: name === 'GRÜNE/B 90' ? 'GRÜNE' : name, votes: countAt(column) }));
-  } else if (slug === 'rheinland-pfalz') {
-    const { shared, sheets } = xlsxSheets(sources.results.file);
-    const rows = xlsxRows(sheets.LW_2026_WK, shared);
-    const districts = rows.filter((row) => row[1] === 'G' && /^\d \d{3}$/.test(String(row[0]).trim()));
-    assertEqual(districts.length, 52, 'Rheinland-Pfalz constituencies');
-    const row = {};
-    for (const col of ['I', 'J', 'AU', 'AW', 'AY', 'BA', 'BC', 'BE', 'BG', 'BI', 'BK', 'BM', 'BO', 'BQ', 'BS', 'BU']) {
-      row[colIndex(col)] = districts.reduce((sum, district) => {
-        const value = district[colIndex(col)];
-        if (!Number.isSafeInteger(value) || value < 0) throw new Error(`Missing Rheinland-Pfalz ${col} count`);
-        return sum + value;
-      }, 0);
-    }
-    eligible = row[colIndex('I')];
-    voters = row[colIndex('J')];
-    invalid = row[colIndex('AU')];
-    valid = row[colIndex('AW')];
-    parties = ['AY', 'BA', 'BC', 'BE', 'BG', 'BI', 'BK', 'BM', 'BO', 'BQ', 'BS', 'BU'].map((col) => ({
-      name: rows[2][colIndex(col)], votes: row[colIndex(col)],
-    }));
-
   } else {
     const html = await readFile(sources.results.file, 'utf8');
-    const table = html.match(/<table\b[^>]*>[\s\S]*?Wahlberechtigte[\s\S]*?<\/table>/)?.[0];
-    if (!table || !html.includes(String(year))) throw new Error(`${slug}: missing results table`);
-    const rows = htmlRows(table).filter((row) => row.length > 1);
-    const col = resultColumn;
-    const value = (label) => officialCount(rows.find((row) => row[0].startsWith(label))?.[col]);
-    eligible = value('Wahlberechtigte');
-    voters = value('Wähl');
-    invalid = value('Ungültige');
-    valid = value('Gültige');
-    const start = rows.findIndex((row) => row[0].startsWith('Gültige')) + 1;
-    parties = rows.slice(start).filter((row) => !(row[0].startsWith('Einzelbewerb') && row[col] === '')).map((row) => ({
-      name: row[0].replace(/ \(.*\)$/, ''), votes: officialCount(row[col]),
-    })).filter((party) => party.votes > 0);
+    ({ eligible, voters, invalid, valid, parties } = htmlResults(route, html));
   }
   parties.sort((a, b) => b.votes - a.votes);
 

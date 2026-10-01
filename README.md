@@ -4,7 +4,7 @@ Static Astro site for German state elections and population-based voting flows.
 
 ```sh
 pnpm install
-pnpm data:download # only when refreshing the official PDFs
+pnpm data:download # only when refreshing official sources
 pnpm dev
 ```
 
@@ -30,6 +30,13 @@ election results. Population, age, and citizenship data must have reference date
 close to the election date; disclose any timing gaps or mismatches between sources.
 See [the all-state data availability review](DATA_AVAILABILITY_REVIEW.md) for
 official source alternatives, timing gaps, and remaining demographic data needs.
+See the [election CSV review](CSV_AVAILABILITY_REVIEW.md) for official result
+exports, comparisons with existing datasets, and recommended source replacements.
+Fourteen elections now import official CSV results (Hamburg's CSV is retained in
+its published ZIP). Niedersachsen retains HTML for omitted invalid-vote counts;
+Schleswig-Holstein retains HTML to check the CSV against published final results.
+Bremen still needs its PDF's ballot fields. Berlin 2023 and Brandenburg use XLSX;
+Sachsen and Thüringen use HTML where no equivalent CSV was confirmed.
 
 `src/data/states.ts` lists all 16 states with an explicit date and result source URL
 for each election. Available years, the latest election date and its result link

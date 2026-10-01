@@ -3,13 +3,16 @@
   "sources": [
     {
       "id": "results",
-      "url": "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-10.html",
-      "file": "data/raw/saarland/2022/results.html",
-      "publisher": "Die Bundeswahlleiterin",
-      "location": "Ergebnis der Landtagswahl, Landesergebnis",
+      "file": "data/raw/saarland/2022/results.csv",
+      "csvHeader": "Landtagswahl 2022;",
+      "encoding": "utf-8",
+      "publisher": "Landeswahlleiterin Saarland",
+      "resultStatus": "final",
+      "location": "Region 10 Saarland; Endgültig-Spalten, Stimmen; ÖDP und Partei der Humanisten",
       "electionDate": "2022-03-27",
-      "retrievedAt": "2026-09-05T21:35:54.415Z",
-      "sha256": "3238a89a316ac37e58fb7a03b6a2a6a6c38003f60b77fee13f963a014c18bc38"
+      "url": "https://wahlergebnis.saarland.de/LTW/KERG_SAARLAND.csv",
+      "sha256": "49c9dc360edfde1d5ab90a4c637d1274509dbd55158f922b155e8487eaf3e77b",
+      "retrievedAt": "2026-10-01T18:07:55.423264Z"
     },
     {
       "id": "population",

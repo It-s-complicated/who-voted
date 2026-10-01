@@ -3,13 +3,16 @@
   "sources": [
     {
       "id": "results",
-      "url": "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-15.html",
-      "file": "data/raw/sachsen-anhalt/2021/results.html",
-      "publisher": "Die Bundeswahlleiterin",
+      "file": "data/raw/sachsen-anhalt/2021/results.csv",
+      "csvHeader": "Ergebnisart;",
+      "encoding": "windows-1252",
+      "publisher": "Statistisches Landesamt Sachsen-Anhalt",
+      "resultStatus": "final",
+      "location": "Ergebnisart E, Satzart LAN, Schlüsselnummer 15; Zweitstimmen",
       "electionDate": "2021-06-06",
-      "location": "Landtagswahl 2021, Landesergebnis",
-      "retrievedAt": "2026-09-05T21:35:54.495Z",
-      "sha256": "604a6c8c10bf14b60ddab1c2b1baf38c49835f31978655df702d0dacd2ea31e8"
+      "url": "https://wahlergebnisse.sachsen-anhalt.de/wahlen/lt21/erg/csv/lt21dat1.csv",
+      "sha256": "a2904509e0f48d79534d0afc65359a9c1294e26ebfce564d82b43882d2b8281c",
+      "retrievedAt": "2026-10-01T18:07:55.423568Z"
     },
     {
       "id": "population",

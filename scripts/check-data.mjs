@@ -6,7 +6,7 @@ import { stateSources } from './state-sources.mjs';
 import { electionRules } from './election-rules.mjs';
 import { parsePopulationRows } from './population.mjs';
 import { electionSchema } from '../src/data/election.ts';
-import { parseCsvResults } from './csv-results.mjs';
+import { csvRows, parseCsvResults } from './csv-results.mjs';
 
 // A newer election must change the summary without changing historical metadata.
 const historical = structuredClone(states['sachsen-anhalt'].elections);
@@ -42,9 +42,22 @@ assert.deepEqual(bwRules, {
 assert.equal(electionRules('saarland/2022').resultColumn, 1);
 assert.equal(electionRules('sachsen-anhalt/2021').resultColumn, 3);
 
-// Baselines from the PDF imports, independently matched against the official XLSX
-// exports. Lock every non-provenance field, including each party's name and votes.
+// Baselines from the previous HTML/PDF/XLSX imports, independently compared
+// with official CSV exports. Preserve every non-provenance field; Saarland's
+// ÖPD/Die Humanistien typos are intentionally corrected before hashing.
 for (const [route, expectedHash] of Object.entries({
+  'baden-wuerttemberg/2026': '692eb0676d6f1b78f77c73be2d94e116b60c9024b94d9496e84a20e5ab36307a',
+  'bayern/2023': '8fd145e666c000f09fdef67c7382fb88d915db37e9e0019c124094e8c82b1574',
+  'hessen/2023': '167e35701173df770658f21a81752bfab1876426ad6e0906aec30153448d0133',
+  'mecklenburg-vorpommern/2021': '7b3763f4cad4afaae2ff885e91b1a3789a9e2f45244da9a8fa2e20abb464de18',
+  'niedersachsen/2022': '943b0900459c5876c5fa01a173ffc5862b2bdf1c766063d13893af279752bb86',
+  'nordrhein-westfalen/2022': '89275d16df552f5d62f4983e8c5b0826cb3baad7448010fee532e016b0847969',
+  'rheinland-pfalz/2026': 'caaf5ae7d105e4b5c20c4108ec26c99c812ff1485bf619faadafb6822f3a52d1',
+  'saarland/2022': 'bb13f19e6bec2b4e92f397ad3f5ab7a65ce5877ef64bd9e90afbc06a3d418453',
+  'sachsen-anhalt/2021': 'aed51eae834976d961e870880c9905e39d1c730ae1f15cf9eb9cbbe053b62578',
+  'sachsen-anhalt/2026': '08084f48b7cbc2d8b55cf11fb0da86024acf51aa08a34047cc94de2cc2ea2bb9',
+  'schleswig-holstein/2022': 'f3fafa999413193f962250004fcba670f79558485428e254300c7229d3c487dd',
+  'hamburg/2025': 'd8efb0ef7d09d0b03637683ae7a39260ecc7f728658c12560a1a7e5a6f7f1173',
   "brandenburg/2024": "d5ecc140103be1db952ca0c5815892dfa6d0e4904b952e88636c80c8e0964d56"
 })) {
   const { sources: _sources, state: _state, previousParliament: _previousParliament, ...data } = JSON.parse(readFileSync(`public/data/${route}.json`, 'utf8'));
@@ -204,4 +217,18 @@ for (const [route, invalid, partyVotes] of [
   const badCount = row.replace(berlin ? ';1824514;' : ';1015323;', ';oops;');
   assert.throws(() => parseCsvResults(route, text.replace(row, badCount), description), /Invalid/);
 }
-console.log('Validated 19 elections across all 16 states, demographic parsing, and rejection of corrupt data.');
+// Quoting and multiline cells are required by the new official layouts. The
+// relaxed preamble widths must not relax statewide uniqueness or count checks.
+assert.deepEqual(csvRows('\uFEFFa;b\r\n"two\r\nlines";"escaped ""quote"""'), [['a', 'b'], ['two\r\nlines', 'escaped "quote"']]);
+assert.throws(() => csvRows('a;b\n"unterminated;1'), /Quote Not Closed/);
+const st2026 = readFileSync('data/raw/sachsen-anhalt/2026/results.csv', 'utf8');
+const stRow = st2026.split(/\r?\n/).find((line) => line.startsWith('"E";"06.09.2026";"LAN";"15";"Sachsen-Anhalt";"";'));
+assert.ok(stRow);
+assert.throws(() => parseCsvResults('sachsen-anhalt/2026', `${st2026.trim()}\n${stRow}`), /Unique statewide/);
+const malformedStRow = stRow.replace(';1327991;', ';oops;');
+assert.notEqual(malformedStRow, stRow);
+assert.throws(() => parseCsvResults('sachsen-anhalt/2026', st2026.replace(stRow, malformedStRow)), /Invalid/);
+const nds2022 = readFileSync('data/raw/niedersachsen/2022/results.csv', 'utf8');
+assert.throws(() => parseCsvResults('niedersachsen/2022', nds2022.trim().split(/\r?\n/).slice(0, -1).join('\n')), /Complete count/);
+assert.equal(parseCsvResults('niedersachsen/2022', nds2022).invalid, undefined, 'Missing invalid votes must come from supplementary evidence');
+console.log('Validated 19 elections across all 16 states, CSV migrations, demographic parsing, and rejection of corrupt data.');

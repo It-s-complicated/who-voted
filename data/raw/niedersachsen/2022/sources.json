@@ -3,13 +3,16 @@
   "sources": [
     {
       "id": "results",
-      "url": "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-3.html",
-      "file": "data/raw/niedersachsen/2022/results.html",
-      "publisher": "Die Bundeswahlleiterin",
-      "location": "Ergebnis der Landtagswahl, Landesergebnis",
+      "file": "data/raw/niedersachsen/2022/results.csv",
+      "csvHeader": "Wahlkreis;",
+      "encoding": "utf-8",
+      "publisher": "Landesamt für Statistik Niedersachsen",
+      "resultStatus": "final",
+      "location": "Summe der Wahlkreise 1–87, Zweitstimmen II; ungültige Stimmen aus supplementary-results",
       "electionDate": "2022-10-09",
-      "retrievedAt": "2026-09-05T21:35:54.199Z",
-      "sha256": "7b27c47f6f2a24cef5af77e574b26a9c384310b70522dc64f4ac7736c37045ab"
+      "url": "https://wahlen.statistik.niedersachsen.de/LW2022/wahlergebnis.csv",
+      "sha256": "25316d1de8a18980080de7473e998ba2e8ca76e611e870445da53944ed34ee1b",
+      "retrievedAt": "2026-10-01T18:07:55.420267Z"
     },
     {
       "id": "population",
@@ -21,6 +24,15 @@
       "basis": "Bevölkerungsfortschreibung auf Basis des Zensus 2022",
       "retrievedAt": "2026-09-05T21:35:54.199Z",
       "sha256": "890d1386cbf9c19e97d750792c6c068c00c7141d8cd4c286f633ec0a8dbc736c"
+    },
+    {
+      "id": "supplementary-results",
+      "url": "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-3.html",
+      "file": "data/raw/niedersachsen/2022/supplementary-results.html",
+      "publisher": "Die Bundeswahlleiterin",
+      "location": "Amtliches Endergebnis; unabhängiger Abgleich aller CSV-Zahlen und ungültiger Zweitstimmen",
+      "sha256": "7b27c47f6f2a24cef5af77e574b26a9c384310b70522dc64f4ac7736c37045ab",
+      "retrievedAt": "2026-09-05T21:35:54.199Z"
     }
   ]
 }

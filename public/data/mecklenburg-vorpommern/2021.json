@@ -147,13 +147,16 @@
   "sources": [
     {
       "id": "results",
-      "url": "https://www.bundeswahlleiterin.de/service/landtagswahlen/land-13.html",
-      "file": "data/raw/mecklenburg-vorpommern/2021/results.html",
-      "publisher": "Die Bundeswahlleiterin",
-      "location": "Ergebnis der Landtagswahl, Landesergebnis",
+      "file": "data/raw/mecklenburg-vorpommern/2021/results.csv",
+      "csvHeader": "Wahl zum Landtag von Mecklenburg-Vorpommern am 26. September 2021",
+      "encoding": "windows-1252",
+      "publisher": "Landeswahlleiterin Mecklenburg-Vorpommern",
+      "resultStatus": "final",
+      "location": "Wahlkreis 99, Ausgabe A, Erst-/Zweitstimme 2; 2003/2003 Wahlbezirke",
       "electionDate": "2021-09-26",
-      "retrievedAt": "2026-09-05T21:35:53.696Z",
-      "sha256": "b5d44d4abd0e13a80b6393d5fc529ba473475da87a8aae9fc9e0e83c2ddd026a"
+      "url": "https://www.laiv-mv.de/static/LAIV/Wahlen/2-Landtagswahlen/2021/Ergebnisse/l_wahlkreise.csv",
+      "sha256": "ad1ba0899aab43ead2db51cfe720921b902e929e4643469b2b0aa12dcdb31cf9",
+      "retrievedAt": "2026-10-01T18:07:55.419883Z"
     },
     {
       "id": "population",

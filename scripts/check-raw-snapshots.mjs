@@ -3,6 +3,7 @@ import { execFileSync } from 'node:child_process';
 import { cp, mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { stateSources } from './state-sources.mjs';
 
 const root = new URL('../', import.meta.url);
 const temporary = await mkdtemp(join(tmpdir(), 'who-voted-snapshots-'));
@@ -25,7 +26,9 @@ try {
       await import(${JSON.stringify(new URL('scripts/download-data.mjs', root).href)});
     `], { cwd: temporary, stdio: 'pipe' });
   }
-  download(['bayern/2023', 'hessen/2023']);
+  // Exercise every migrated CSV signature, including Windows-1252 and quoted
+  // headers, without refreshing live results or shared population exports.
+  download(Object.entries(stateSources).filter(([, sources]) => sources.results.encoding).map(([route]) => route));
   const oldBavaria = await manifest('bayern/2023');
   const oldHesse = await manifest('hessen/2023');
   const oldPopulation = population(oldBavaria);

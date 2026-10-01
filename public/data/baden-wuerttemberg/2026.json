@@ -135,13 +135,16 @@
   "sources": [
     {
       "id": "results",
-      "url": "https://wahlen.statistik-bw.de/ltw26/",
-      "file": "data/raw/baden-wuerttemberg/2026/state-results.html",
+      "file": "data/raw/baden-wuerttemberg/2026/results.csv",
+      "csvHeader": "Wahlkreisnummer;",
+      "encoding": "utf-8",
       "publisher": "Statistisches Landesamt Baden-Württemberg",
-      "location": "Ergebnistabelle, Land Baden-Württemberg, Zweitstimmen",
+      "resultStatus": "final",
+      "location": "LAND BW, Zweitstimmen F/F1–F21; 11570/11570 Wahlbezirke",
       "electionDate": "2026-03-08",
-      "retrievedAt": "2026-09-05T21:35:41.132Z",
-      "sha256": "01b9d7edac2461e1790b03cb3392f14b5441c908686643182a48cae4be45ce48"
+      "url": "https://wahlen.statistik-bw.de/ltw26/ltw26-ergebnisse.csv",
+      "sha256": "5afd94b13ee6af30c0ec63bdd2543ca3826f80d2281646a1f84d9f0e6a822866",
+      "retrievedAt": "2026-10-01T18:07:55.416464Z"
     },
     {
       "id": "population",

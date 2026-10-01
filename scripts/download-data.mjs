@@ -6,7 +6,11 @@ import { stateSources } from './state-sources.mjs';
 
 const sources = {
   'hamburg/2025': {
-    'results.pdf': states.hamburg.elections[2025].url,
+    results: {
+      url: states.hamburg.elections[2025].url, file: 'data/raw/hamburg/2025/results.zip',
+      publisher: 'Statistisches Amt für Hamburg und Schleswig-Holstein', resultStatus: 'final',
+      location: 'BUE2025_e_05/Tabelle1.csv, Landesliste (absolut), Stimmen und Stimmzettel',
+    },
     'population.xlsx':
       'https://www.statistik-nord.de/fileadmin/Dokumente/A_I_3_j24_HH_Zensus_2022.xlsx',
     'register.xlsx':
@@ -59,7 +63,7 @@ for (const [directory, files] of Object.entries(sources)) {
         : undefined);
       if (!response.ok) throw new Error(`${source.url}: ${response.status} ${response.statusText}`);
       bytes = new Uint8Array(await response.arrayBuffer());
-      const head = new TextDecoder().decode(bytes.subarray(0, 500)).trimStart();
+      const head = new TextDecoder(source.encoding ?? 'utf-8').decode(bytes.subarray(0, 500)).trimStart();
       const valid = source.file.endsWith('.csv') ? head.replace('\uFEFF', '').startsWith(source.csvHeader ?? 'Tabelle:')
         : source.file.endsWith('.html') ? /<!doctype html|<html/i.test(head)
         : source.file.endsWith('.pdf') ? head.startsWith('%PDF-') : head.startsWith('PK');
