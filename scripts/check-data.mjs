@@ -6,7 +6,7 @@ import { stateSources } from './state-sources.mjs';
 import { electionRules } from './election-rules.mjs';
 import { parsePopulationRows } from './population.mjs';
 import { electionSchema } from '../src/data/election.ts';
-import { septemberResults } from './september-2026.mjs';
+import { parseCsvResults } from './csv-results.mjs';
 
 // A newer election must change the summary without changing historical metadata.
 const historical = structuredClone(states['sachsen-anhalt'].elections);
@@ -190,18 +190,18 @@ for (const [route, invalid, partyVotes] of [
   const berlin = route.startsWith('berlin/');
   const text = new TextDecoder(berlin ? 'utf-8' : 'windows-1252').decode(readFileSync(`data/raw/${route}/results.csv`));
   const description = berlin ? new TextDecoder('windows-1252').decode(readFileSync(`data/raw/${route}/description.csv`)) : '';
-  const parsed = septemberResults(route, text, description);
+  const parsed = parseCsvResults(route, text, description);
   assert.equal(parsed.invalid, invalid);
   assert.deepEqual(parsed.parties.map((party) => party.votes), partyVotes);
   const data = JSON.parse(readFileSync(`public/data/${route}.json`, 'utf8'));
   assert.equal(data.resultStatus, 'preliminary');
   assert.equal(data.votingAge, 16);
   const row = text.split(/\r?\n/).find((line) => berlin ? line.startsWith('GI9900;') : line.includes(';A;99;') && line.includes(';2;8928;'));
-  assert.throws(() => septemberResults(route, text.replace(`${row}\r\n`, ''), description), /Unique statewide/);
-  assert.throws(() => septemberResults(route, `${text.trim()}\n${row}`, description), /Unique statewide/);
+  assert.throws(() => parseCsvResults(route, text.replace(`${row}\r\n`, ''), description), /Unique statewide/);
+  assert.throws(() => parseCsvResults(route, `${text.trim()}\n${row}`, description), /Unique statewide/);
   const partial = row.replace(berlin ? ';4114;4114;' : ';1974;1974;', berlin ? ';4114;4113;' : ';1974;1973;');
-  assert.throws(() => septemberResults(route, text.replace(row, partial), description), /Complete count/);
+  assert.throws(() => parseCsvResults(route, text.replace(row, partial), description), /Complete count/);
   const badCount = row.replace(berlin ? ';1824514;' : ';1015323;', ';oops;');
-  assert.throws(() => septemberResults(route, text.replace(row, badCount), description), /Invalid/);
+  assert.throws(() => parseCsvResults(route, text.replace(row, badCount), description), /Invalid/);
 }
 console.log('Validated 19 elections across all 16 states, demographic parsing, and rejection of corrupt data.');

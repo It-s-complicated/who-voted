@@ -86,6 +86,16 @@ Before downloading, inspect the configured population file paths. Even a downloa
 
 Check PDF pages, table headers, year headings, party lists, spreadsheet sheets/columns, and completeness indicators before reusing any parser. Matching filenames or states do not prove matching layouts. The existing Brandenburg and Rheinland-Pfalz branches still contain document-specific assumptions.
 
+Document exceptional data handling next to the parser: why the shared path cannot
+read the source, which elections and formats the exception covers, and which
+source assumptions must be reviewed when refreshing it. For example,
+[`parseCsvResults`](scripts/csv-results.mjs) handles Berlin 2026 and
+Mecklenburg-Vorpommern 2026 because their CSV exports use different headers and
+statewide second-vote identifiers, and Berlin needs a party-code dictionary.
+The parser checks the retained snapshot dates and complete district counts to
+prevent an unreviewed or partial export from silently replacing verified data.
+Its separate module lets regression checks import it without rebuilding datasets.
+
 Review the shared population-date selection too: it currently chooses between census data and annual snapshots using hardcoded routes and a year-selection heuristic capped at 2025. Adding a newer election does not automatically select a newer export. The census parser also identifies its format through `1000A-2012` in the filename; preserve that marker when naming a versioned census file.
 
 The catalog and URLs currently identify elections by state and year. Two elections in the same state and calendar year would need an identity/routing change before either could be represented separately.

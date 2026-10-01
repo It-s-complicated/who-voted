@@ -1,8 +1,13 @@
 import assert from 'node:assert/strict';
 
+// Berlin 2026 and Mecklenburg-Vorpommern 2026 supply semicolon CSV exports
+// rather than the tables read by the HTML/XLSX/PDF result parsers. Their column
+// names and statewide second-vote identifiers differ; Berlin also needs a party
+// code dictionary. Keep this parser importable so checks can exercise those
+// source assumptions without running the data-build assembly in process-data.mjs.
 // ponytail: these retained semicolon exports have no quoted data fields;
 // reject quoting and use a CSV library if a future export needs it.
-export function septemberResults(route, text, description = '') {
+export function parseCsvResults(route, text, description = '') {
   const berlin = route === 'berlin/2026';
   assert.ok(berlin || route === 'mecklenburg-vorpommern/2026');
   const lines = text.trim().split(/\r?\n/);
@@ -28,6 +33,8 @@ export function septemberResults(route, text, description = '') {
     return value;
   };
   assert.equal(row[berlin ? 'Gebietsname' : 'Wahlkreisname/Land'], berlin ? 'Berlin' : 'Mecklenburg-Vorpommern');
+  // Pin the retained preliminary snapshots and district totals: a newer or
+  // partial export must be reviewed before it can replace the verified input.
   // Berlin's Datum is YY.MM.DD, per the retained data dictionary.
   assert.match(row[berlin ? 'Datum' : 'Berechnungsdatum'], berlin ? /^26\.09\.21$/ : /^21\.09\.2026 /);
   assert.equal(count(berlin ? 'AnzWbez' : 'Wahlbezirke insg.'), berlin ? 4114 : 1974);
@@ -36,11 +43,13 @@ export function septemberResults(route, text, description = '') {
   const shortNames = { P01: 'CDU', P02: 'SPD', P03: 'GRÜNE', P04: 'Die Linke', P05: 'AfD', P06: 'FDP', P07: 'Tierschutzpartei', P08: 'Die PARTEI', P09: 'Volt', P12: 'Die Urbane.', P13: 'DKP', P14: 'ÖDP', P15: 'Die Heimat', P16: 'Bergpartei', P17: 'SGP', P24: 'BSW', P27: 'PdF' };
   const partyColumns = berlin ? headers.filter((key) => /^P\d+$/.test(key)) : headers.slice(12);
   const parties = partyColumns.flatMap((key) => {
+    // MV marks candidates without a second-vote list as "x", not a vote count.
     if (!berlin && row[key] === 'x') {
       assert.ok(['LfK', 'Einzelbewerber'].includes(key), 'Only direct candidates have no second votes');
       return [];
     }
     const votes = count(key);
+    // Berlin includes unused party-code columns; verify zero before omitting them.
     if (berlin && names[key]?.startsWith('nicht besetzt')) {
       assert.equal(votes, 0, 'Unoccupied party code');
       return [];

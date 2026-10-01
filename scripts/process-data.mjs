@@ -6,7 +6,7 @@ import { stateSources } from './state-sources.mjs';
 import { electionRules } from './election-rules.mjs';
 import { electionSchema } from '../src/data/election.ts';
 import { populationSnapshot } from './population.mjs';
-import { septemberResults } from './september-2026.mjs';
+import { parseCsvResults } from './csv-results.mjs';
 
 function pdfPage(file, firstPage, lastPage = firstPage) {
   return execFileSync(
@@ -443,10 +443,12 @@ async function otherStateData(route, sources) {
   if (route === 'berlin/2023') {
     ({ eligible, voters, invalid, valid, parties } = berlinResults(sources.results.file));
   } else if (['berlin/2026', 'mecklenburg-vorpommern/2026'].includes(route)) {
+    // These retained exports use different encodings; Berlin's party dictionary
+    // is Windows-1252 even though its results are UTF-8. See csv-results.mjs.
     const text = new TextDecoder(slug === 'berlin' ? 'utf-8' : 'windows-1252').decode(await readFile(sources.results.file));
     const description = sources.description
       ? new TextDecoder('windows-1252').decode(await readFile(sources.description.file)) : '';
-    ({ eligible, voters, invalid, valid, parties } = septemberResults(route, text, description));
+    ({ eligible, voters, invalid, valid, parties } = parseCsvResults(route, text, description));
   } else if (route === 'sachsen-anhalt/2026') {
     const html = await readFile(sources.results.file, 'utf8');
     const widgets = [...html.matchAll(/<script[^>]*type="application\/json"[^>]*>([\s\S]*?)<\/script>/g)]
