@@ -19,12 +19,14 @@ const rules = {
   },
   'hamburg/2025': {
     votingAge: 16, voteLabel: 'Landesstimmen', votesPerVoter: 5,
+    unitNote: 'Jede Wählerin und jeder Wähler hat bis zu 5 Landesstimmen und kann sie auf mehrere Parteien verteilen. Die Parteibänder zählen Stimmen, keine Personen; aus den amtlichen Ergebnissen lässt sich nicht ableiten, wie viele Personen einer Partei zuzurechnen sind.',
     sources: [
       { url: 'https://www.statistik-nord.de/fileadmin/Dokumente/Glossar_B%C3%BCrgerschaftswahl_2025_Hamburg.pdf', publisher: 'Statistikamt Nord', location: 'Glossar zur Bürgerschaftswahl 02.03.2025, Seiten 3 und 5: Landesstimmen und Wahlberechtigte' },
     ],
   },
   'bremen/2023': {
     votingAge: 16, voteLabel: 'Stimmen', votesPerVoter: 5,
+    unitNote: 'Jede Wählerin und jeder Wähler hat bis zu 5 Stimmen (Listen- und Personenstimmen) und kann sie auf mehrere Parteien verteilen. Die Parteibänder zählen Stimmen, keine Personen; aus den amtlichen Ergebnissen lässt sich nicht ableiten, wie viele Personen einer Partei zuzurechnen sind.',
     sources: [
       { url: 'https://landesportal.bremen.de/die-wahl-der-buergerschaft', publisher: 'Freie Hansestadt Bremen', location: 'Wahlalter und fünf Stimmen; Seite verweist ausdrücklich auf die Bürgerschaftswahl 2023' },
     ],
@@ -36,7 +38,7 @@ const rules = {
     ],
   },
   'baden-wuerttemberg/2026': {
-    votingAge: 16, voteLabel: 'Zweitstimmen', votesPerVoter: 1, resultColumn: 4,
+    votingAge: 16, voteLabel: 'Zweitstimmen', votesPerVoter: 1,
     sources: [
       { url: 'https://www.statistik-bw.de/presse/pressemitteilungen/pressemitteilung/landtagswahl-2026-wahlen-in-zahlen/', publisher: 'Statistisches Landesamt Baden-Württemberg', location: 'Pressemitteilung 35/2026, 26.02.2026: Mindestalter und Zwei-Stimmen-System' },
     ],
@@ -46,7 +48,7 @@ const rules = {
       { url: 'https://www.statistik.bayern.de/presse/mitteilungen/2023/pm09/index.html', publisher: 'Bayerisches Landesamt für Statistik', location: 'Pressemitteilung 09/2023: Stimmberechtigung' },
       { url: 'https://www.statistik.bayern.de/presse/mitteilungen/2023/pm08/index.html', publisher: 'Bayerisches Landesamt für Statistik', location: 'Pressemitteilung 08/2023: Erst- und Zweitstimmen, Gesamtstimmen' },
     ],
-    votingAge: 18, voteLabel: 'Gesamtstimmen', votesPerVoter: 2, resultColumn: 1,
+    votingAge: 18, voteLabel: 'Gesamtstimmen', votesPerVoter: 2,
     unitNote: 'In Bayern zählen Erst- und Zweitstimmen zusammen für die Sitzverteilung. Jede Person hat zwei Stimmen. Ab den gültigen Gesamtstimmen zeigen die Bänder Stimmen geteilt durch zwei; sie lassen sich nicht einzelnen Personen zuordnen.',
   },
   'brandenburg/2024': {
@@ -56,13 +58,13 @@ const rules = {
     ],
   },
   'hessen/2023': {
-    votingAge: 18, voteLabel: 'Landesstimmen', votesPerVoter: 1, resultColumn: 3,
+    votingAge: 18, voteLabel: 'Landesstimmen', votesPerVoter: 1,
     sources: [
       { url: 'https://statistik.hessen.de/sites/statistik.hessen.de/files/2023-10/BVII2_3_5j23.pdf', publisher: 'Hessisches Statistisches Landesamt', location: 'Landtagswahl 08.10.2023, Vorbemerkungen, PDF-Seite 4: Wahlsystem und Wahlberechtigung' },
     ],
   },
   'mecklenburg-vorpommern/2021': {
-    votingAge: 18, voteLabel: 'Zweitstimmen', votesPerVoter: 1, resultColumn: 3,
+    votingAge: 18, voteLabel: 'Zweitstimmen', votesPerVoter: 1,
     sources: [
       { url: 'https://www.laiv-mv.de/static/LAIV/Wahlen/Linker%20Seiteninhalt/LTW%20und%20KW%20in%20MV%202021%20-%20Stand%20August%202021.pdf', publisher: 'Landeswahlleiter Mecklenburg-Vorpommern', location: 'Wahlrechtsbroschüre, Stand August 2021, LKWG M-V §§ 4 und 53, PDF-Seiten 29 und 50' },
     ],
@@ -74,7 +76,7 @@ const rules = {
     ],
   },
   'nordrhein-westfalen/2022': {
-    votingAge: 18, voteLabel: 'Zweitstimmen', votesPerVoter: 1, resultColumn: 3,
+    votingAge: 18, voteLabel: 'Zweitstimmen', votesPerVoter: 1,
     sources: [
       { url: 'https://www.im.nrw/landeswahlleiter-stellt-die-wichtigsten-zahlen-zur-nrw-landtagswahl-vor', publisher: 'Ministerium des Innern Nordrhein-Westfalen / Landeswahlleiter', location: 'Pressemitteilung 04.05.2022: Zweitstimme und Wahlberechtigte' },
     ],
@@ -87,7 +89,7 @@ const rules = {
     ],
   },
   'saarland/2022': {
-    votingAge: 18, voteLabel: 'Stimmen', votesPerVoter: 1, resultColumn: 1,
+    votingAge: 18, voteLabel: 'Stimmen', votesPerVoter: 1,
     sources: [
       { url: 'https://wahlergebnis.saarland.de/LTW/SL_LTW_2022_VE.pdf', publisher: 'Statistisches Amt Saarland', location: 'Landtagswahl 2022, Informationen zur Landtagswahl, PDF-Seite 8: Wahlberechtigung und eine Stimme' },
     ],
@@ -100,7 +102,7 @@ const rules = {
     ],
   },
   'sachsen-anhalt/2021': {
-    votingAge: 18, voteLabel: 'Zweitstimmen', votesPerVoter: 1, resultColumn: 3,
+    votingAge: 18, voteLabel: 'Zweitstimmen', votesPerVoter: 1,
     sources: [
       { url: 'https://statistik.sachsen-anhalt.de/fileadmin/Bibliothek/Landesaemter/StaLa/startseite/Themen/Wahlen/Berichte/6B712_2021-A.pdf', publisher: 'Statistisches Landesamt Sachsen-Anhalt', location: 'Wahl des 8. Landtages 06.06.2021, Seite 6: Vorbemerkungen und Wahlverfahren' },
     ],

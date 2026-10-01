@@ -95,7 +95,7 @@ Before downloading, inspect the configured population file paths. Even a downloa
 | [scripts/election-rules.mjs](scripts/election-rules.mjs) | Add the exact `state/year` key, voting age, official vote label, votes per voter, references, and any unit note. For the shared HTML parser, supply a zero-based `resultColumn` checked against that retained table. Unknown routes have no rule fallback. |
 | [scripts/state-sources.mjs](scripts/state-sources.mjs) | For states using the shared import, configure the result filename, publisher, location, and status. Verify the selected population source, reference date, and basis. Set `resultStatus: 'preliminary'` explicitly when applicable; the shared parser otherwise defaults to final. |
 | [scripts/download-data.mjs](scripts/download-data.mjs) | Hamburg and Bremen currently have separate, exact-election source entries here. Add a new entry for their new election and any required additional sources. Other states, including both Berlin elections, inherit their source configuration from `stateSources`. |
-| [scripts/process-data.mjs](scripts/process-data.mjs) | Reuse a parser only after verifying the actual document layout. Add and register an election-specific parser where needed. Hamburg and Bremen are explicitly registered in the assembly block; Berlin uses election-specific result parsers and the shared population import. |
+| [scripts/process-data.mjs](scripts/process-data.mjs) | Reuse a parser only after verifying the actual document layout. Parsers return normalized `results` (eligible, voters, valid, invalid, parties, optional ballots), `population` (including demographic provenance), and `sourceFiles`; `electionData` assembles every election's output. Hamburg and Bremen are explicitly registered in the assembly block; keep source-specific calculations in their parsers, not separate output builders. |
 | [scripts/check-data.mjs](scripts/check-data.mjs) | Add independently verified expected totals for the new state/year. Existing expected totals are mostly keyed by state; convert affected assertions to exact election keys so historical elections keep their own expectations. |
 
 Check PDF pages, table headers, year headings, party lists, spreadsheet sheets/columns, and completeness indicators before reusing any parser. Matching filenames or states do not prove matching layouts. The existing Brandenburg and Rheinland-Pfalz branches still contain document-specific assumptions.
@@ -105,7 +105,8 @@ read the source, which elections and formats the exception covers, and which
 source assumptions must be reviewed when refreshing it.
 [`parseCsvResults`](scripts/csv-results.mjs) handles the official CSV layouts,
 including Hamburg's CSV inside its published ZIP. It uses `csv-parse` for quoted
-and multiline fields, then election-specific selectors and count checks; CSV
+and multiline fields, then small layout-specific functions with local row readers.
+Party uniqueness and vote totals are checked at the shared parser boundary; CSV
 does not imply one shared table layout. Berlin 2026 needs a party-code dictionary.
 The preliminary Berlin and Mecklenburg-Vorpommern imports additionally pin
 snapshot dates and complete district counts. Niedersachsen's missing invalid

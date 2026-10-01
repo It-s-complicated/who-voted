@@ -37,10 +37,13 @@ for (const route of ['baden-wuerttemberg/2021', 'schleswig-holstein/2009', 'sach
 }
 const { sources: bwRuleSources, ...bwRules } = electionRules('baden-wuerttemberg/2026');
 assert.deepEqual(bwRules, {
-  votingAge: 16, voteLabel: 'Zweitstimmen', votesPerVoter: 1, resultColumn: 4,
+  votingAge: 16, voteLabel: 'Zweitstimmen', votesPerVoter: 1,
 });
-assert.equal(electionRules('saarland/2022').resultColumn, 1);
-assert.equal(electionRules('sachsen-anhalt/2021').resultColumn, 3);
+// Only retained HTML results (including supplementary evidence) need a column.
+for (const [route, sources] of Object.entries(stateSources)) {
+  const usesHtml = sources.results.file.endsWith('.html') || Boolean(sources['supplementary-results']);
+  assert.equal(Object.hasOwn(electionRules(route), 'resultColumn'), usesHtml, `${route}: HTML column configuration`);
+}
 
 // Baselines from the previous HTML/PDF/XLSX imports, independently compared
 // with official CSV exports. Preserve every non-provenance field; Saarland's
@@ -110,6 +113,7 @@ for (const [slug, state] of Object.entries(states)) {
     assert.equal(data.votingAge, rules.votingAge);
     assert.equal(data.secondVotes.label, `Gültige ${rules.voteLabel}`);
     assert.equal(data.secondVotes.votesPerVoter, rules.votesPerVoter);
+    assert.equal(data.unitNote, rules.unitNote);
     assert.ok(rules.sources.length > 0, `${slug}/${year}: official rule references required`);
     for (const source of rules.sources) {
       assert.equal(new URL(source.url).protocol, 'https:');
@@ -119,7 +123,6 @@ for (const [slug, state] of Object.entries(states)) {
     assert.equal(data.sources.find((source) => source.id === 'results').url, metadata.url);
     const source = stateSources[`${slug}/${year}`]?.results;
     if (source) {
-      assert.equal(data.unitNote, rules.unitNote);
       assert.equal(source.electionDate, metadata.electionDate);
       assert.equal(source.url, metadata.url);
     }
@@ -221,6 +224,7 @@ for (const [route, invalid, partyVotes] of [
 // relaxed preamble widths must not relax statewide uniqueness or count checks.
 assert.deepEqual(csvRows('\uFEFFa;b\r\n"two\r\nlines";"escaped ""quote"""'), [['a', 'b'], ['two\r\nlines', 'escaped "quote"']]);
 assert.throws(() => csvRows('a;b\n"unterminated;1'), /Quote Not Closed/);
+assert.throws(() => parseCsvResults('unknown/2026', 'a;b'), /Unsupported CSV election/);
 const st2026 = readFileSync('data/raw/sachsen-anhalt/2026/results.csv', 'utf8');
 const stRow = st2026.split(/\r?\n/).find((line) => line.startsWith('"E";"06.09.2026";"LAN";"15";"Sachsen-Anhalt";"";'));
 assert.ok(stRow);

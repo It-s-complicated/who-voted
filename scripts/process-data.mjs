@@ -90,8 +90,7 @@ function berlinResults(file) {
   const parties = Object.entries(headers)
     .filter(([column]) => Number(column) >= colIndex('S'))
     .map(([column, name]) => ({ name, votes: sum(column) }))
-    .filter((party) => party.votes > 0)
-    .sort((a, b) => b.votes - a.votes);
+    .filter((party) => party.votes > 0);
 
   const eligible = value('Wahlberechtigte insgesamt');
   const voters = value('Wählende');
@@ -114,7 +113,6 @@ function hamburgData() {
 
   const csv = execFileSync('unzip', ['-p', sourceFiles.results, 'BUE2025_e_05/Tabelle1.csv'], { encoding: 'utf8' });
   const { eligible, voters, valid: validVotes, parties, ballots } = parseCsvResults('hamburg/2025', csv);
-  parties.sort((a, b) => b.votes - a.votes);
   const { total: ballotsTotal, valid: ballotsValid, invalid: ballotsInvalid } = ballots;
 
   // Melderegister counts (primary population basis)
@@ -173,48 +171,14 @@ function hamburgData() {
   }
 
   return {
-    data: {
-      id: 'hamburg-bue-2025',
-      year: 2025,
-      title: 'Bürgerschaftswahl in Hamburg',
-      electionDate: stateCatalog.hamburg.elections[2025].electionDate,
-      resultStatus: 'final',
-      votingAge: 16,
-      eyebrow: 'Bürgerschaftswahl · Landesstimmen',
-      intro:
-        'Die Bürgerschaftswahl am 2. März 2025 in Zahlen.',
-      population: {
-        residents,
-        referenceDate: '2024-12-31',
+    results: { eligible, voters, valid: validVotes, parties, ballots },
+    population: {
+      residents, referenceDate: '2024-12-31', basis: 'Einwohnermelderegister', sourceId: 'register',
+      demographics: {
+        referenceDate: '2024-12-31', underVotingAge, nonGermanVotingAgeOrOlder,
+        method: 'estimated', sourceIds: ['register', 'foreign', 'population'],
+        note: 'Die Unter-16-Zahlen sind geschätzt: Unter-18-Bestände des Melderegisters werden mit dem Altersverhältnis der Bevölkerungsfortschreibung umgerechnet, auch für nichtdeutsche Minderjährige. Eine direkte Auszählung nach Alter und Staatsangehörigkeit liegt hier nicht vor.',
       },
-      eligibility: {
-        eligible,
-        notEligible,
-        estimatedBreakdown: {
-          underVotingAge,
-          nonGermanVotingAgeOrOlder,
-          otherOrTimingDifference,
-        },
-      },
-      turnout: {
-        voters,
-        nonVoters: eligible - voters,
-      },
-      ballots: {
-        total: ballotsTotal,
-        valid: ballotsValid,
-        invalid: ballotsInvalid,
-        none: ballotsNone,
-      },
-      secondVotes: {
-        label: 'Gültige Landesstimmen',
-        valid: validVotes,
-        votesPerVoter: 5,
-        parties,
-      },
-      unitNote:
-        'Jede Wählerin und jeder Wähler hat bis zu 5 Landesstimmen und kann sie auf mehrere Parteien verteilen. Die Parteibänder zählen Stimmen, keine Personen; aus den amtlichen Ergebnissen lässt sich nicht ableiten, wie viele Personen einer Partei zuzurechnen sind.',
-      sources: null, // filled below
     },
     sourceFiles,
     publisher: 'Statistisches Amt für Hamburg und Schleswig-Holstein',
@@ -282,8 +246,7 @@ async function bremenData() {
     .map((name) => ({
       name: name === 'Verjüngungsforschung' ? 'Partei für schulmedizinische Verjüngungsforschung' : name,
       votes: party(name),
-    }))
-    .sort((a, b) => b.votes - a.votes);
+    }));
 
   // Population by single-year age and nationality (Fortschreibung, GENESIS 12411-0014)
   const csv = (await readFile(sourceFiles.population, 'utf8')).split('\n');
@@ -322,48 +285,17 @@ async function bremenData() {
   }
 
   return {
-    data: {
-      id: 'bremen-bue-2023',
-      year: 2023,
-      title: 'Bürgerschaftswahl (Landtag) in Bremen',
-      electionDate: stateCatalog.bremen.elections[2023].electionDate,
-      resultStatus: 'final',
-      votingAge: 16,
-      eyebrow: 'Bürgerschaftswahl · Stimmen',
-      intro:
-        'Die Bürgerschaftswahl am 14. Mai 2023 in Zahlen.',
-      population: {
-        residents,
-        referenceDate: '2022-12-31',
+    results: {
+      eligible, voters, valid: validVotes, parties,
+      ballots: { total: ballotsValid + ballotsInvalid, valid: ballotsValid, invalid: ballotsInvalid, none: ballotsNone },
+    },
+    population: {
+      residents, referenceDate: '2022-12-31', basis: 'Bevölkerungsfortschreibung auf Basis des Zensus 2022',
+      sourceId: 'population',
+      demographics: {
+        referenceDate: '2022-12-31', underVotingAge, nonGermanVotingAgeOrOlder,
+        method: 'direct', sourceIds: ['population'],
       },
-      eligibility: {
-        eligible,
-        notEligible,
-        estimatedBreakdown: {
-          underVotingAge,
-          nonGermanVotingAgeOrOlder,
-          otherOrTimingDifference,
-        },
-      },
-      turnout: {
-        voters,
-        nonVoters: eligible - voters,
-      },
-      ballots: {
-        total: ballotsValid + ballotsInvalid,
-        valid: ballotsValid,
-        invalid: ballotsInvalid,
-        none: ballotsNone,
-      },
-      secondVotes: {
-        label: 'Gültige Stimmen',
-        valid: validVotes,
-        votesPerVoter: 5,
-        parties,
-      },
-      unitNote:
-        'Jede Wählerin und jeder Wähler hat bis zu 5 Stimmen (Listen- und Personenstimmen) und kann sie auf mehrere Parteien verteilen. Die Parteibänder zählen Stimmen, keine Personen; aus den amtlichen Ergebnissen lässt sich nicht ableiten, wie viele Personen einer Partei zuzurechnen sind.',
-      sources: null, // filled below
     },
     sourceFiles,
     publisher: 'Statistisches Landesamt Bremen',
@@ -409,12 +341,10 @@ function htmlResults(route, html) {
 }
 
 async function otherStateData(route, sources) {
-  const [slug, yearText] = route.split('/');
-  const year = Number(yearText);
+  const [slug] = route.split('/');
   const state = stateCatalog[slug];
-  const electionDate = sources.results.electionDate;
   let eligible, voters, invalid, valid, parties;
-  const { votingAge, voteLabel, votesPerVoter, unitNote } = electionRules(route);
+  const { votingAge } = electionRules(route);
 
   if (route === 'berlin/2023') {
     ({ eligible, voters, invalid, valid, parties } = berlinResults(sources.results.file));
@@ -463,10 +393,35 @@ async function otherStateData(route, sources) {
     const html = await readFile(sources.results.file, 'utf8');
     ({ eligible, voters, invalid, valid, parties } = htmlResults(route, html));
   }
-  parties.sort((a, b) => b.votes - a.votes);
-
   const { referenceDate, basis } = sources.population;
   const { residents, underVotingAge, nonGermanVotingAgeOrOlder } = populationSnapshot(sources.population, state.name, votingAge);
+  return {
+    results: { eligible, voters, invalid, valid, parties },
+    resultStatus: sources.results.resultStatus ?? 'final',
+    population: {
+      residents, referenceDate, basis, sourceId: 'population',
+      demographics: {
+        referenceDate, underVotingAge, nonGermanVotingAgeOrOlder,
+        method: 'direct', sourceIds: ['population'],
+        ...(basis === 'Zensus 2022' ? { note: 'Zensuswerte sind durch das Geheimhaltungsverfahren leicht verändert; Summen können geringfügig abweichen.' } : {}),
+      },
+    },
+    sourceFiles: Object.fromEntries(Object.entries(sources).map(([id, source]) => [id, source.file])),
+  };
+}
+
+// Assemble every election from normalized results and demographic counts.
+// Source parsers retain their layout/completeness checks; the schema below
+// validates the assembled flows before anything is written.
+function electionData(route, { results, population, resultStatus = 'final' }) {
+  const [slug, yearText] = route.split('/');
+  const year = Number(yearText);
+  const state = stateCatalog[slug];
+  const { electionDate } = state.elections[year];
+  const { votingAge, voteLabel, votesPerVoter, unitNote } = electionRules(route);
+  const { eligible, voters, invalid, valid, parties, ballots } = results;
+  const { residents, demographics: { underVotingAge, nonGermanVotingAgeOrOlder } } = population;
+  parties.sort((a, b) => b.votes - a.votes);
   const date = new Intl.DateTimeFormat('de-DE', { dateStyle: 'long' }).format(new Date(electionDate));
   const notEligible = residents - eligible;
   // Preserve source counts; the chart estimates its split proportionally.
@@ -477,50 +432,48 @@ async function otherStateData(route, sources) {
     otherOrTimingDifference: Math.max(0, notEligible - underVotingAge - nonGermanVotingAgeOrOlder),
   };
   const format = new Intl.NumberFormat('de-DE');
-  const electionName = slug === 'berlin' ? 'Abgeordnetenhauswahl' : 'Landtagswahl';
+  let electionName = 'Landtagswahl';
+  let idCode = 'ltw';
+  if (slug === 'berlin') {
+    electionName = 'Abgeordnetenhauswahl';
+    idCode = 'agh';
+  } else if (slug === 'hamburg' || slug === 'bremen') {
+    electionName = 'Bürgerschaftswahl';
+    idCode = 'bue';
+  }
   return {
-    data: {
-      id: `${slug}-${slug === 'berlin' ? 'agh' : 'ltw'}-${year}`, year,
-      title: `${electionName} in ${state.name}`,
-      electionDate,
-      resultStatus: sources.results.resultStatus ?? 'final',
-      votingAge,
-      eyebrow: `${electionName} · ${voteLabel}`,
-      intro: `Die ${electionName} am ${date} in Zahlen.`,
-      ...(route === 'berlin/2023' ? {
-        title: 'Wiederholungswahl zum Abgeordnetenhaus von Berlin',
-        intro: `Die Wiederholungswahl am ${date} in Zahlen.`,
-      } : {}),
-      population: {
-        residents, referenceDate, basis, sourceId: 'population',
-        demographics: {
-          referenceDate, underVotingAge, nonGermanVotingAgeOrOlder,
-          method: 'direct', sourceIds: ['population'],
-          ...(basis === 'Zensus 2022' ? { note: 'Zensuswerte sind durch das Geheimhaltungsverfahren leicht verändert; Summen können geringfügig abweichen.' } : {}),
-        },
-      },
-      eligibility: {
-        eligible,
-        notEligible,
-        estimatedBreakdown: breakdown,
-        ...(overhang ? { note: `Die Bevölkerungsstatistik zählt ${format.format(underVotingAge)} Personen unter ${votingAge} Jahren und ${format.format(nonGermanVotingAgeOrOlder)} nichtdeutsche Personen ab ${votingAge} Jahren. Ihre Summe übersteigt die aus Bevölkerung minus Wahlberechtigten berechnete Gruppe um ${format.format(underVotingAge + nonGermanVotingAgeOrOlder - notEligible)} Personen. Bevölkerungsstatistik und Wählerverzeichnis unterscheiden sich in Stichtag, Erhebungsmethode und Revisionsstand.` } : {}),
-      },
-      turnout: { voters, nonVoters: eligible - voters },
-      secondVotes: {
-        label: `Gültige ${voteLabel}`, valid, votesPerVoter,
+    id: `${slug}-${idCode}-${year}`, year,
+    title: `${electionName}${slug === 'bremen' ? ' (Landtag)' : ''} in ${state.name}`,
+    electionDate,
+    resultStatus,
+    votingAge,
+    eyebrow: `${electionName} · ${voteLabel}`,
+    intro: `Die ${electionName} am ${date} in Zahlen.`,
+    ...(route === 'berlin/2023' ? {
+      title: 'Wiederholungswahl zum Abgeordnetenhaus von Berlin',
+      intro: `Die Wiederholungswahl am ${date} in Zahlen.`,
+    } : {}),
+    population,
+    eligibility: {
+      eligible,
+      notEligible,
+      estimatedBreakdown: breakdown,
+      ...(overhang ? { note: `Die Bevölkerungsstatistik zählt ${format.format(underVotingAge)} Personen unter ${votingAge} Jahren und ${format.format(nonGermanVotingAgeOrOlder)} nichtdeutsche Personen ab ${votingAge} Jahren. Ihre Summe übersteigt die aus Bevölkerung minus Wahlberechtigten berechnete Gruppe um ${format.format(underVotingAge + nonGermanVotingAgeOrOlder - notEligible)} Personen. Bevölkerungsstatistik und Wählerverzeichnis unterscheiden sich in Stichtag, Erhebungsmethode und Revisionsstand.` } : {}),
+    },
+    turnout: { voters, nonVoters: eligible - voters },
+    ...(ballots ? { ballots } : {}),
+    secondVotes: {
+      label: `Gültige ${voteLabel}`, valid, votesPerVoter,
+      ...(!ballots ? {
         noValidSecondVote: voters * votesPerVoter - valid,
         invalid,
         noSecondVote: voters * votesPerVoter - valid - invalid,
         noValidLabel: votesPerVoter > 1 ? 'Ungültige / fehlende Stimmen' : `Keine gültige ${voteLabel === 'Stimmen' ? 'Stimme' : voteLabel === 'Landesstimmen' ? 'Landesstimme' : 'Zweitstimme'}`,
-        parties,
-      },
-      ...(unitNote ? { unitNote } : {}),
-      sources: null,
+      } : {}),
+      parties,
     },
-    sourceFiles: Object.fromEntries(
-      Object.entries(sources)
-        .map(([id, source]) => [id, source.file]),
-    ),
+    ...(unitNote ? { unitNote } : {}),
+    sources: null,
   };
 }
 
@@ -539,6 +492,7 @@ for (const [route, sources] of Object.entries(stateSources)) {
 }
 
 for (const [route, parsed] of Object.entries(states)) {
+  parsed.data = electionData(route, parsed);
   const state = route.split('/')[0];
   parsed.data.state = { slug: state, name: stateCatalog[state].name };
   parsed.data.previousParliament = stateCatalog[state].elections[parsed.data.year].previousParliament;
@@ -562,17 +516,6 @@ for (const [route, parsed] of Object.entries(states)) {
   );
 
   const population = parsed.data.population;
-  if (!population.demographics) {
-    const { underVotingAge, nonGermanVotingAgeOrOlder } = parsed.data.eligibility.estimatedBreakdown;
-    population.basis = state === 'bremen' ? 'Bevölkerungsfortschreibung auf Basis des Zensus 2022' : 'Einwohnermelderegister';
-    population.sourceId = state === 'hamburg' ? 'register' : 'population';
-    population.demographics = {
-      referenceDate: population.referenceDate, underVotingAge, nonGermanVotingAgeOrOlder,
-      method: state === 'hamburg' ? 'estimated' : 'direct',
-      sourceIds: state === 'hamburg' ? ['register', 'foreign', 'population'] : ['population'],
-      ...(state === 'hamburg' ? { note: 'Die Unter-16-Zahlen sind geschätzt: Unter-18-Bestände des Melderegisters werden mit dem Altersverhältnis der Bevölkerungsfortschreibung umgerechnet, auch für nichtdeutsche Minderjährige. Eine direkte Auszählung nach Alter und Staatsangehörigkeit liegt hier nicht vor.' } : {}),
-    };
-  }
   const gap = Math.round((Date.parse(population.referenceDate) - Date.parse(parsed.data.electionDate)) / 86400000);
   const demographicGap = Math.round((Date.parse(population.demographics.referenceDate) - Date.parse(parsed.data.electionDate)) / 86400000);
   population.note = gap === 0 ? 'Die Bevölkerungsdaten beziehen sich auf den Wahltag.'
