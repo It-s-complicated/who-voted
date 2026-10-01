@@ -32,7 +32,18 @@ Prefer the election authority's results and statistical office's population data
 
 The chart shows parties from the preceding parliament plus parties with at least 5% of current votes. Before adding an election, check whether a new party won seats below 5%; that case needs an explicit seat-based selection rule.
 
-Prefer official CSV or structured API exports, then Excel, then HTML tables; use PDF as a fallback. Choose by completeness and meaning first: the source must cover the required figures, election year, territory, vote category, and result status (or population reference date and basis). A complete final Excel result is preferable to a partial or preliminary CSV. Check column definitions, encoding, delimiters, number formats, and totals even for structured exports.
+Choose official, complete, correctly defined data first; choose the format second.
+The source must cover the required figures, election year, territory, vote category,
+and result status (or population reference date and basis). Prefer final results
+when available: a complete final Excel result takes priority over a partial or
+preliminary CSV.
+
+When coverage and result status are equivalent, prefer official CSV or documented
+structured API exports (such as JSON), then Excel, then HTML tables; use PDF as a
+fallback. CSV and structured APIs avoid extracting visual layouts, but still need
+verified column definitions, encoding, delimiters, missing-value conventions,
+number formats, and totals. Document any source-specific parsing exceptions as
+described in section 3.
 
 Existing sources can be replaced after verifying equivalent coverage. Update the downloader configuration, parser, retained file, and manifest together, regenerate the output, and compare every imported count against the previous dataset and official totals. Investigate differences and document any official correction; preserve shared population snapshots used by other elections.
 
