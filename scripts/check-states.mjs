@@ -33,6 +33,9 @@ for (const [slug, state] of Object.entries(states)) {
     assert.equal(data.year, year);
     const diagram = readFileSync(`dist/${slug}/${year}/index.html`, 'utf8');
     assert.ok(diagram.includes('<svg'));
+    const options = [...diagram.matchAll(/<option value="(\d+)"([^>]*)>/g)];
+    assert.deepEqual(options.map((option) => Number(option[1])), state.years.toSorted((a, b) => b - a), `${slug}/${year}: year navigation includes every election`);
+    assert.deepEqual(options.filter((option) => /\bselected\b/.test(option[2])).map((option) => Number(option[1])), [year], `${slug}/${year}: current year selected`);
     const resultLabel = data.resultStatus === 'preliminary' ? 'vorläufiges' : 'endgültiges';
     assert.ok(diagram.includes(`: ${resultLabel} Wahlergebnis</a>`), `${slug}/${year}: source result status`);
   }

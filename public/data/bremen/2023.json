@@ -133,5 +133,18 @@
       "publisher": "Statistisches Landesamt Bremen",
       "license": "Datenlizenz Deutschland Namensnennung 2.0"
     }
+  ],
+  "state": {
+    "slug": "bremen",
+    "name": "Bremen"
+  },
+  "previousParliament": [
+    "SPD",
+    "CDU",
+    "GRÜNE",
+    "DIE LINKE",
+    "BIW",
+    "FDP",
+    "AfD"
   ]
 }

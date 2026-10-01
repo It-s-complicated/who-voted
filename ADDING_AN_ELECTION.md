@@ -4,6 +4,13 @@ An election is ready to add when its official results, population and demographi
 
 This guide describes the current pipeline. Use [ElectionData](src/data/election.ts) for the output fields, [validateElection](scripts/validate-election.mjs) for data constraints, and [Berlin 2023](public/data/berlin/2023.json) as a complete example. For source discovery, see [the availability review](DATA_AVAILABILITY_REVIEW.md) and [official rule references](ELECTION_RULES.md).
 
+The site reads these generated files through one Astro `elections` collection.
+The build adds `state.slug`, `state.name`, and `previousParliament` from the catalog
+to each dataset. Its collection ID is `<state>/<year>`; the filename must match
+those fields, and every catalog election must have a dataset. New output fields
+belong in the shared schema in `src/data/election.ts`, which also defines the
+application type and validates imports before they are written.
+
 ## 1. Collect the required data
 
 Use statewide figures for the same election and territory. Keep absolute counts; rounded percentages cannot reconstruct the flows reliably.

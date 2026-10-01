@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
+import { electionSchema } from '../src/data/election.ts';
 
 export function validateElection(data) {
+  electionSchema.parse(data);
   const check = (value, path) => {
     assert.ok(Number.isSafeInteger(value) && value >= 0, `${data.id}: ${path} must be a nonnegative integer`);
   };

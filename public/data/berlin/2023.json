@@ -202,5 +202,17 @@
       "sha256": "3fd517bbd257e772d59a4884a8c3e347935dcb04ffdf58776ec351fa5451d12e",
       "retrievedAt": "2026-09-21T19:46:02.536Z"
     }
+  ],
+  "state": {
+    "slug": "berlin",
+    "name": "Berlin"
+  },
+  "previousParliament": [
+    "CDU",
+    "SPD",
+    "GRÜNE",
+    "DIE LINKE",
+    "AfD",
+    "FDP"
   ]
 }

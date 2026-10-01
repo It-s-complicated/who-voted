@@ -6,25 +6,22 @@ import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import ElectionChart from "../../components/ElectionChart.astro";
 import type { DiagramNode, DiagramLink } from "../../data/chart";
 import { renderCard } from "astro-cards/runtime";
-import { states } from "../../data/states";
-import type { ElectionData } from "../../data/election";
-import { readFileSync } from "node:fs";
+import { getCollection } from "astro:content";
 
-export function getStaticPaths() {
-  return Object.entries(states).flatMap(([state, { years }]) =>
-    years.map((year) => ({ params: { state, year: String(year) } })),
-  );
+export async function getStaticPaths() {
+  const elections = await getCollection("elections");
+  const grouped = Map.groupBy(elections, ({ data }) => data.state.slug);
+  return Array.from(grouped.values()).flatMap((entries) => {
+    const years = entries.map(({ data }) => data.year).toSorted((a, b) => b - a);
+    return entries.map(({ data }) => ({
+      params: { state: data.state.slug, year: String(data.year) },
+      props: { data, years },
+    }));
+  });
 }
 
-const state = states[Astro.params.state ?? ""];
-if (!state) throw new Error(`Unknown state: ${Astro.params.state}`);
-
-const data = JSON.parse(
-  readFileSync(
-    `public/data/${Astro.params.state}/${Astro.params.year}.json`,
-    "utf8",
-  ),
-) as ElectionData;
+const { data, years } = Astro.props;
+const state = data.state;
 const format = new Intl.NumberFormat("de-DE");
 function percentage(value: number): string {
   return `${((value / data.population.residents) * 100).toFixed(1).replace(".", ",")} %`;
@@ -42,7 +39,7 @@ function nodeValue(
 // if a future newcomer enters parliament below the threshold.
 const threshold = 0.05;
 const previousParliament = new Set(
-  state.elections[data.year].previousParliament.map((party: string) => party.toLocaleLowerCase("de-DE")),
+  data.previousParliament.map((party) => party.toLocaleLowerCase("de-DE")),
 );
 const partyColors: Record<string, string> = {
   cdu: "#202831",
@@ -418,8 +415,7 @@ const tableRows = [
             aria-label="Wahljahr auswählen"
           >
             {
-              state.years
-                .toSorted((a, b) => b - a)
+              years
                 .map((year) => (
                   <option
                     value={String(year)}

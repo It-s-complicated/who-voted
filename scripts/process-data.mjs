@@ -596,6 +596,8 @@ for (const [route, sources] of Object.entries(stateSources)) {
 
 for (const [route, parsed] of Object.entries(states)) {
   const state = route.split('/')[0];
+  parsed.data.state = { slug: state, name: stateCatalog[state].name };
+  parsed.data.previousParliament = stateCatalog[state].elections[parsed.data.year].previousParliament;
   const manifest = JSON.parse(
     await readFile(`data/raw/${state}/${parsed.data.year}/sources.json`, 'utf8'),
   );

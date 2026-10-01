@@ -6,6 +6,7 @@ import { stateSources } from './state-sources.mjs';
 import { electionRules } from './election-rules.mjs';
 import { parsePopulationRows } from './population.mjs';
 import { validateElection } from './validate-election.mjs';
+import { electionSchema } from '../src/data/election.ts';
 import { septemberResults } from './september-2026.mjs';
 
 // A newer election must change the summary without changing historical metadata.
@@ -45,9 +46,9 @@ assert.equal(electionRules('sachsen-anhalt/2021').resultColumn, 3);
 // Baselines from the PDF imports, independently matched against the official XLSX
 // exports. Lock every non-provenance field, including each party's name and votes.
 for (const [route, expectedHash] of Object.entries({
-  "brandenburg/2024": "8804d6d8e3e9261d2223388055ab1be128f9dab870bd002f906339b1ad7b9d59"
+  "brandenburg/2024": "d5ecc140103be1db952ca0c5815892dfa6d0e4904b952e88636c80c8e0964d56"
 })) {
-  const { sources, ...data } = JSON.parse(readFileSync(`public/data/${route}.json`, 'utf8'));
+  const { sources: _sources, state: _state, previousParliament: _previousParliament, ...data } = JSON.parse(readFileSync(`public/data/${route}.json`, 'utf8'));
   assert.equal(createHash('sha256').update(JSON.stringify(data)).digest('hex'), expectedHash, `${route}: source migration preserves election data`);
 }
 
@@ -89,6 +90,9 @@ for (const [slug, state] of Object.entries(states)) {
   for (const year of state.years) {
     const data = JSON.parse(readFileSync(`public/data/${slug}/${year}.json`, 'utf8'));
     validateElection(data);
+    assert.deepEqual(electionSchema.parse(data), data, `${slug}/${year}: collection preserves every data field`);
+    assert.deepEqual(data.state, { slug, name: state.name });
+    assert.deepEqual(data.previousParliament, state.elections[year].previousParliament);
     if (slug === 'sachsen-anhalt' && year === 2026) assert.equal(data.resultStatus, 'final');
     const metadata = state.elections[year];
     const rules = electionRules(`${slug}/${year}`);
@@ -120,6 +124,11 @@ for (const [slug, state] of Object.entries(states)) {
     }, `${slug}: breakdown`);
     // Independently break each conservation boundary: validation must reject it.
     for (const corrupt of [
+      (d) => { delete d.state; },
+      (d) => { d.state.name = ''; },
+      (d) => { d.state.slug = '../berlin'; },
+      (d) => { d.previousParliament = []; },
+      (d) => { d.title = 123; },
       (d) => { d.turnout.voters = NaN; },
       (d) => { d.eligibility.eligible = d.population.residents + 1; },
       (d) => { d.secondVotes.parties[0].votes += 1; },

@@ -1,12 +1,21 @@
 ---
 import RouteIndex from "../../components/RouteIndex.astro";
-import { states } from "../../data/states";
+import { getCollection } from "astro:content";
 
-export function getStaticPaths() {
-  return Object.entries(states).map(([state, election]) => ({
-    params: { state },
-    props: election,
-  }));
+export async function getStaticPaths() {
+  const elections = await getCollection("elections");
+  const grouped = Object.groupBy(elections, ({ data }) => data.state.slug);
+  return Object.entries(grouped).map(([state, entries]) => {
+    const sorted = entries!.toSorted((a, b) => b.data.electionDate.localeCompare(a.data.electionDate));
+    return {
+      params: { state },
+      props: {
+        name: sorted[0].data.state.name,
+        years: sorted.map(({ data }) => data.year),
+        latestElection: sorted[0].data.electionDate,
+      },
+    };
+  });
 }
 
 const { name, years, latestElection } = Astro.props;

@@ -1,15 +1,17 @@
 ---
 import RouteIndex from "../components/RouteIndex.astro";
-import { states } from "../data/states";
+import { getCollection } from "astro:content";
 
-const elections = Object.entries(states).flatMap(([slug, state]) =>
-  Object.entries(state.elections).map(([year, { electionDate }]) => ({
-    name: state.name,
-    href: `/${slug}/${year}/`,
-    date: electionDate,
-    year: Number(year),
-  })),
-).toSorted((a, b) => b.date.localeCompare(a.date));
+const entries = await getCollection("elections");
+const states = Object.values(Object.groupBy(entries, ({ data }) => data.state.slug))
+  .map((group) => group![0].data.state)
+  .toSorted((a, b) => a.name.localeCompare(b.name, "de-DE"));
+const elections = entries.map(({ data }) => ({
+  name: data.state.name,
+  href: `/${data.state.slug}/${data.year}/`,
+  date: data.electionDate,
+  year: data.year,
+})).toSorted((a, b) => b.date.localeCompare(a.date) || a.name.localeCompare(b.name, "de-DE"));
 const newestYear = elections[0].year;
 const oldestYear = elections.at(-1)!.year;
 const years = Array.from({ length: newestYear - oldestYear + 1 }, (_, i) => newestYear - i);
@@ -45,7 +47,7 @@ const dateFormat = new Intl.DateTimeFormat("de-DE", { dateStyle: "long", timeZon
   <nav class="states" aria-label="Bundesländer">
     <h2>Nach Bundesland</h2>
     <ul>
-      {Object.entries(states).map(([slug, { name }]) => (
+      {states.map(({ slug, name }) => (
         <li><a href={`/${slug}/`}>{name}</a></li>
       ))}
     </ul>

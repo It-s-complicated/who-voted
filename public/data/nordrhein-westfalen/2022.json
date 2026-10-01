@@ -187,5 +187,16 @@
       "retrievedAt": "2026-09-12T20:47:32.392Z",
       "sha256": "7ab237b6d372886e1fc2f21e44682597e2637dda2f01dd3b3f6eb1b88c517704"
     }
+  ],
+  "state": {
+    "slug": "nordrhein-westfalen",
+    "name": "Nordrhein-Westfalen"
+  },
+  "previousParliament": [
+    "CDU",
+    "SPD",
+    "GRÜNE",
+    "FDP",
+    "AfD"
   ]
 }

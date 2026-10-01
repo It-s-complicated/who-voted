@@ -39,6 +39,14 @@ also include the complete preliminary results from 20 September 2026 alongside
 their previous elections; there are 19 election datasets.
 `years` lists only elections with local diagram datasets.
 
+Pages query one Astro `elections` collection defined in `src/content.config.ts`.
+Each generated JSON dataset includes its state slug/name and previous-parliament
+parties, so election pages and navigation use only collection data. Collection IDs
+are `<state>/<year>`. The schema in `src/data/election.ts` also supplies the
+`ElectionData` type and is shared with the standalone import validator; arithmetic
+checks remain in `scripts/validate-election.mjs`. Collection loading rejects missing,
+unconfigured, or incorrectly located datasets.
+
 Every state has a diagram for its latest election. Hamburg, Bremen and
 Saarland split the non-eligible population into residents below voting age,
 non-German residents of voting age, and a reconciliation remainder. All other

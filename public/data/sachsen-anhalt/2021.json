@@ -158,5 +158,16 @@
       "retrievedAt": "2026-09-05T21:35:54.495Z",
       "sha256": "890d1386cbf9c19e97d750792c6c068c00c7141d8cd4c286f633ec0a8dbc736c"
     }
+  ],
+  "state": {
+    "slug": "sachsen-anhalt",
+    "name": "Sachsen-Anhalt"
+  },
+  "previousParliament": [
+    "CDU",
+    "AfD",
+    "DIE LINKE",
+    "SPD",
+    "GRÜNE"
   ]
 }

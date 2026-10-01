@@ -148,5 +148,17 @@
       "sha256": "3fd517bbd257e772d59a4884a8c3e347935dcb04ffdf58776ec351fa5451d12e",
       "retrievedAt": "2026-09-21T19:46:12.772Z"
     }
+  ],
+  "state": {
+    "slug": "mecklenburg-vorpommern",
+    "name": "Mecklenburg-Vorpommern"
+  },
+  "previousParliament": [
+    "SPD",
+    "AfD",
+    "CDU",
+    "Die Linke",
+    "GRÜNE",
+    "FDP"
   ]
 }

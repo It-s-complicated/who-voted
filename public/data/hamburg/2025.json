@@ -154,5 +154,17 @@
       "publisher": "Statistisches Amt für Hamburg und Schleswig-Holstein",
       "license": "Datenlizenz Deutschland Namensnennung 2.0"
     }
+  ],
+  "state": {
+    "slug": "hamburg",
+    "name": "Hamburg"
+  },
+  "previousParliament": [
+    "SPD",
+    "CDU",
+    "GRÜNE",
+    "Die Linke",
+    "AfD",
+    "FDP"
   ]
 }
