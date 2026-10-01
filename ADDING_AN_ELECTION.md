@@ -2,7 +2,7 @@
 
 An election is ready to add when its official results, population and demographic data, and election-specific rules can reproduce a complete diagram. Collect the evidence first, then register the election and implement its import. A catalog entry alone does not produce a working dataset.
 
-This guide describes the current pipeline. Use [ElectionData](src/data/election.ts) for the output fields, [validateElection](scripts/validate-election.mjs) for data constraints, and [Berlin 2023](public/data/berlin/2023.json) as a complete example. For source discovery, see [the availability review](DATA_AVAILABILITY_REVIEW.md) and [official rule references](ELECTION_RULES.md).
+This guide describes the current pipeline. Use [electionSchema and ElectionData](src/data/election.ts) for the output fields and data constraints, and [Berlin 2023](public/data/berlin/2023.json) as a complete example. For source discovery, see [the availability review](DATA_AVAILABILITY_REVIEW.md) and [official rule references](ELECTION_RULES.md).
 
 The site reads these generated files through one Astro `elections` collection.
 The build adds `state.slug`, `state.name`, and `previousParliament` from the catalog

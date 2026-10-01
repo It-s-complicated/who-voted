@@ -16,7 +16,7 @@ export const electionSchema = z.object({
   eyebrow: text,
   intro: text,
   population: z.object({
-    residents: count,
+    residents: count.positive(),
     referenceDate: date,
     basis: text,
     sourceId: text,
@@ -45,8 +45,8 @@ export const electionSchema = z.object({
   turnout: z.object({ voters: count, nonVoters: count }),
   secondVotes: z.object({
     label: text,
-    valid: count,
-    votesPerVoter: count,
+    valid: count.positive(),
+    votesPerVoter: count.positive(),
     noValidSecondVote: count.optional(),
     noValidLabel: text.optional(),
     invalid: count.optional(),
@@ -68,6 +68,57 @@ export const electionSchema = z.object({
       }),
     )
     .min(1),
+}).superRefine((data, context) => {
+  const { population, eligibility, turnout, secondVotes: votes, ballots } = data;
+  function check(condition: boolean, message: string) {
+    if (!condition) context.addIssue({ code: "custom", message: `${data.id}: ${message}` });
+  }
+  check(turnout.voters <= eligibility.eligible && eligibility.eligible <= population.residents,
+    "voters <= eligible <= residents");
+  check(eligibility.eligible + eligibility.notEligible === population.residents, "population flow");
+  check(turnout.voters + turnout.nonVoters === eligibility.eligible, "turnout flow");
+  check(votes.valid <= turnout.voters * votes.votesPerVoter, "vote capacity");
+  check(new Set(votes.parties.map((party) => party.name)).size === votes.parties.length, "duplicate party name");
+  check(votes.parties.reduce((sum, party) => sum + party.votes, 0) === votes.valid, "party vote sum");
+
+  const demographics = population.demographics;
+  check(demographics.underVotingAge + demographics.nonGermanVotingAgeOrOlder <= population.residents,
+    "demographic population bounds");
+  if (demographics.method === "estimated") check(Boolean(demographics.note), "missing estimation method note");
+  const breakdown = eligibility.estimatedBreakdown;
+  if (breakdown) {
+    const knownSplit = breakdown.underVotingAge + breakdown.nonGermanVotingAgeOrOlder;
+    check(breakdown.otherOrTimingDifference === Math.max(0, eligibility.notEligible - knownSplit), "eligibility residual");
+    check(breakdown.underVotingAge === demographics.underVotingAge, "age count differs from demographics");
+    check(breakdown.nonGermanVotingAgeOrOlder === demographics.nonGermanVotingAgeOrOlder,
+      "citizenship count differs from demographics");
+    if (knownSplit > eligibility.notEligible) check(Boolean(eligibility.note), "missing overhang explanation");
+  } else {
+    check(Boolean(eligibility.note), "missing unavailable split explanation");
+  }
+
+  if (ballots) {
+    check(ballots.valid + ballots.invalid === ballots.total, "ballot total");
+    check(ballots.total + ballots.none === turnout.voters, "ballot turnout");
+    check(votes.valid <= ballots.valid * votes.votesPerVoter, "valid ballot vote capacity");
+  } else {
+    check(votes.invalid !== undefined && votes.noSecondVote !== undefined && votes.noValidSecondVote !== undefined,
+      "missing invalid or uncast vote counts");
+    check(votes.noValidSecondVote !== undefined && votes.valid + votes.noValidSecondVote === turnout.voters * votes.votesPerVoter,
+      "vote flow");
+    check(votes.invalid !== undefined && votes.noSecondVote !== undefined && votes.invalid + votes.noSecondVote === votes.noValidSecondVote,
+      "invalid and uncast vote flow");
+  }
+  check(Number(data.electionDate.slice(0, 4)) === data.year, "election date/year mismatch");
+  if (demographics.referenceDate !== population.referenceDate) {
+    check(Boolean(demographics.note?.includes(demographics.referenceDate)), "missing demographic date explanation");
+  }
+
+  const sourceIds = new Set(data.sources.map((source) => source.id));
+  check(sourceIds.size === data.sources.length, "duplicate source id");
+  for (const id of ["results", "population", population.sourceId, ...demographics.sourceIds]) {
+    check(sourceIds.has(id), `missing source ${id}`);
+  }
 });
 
 export type ElectionData = z.infer<typeof electionSchema>;

@@ -4,7 +4,7 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { states as stateCatalog } from '../src/data/states.ts';
 import { stateSources } from './state-sources.mjs';
 import { electionRules } from './election-rules.mjs';
-import { validateElection } from './validate-election.mjs';
+import { electionSchema } from '../src/data/election.ts';
 import { populationSnapshot } from './population.mjs';
 import { septemberResults } from './september-2026.mjs';
 
@@ -635,7 +635,7 @@ for (const [route, parsed] of Object.entries(states)) {
     : `Der Bevölkerungsstichtag liegt ${Math.abs(gap)} Tage ${gap > 0 ? 'nach' : 'vor'} der Wahl. Alter und Staatsangehörigkeit beziehen sich auf den demografischen Stichtag, nicht auf den Wahltag.`;
   if (Math.abs(demographicGap) > 90) population.note += ' Der zeitliche Abstand schränkt die Vergleichbarkeit mit der Wahl ein; eine nähere, zusammenpassende Aufteilung nach Alter und Staatsangehörigkeit ist hier nicht verfügbar.';
 
-  validateElection(parsed.data);
+  electionSchema.parse(parsed.data);
   const year = parsed.data.year;
   await mkdir(`public/data/${state}`, { recursive: true });
   await writeFile(

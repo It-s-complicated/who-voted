@@ -5,7 +5,6 @@ import { states, summarizeState } from '../src/data/states.ts';
 import { stateSources } from './state-sources.mjs';
 import { electionRules } from './election-rules.mjs';
 import { parsePopulationRows } from './population.mjs';
-import { validateElection } from './validate-election.mjs';
 import { electionSchema } from '../src/data/election.ts';
 import { septemberResults } from './september-2026.mjs';
 
@@ -89,7 +88,6 @@ for (const [slug, state] of Object.entries(states)) {
   assert.ok(state.years.includes(Number(state.latestElection.slice(0, 4))), `${slug}: latest election has data`);
   for (const year of state.years) {
     const data = JSON.parse(readFileSync(`public/data/${slug}/${year}.json`, 'utf8'));
-    validateElection(data);
     assert.deepEqual(electionSchema.parse(data), data, `${slug}/${year}: collection preserves every data field`);
     assert.deepEqual(data.state, { slug, name: state.name });
     assert.deepEqual(data.previousParliament, state.elections[year].previousParliament);
@@ -133,7 +131,11 @@ for (const [slug, state] of Object.entries(states)) {
       (d) => { d.eligibility.eligible = d.population.residents + 1; },
       (d) => { d.secondVotes.parties[0].votes += 1; },
       (d) => { d.secondVotes.parties[0].votes = -1; },
+      (d) => { d.secondVotes.parties.push({ name: d.secondVotes.parties[0].name, votes: 0 }); },
+      (d) => { d.secondVotes.votesPerVoter = 0; },
+      (d) => { d.year += 1; },
       (d) => { d.sources = []; },
+      (d) => { d.sources.push(structuredClone(d.sources[0])); },
       (d) => { delete d.population.demographics; },
       (d) => { delete d.population.demographics.underVotingAge; },
       (d) => { d.population.demographics.nonGermanVotingAgeOrOlder = NaN; },
@@ -149,7 +151,7 @@ for (const [slug, state] of Object.entries(states)) {
     ]) {
       const broken = structuredClone(data);
       corrupt(broken);
-      assert.throws(() => validateElection(broken), `${slug}: invalid data rejected`);
+      assert.throws(() => electionSchema.parse(broken), `${slug}: invalid collection data rejected`);
     }
   }
 }

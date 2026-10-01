@@ -43,9 +43,9 @@ Pages query one Astro `elections` collection defined in `src/content.config.ts`.
 Each generated JSON dataset includes its state slug/name and previous-parliament
 parties, so election pages and navigation use only collection data. Collection IDs
 are `<state>/<year>`. The schema in `src/data/election.ts` also supplies the
-`ElectionData` type and is shared with the standalone import validator; arithmetic
-checks remain in `scripts/validate-election.mjs`. Collection loading rejects missing,
-unconfigured, or incorrectly located datasets.
+`ElectionData` type and validates both imports and collection entries, including
+vote conservation, ballot arithmetic, demographics, and source references.
+Collection loading rejects missing, unconfigured, or incorrectly located datasets.
 
 Every state has a diagram for its latest election. Hamburg, Bremen and
 Saarland split the non-eligible population into residents below voting age,
