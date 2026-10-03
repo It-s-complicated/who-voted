@@ -46,12 +46,13 @@ for (const [route, sources] of Object.entries(stateSources)) {
 }
 
 // Baselines from the previous HTML/PDF/XLSX imports, independently compared
-// with official CSV exports, excluding the removed duplicate demographic split.
+// with official CSV exports where available, excluding the removed duplicate demographic split.
 // Preserve every remaining non-provenance field; Saarland's
 // ÖPD/Die Humanistien typos are intentionally corrected before hashing.
 for (const [route, expectedHash] of Object.entries({
   'baden-wuerttemberg/2026': '8be97616b177b9c9fe85613932689910a8240529e74698271e5033806109dc4e',
   'bayern/2023': '8f9a4867b05d17bc812d712730b678b2116767f0d8d6c7802a5ed1b5aeb804be',
+  'bremen/2023': '944a29d38e625bf326ccd5599395accf75a24089fac6704069becf983cc0b42c',
   'hessen/2023': '165c212322b65af8ccb8596b809925dd8a5330ed76cc59fbf96b7a8343b390e6',
   'mecklenburg-vorpommern/2021': 'f362f455dfa9b323e1002fcbfd5914a64c25f99fd681b7ce6e0b43b2ea7f8d10',
   'niedersachsen/2022': 'fae7e47646c8f7729c5f21a8b7569216ccdcf932b38879a15d2a74f9e6dc1d80',
@@ -65,7 +66,7 @@ for (const [route, expectedHash] of Object.entries({
   "brandenburg/2024": "d38be039d498088281890541b96b5c77dc4737c8ec0e39e31fabb3c1ec8275b7"
 })) {
   const { sources: _sources, state: _state, previousParliament: _previousParliament, ...data } = JSON.parse(readFileSync(`public/data/${route}.json`, 'utf8'));
-  assert.equal(createHash('sha256').update(JSON.stringify(data)).digest('hex'), expectedHash, `${route}: source migration preserves election data`);
+  assert.equal(createHash('sha256').update(JSON.stringify(data)).digest('hex'), expectedHash, `${route}: processing preserves election data`);
 }
 
 // Population-basis migration must preserve every Berlin 2023 election count.

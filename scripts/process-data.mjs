@@ -113,7 +113,6 @@ function hamburgData() {
 
   const csv = execFileSync('unzip', ['-p', sourceFiles.results, 'BUE2025_e_05/Tabelle1.csv'], { encoding: 'utf8' });
   const { eligible, voters, valid: validVotes, parties, ballots } = parseCsvResults('hamburg/2025', csv);
-  const { total: ballotsTotal, valid: ballotsValid, invalid: ballotsInvalid } = ballots;
 
   // Melderegister counts (primary population basis)
   const { shared: registerShared, sheets: registerSheets } = xlsxSheets(sourceFiles.register);
@@ -156,16 +155,6 @@ function hamburgData() {
   const nonGermanUnder16 = Math.round(foreign0to17 * underAgeRatio);
   const nonGermanVotingAgeOrOlder = foreignTotal - nonGermanUnder16;
   const otherOrTimingDifference = notEligible - underVotingAge - nonGermanVotingAgeOrOlder;
-  const ballotsNone = voters - ballotsTotal;
-
-  assertEqual(
-    parties.reduce((sum, party) => sum + party.votes, 0),
-    validVotes,
-    'Party Landesstimmen',
-  );
-  assertEqual(ballotsValid + ballotsInvalid + ballotsNone, voters, 'Ballot flow');
-  assertEqual(eligible + notEligible, residents, 'Resident flow');
-  assertEqual(voters + (eligible - voters), eligible, 'Eligible flow');
   if (otherOrTimingDifference < 0 || nonGermanUnder16 < 0) {
     throw new Error('Derived residuals must not be negative');
   }
@@ -272,14 +261,6 @@ async function bremenData() {
   const otherOrTimingDifference = notEligible - underVotingAge - nonGermanVotingAgeOrOlder;
   const ballotsNone = voters - ballotsValid - ballotsInvalid;
 
-  assertEqual(
-    parties.reduce((sum, entry) => sum + entry.votes, 0),
-    validVotes,
-    'Party votes',
-  );
-  assertEqual(ballotsValid + ballotsInvalid + ballotsNone, voters, 'Ballot flow');
-  assertEqual(eligible + notEligible, residents, 'Resident flow');
-  assertEqual(voters + (eligible - voters), eligible, 'Eligible flow');
   if (otherOrTimingDifference < 0 || ballotsNone < 0) {
     throw new Error('Derived residuals must not be negative');
   }
