@@ -46,22 +46,23 @@ for (const [route, sources] of Object.entries(stateSources)) {
 }
 
 // Baselines from the previous HTML/PDF/XLSX imports, independently compared
-// with official CSV exports. Preserve every non-provenance field; Saarland's
+// with official CSV exports, excluding the removed duplicate demographic split.
+// Preserve every remaining non-provenance field; Saarland's
 // ÖPD/Die Humanistien typos are intentionally corrected before hashing.
 for (const [route, expectedHash] of Object.entries({
-  'baden-wuerttemberg/2026': '692eb0676d6f1b78f77c73be2d94e116b60c9024b94d9496e84a20e5ab36307a',
-  'bayern/2023': '8fd145e666c000f09fdef67c7382fb88d915db37e9e0019c124094e8c82b1574',
-  'hessen/2023': '167e35701173df770658f21a81752bfab1876426ad6e0906aec30153448d0133',
-  'mecklenburg-vorpommern/2021': '7b3763f4cad4afaae2ff885e91b1a3789a9e2f45244da9a8fa2e20abb464de18',
-  'niedersachsen/2022': '943b0900459c5876c5fa01a173ffc5862b2bdf1c766063d13893af279752bb86',
-  'nordrhein-westfalen/2022': '89275d16df552f5d62f4983e8c5b0826cb3baad7448010fee532e016b0847969',
-  'rheinland-pfalz/2026': 'caaf5ae7d105e4b5c20c4108ec26c99c812ff1485bf619faadafb6822f3a52d1',
-  'saarland/2022': 'bb13f19e6bec2b4e92f397ad3f5ab7a65ce5877ef64bd9e90afbc06a3d418453',
-  'sachsen-anhalt/2021': 'aed51eae834976d961e870880c9905e39d1c730ae1f15cf9eb9cbbe053b62578',
-  'sachsen-anhalt/2026': '08084f48b7cbc2d8b55cf11fb0da86024acf51aa08a34047cc94de2cc2ea2bb9',
-  'schleswig-holstein/2022': 'f3fafa999413193f962250004fcba670f79558485428e254300c7229d3c487dd',
-  'hamburg/2025': 'd8efb0ef7d09d0b03637683ae7a39260ecc7f728658c12560a1a7e5a6f7f1173',
-  "brandenburg/2024": "d5ecc140103be1db952ca0c5815892dfa6d0e4904b952e88636c80c8e0964d56"
+  'baden-wuerttemberg/2026': '8be97616b177b9c9fe85613932689910a8240529e74698271e5033806109dc4e',
+  'bayern/2023': '8f9a4867b05d17bc812d712730b678b2116767f0d8d6c7802a5ed1b5aeb804be',
+  'hessen/2023': '165c212322b65af8ccb8596b809925dd8a5330ed76cc59fbf96b7a8343b390e6',
+  'mecklenburg-vorpommern/2021': 'f362f455dfa9b323e1002fcbfd5914a64c25f99fd681b7ce6e0b43b2ea7f8d10',
+  'niedersachsen/2022': 'fae7e47646c8f7729c5f21a8b7569216ccdcf932b38879a15d2a74f9e6dc1d80',
+  'nordrhein-westfalen/2022': '513342dae0f2728264349d6678093081d87668af815d296624963078b98cc3b1',
+  'rheinland-pfalz/2026': '194a2a997a14f920fe7d18e83d9f255c72b30b92a3caec5bac876bca096299f4',
+  'saarland/2022': '4d9ebf3189abcc22b0c3a10fc00314ca52d95b2197cd495209d91767a0339dab',
+  'sachsen-anhalt/2021': 'e99c906e236a127a2266e18414f1d7ff85bd5a4bb0ab60ad5007d9d1275f0df5',
+  'sachsen-anhalt/2026': '914114be3c986a5b364130f68f60fda8310a0525da77502422dfae9d8e91fc3f',
+  'schleswig-holstein/2022': '4e53b23e01248c84b2c29e9cfea1d24a93f7808a683b332ac342d82bae85c62c',
+  'hamburg/2025': 'ad68e1ff392d2b2e73b52cb3456c2d11fe4a63148c345c43321ff41be57ec346',
+  "brandenburg/2024": "d38be039d498088281890541b96b5c77dc4737c8ec0e39e31fabb3c1ec8275b7"
 })) {
   const { sources: _sources, state: _state, previousParliament: _previousParliament, ...data } = JSON.parse(readFileSync(`public/data/${route}.json`, 'utf8'));
   assert.equal(createHash('sha256').update(JSON.stringify(data)).digest('hex'), expectedHash, `${route}: source migration preserves election data`);
@@ -129,13 +130,7 @@ for (const [slug, state] of Object.entries(states)) {
     if (year === Number(state.latestElection.slice(0, 4))) assert.equal(data.electionDate, state.latestElection);
     const resultCounts = expected[`${slug}/${year}`];
     if (resultCounts) assert.deepEqual([data.eligibility.eligible, data.turnout.voters, data.secondVotes.valid], resultCounts, `${slug}/${year}`);
-    const demographics = data.population.demographics;
-    const knownSplit = demographics.underVotingAge + demographics.nonGermanVotingAgeOrOlder;
-    assert.deepEqual(data.eligibility.estimatedBreakdown, {
-      underVotingAge: demographics.underVotingAge,
-      nonGermanVotingAgeOrOlder: demographics.nonGermanVotingAgeOrOlder,
-      otherOrTimingDifference: Math.max(0, data.eligibility.notEligible - knownSplit),
-    }, `${slug}: breakdown`);
+    assert.ok(!Object.hasOwn(data.eligibility, 'estimatedBreakdown'), `${slug}: no duplicate demographic counts`);
     // Independently break each conservation boundary: validation must reject it.
     for (const corrupt of [
       (d) => { delete d.state; },
@@ -163,7 +158,13 @@ for (const [slug, state] of Object.entries(states)) {
       (d) => { d.population.demographics.method = 'estimated'; delete d.population.demographics.note; },
       (d) => { d.population.demographics.referenceDate = '2000-01-01'; delete d.population.demographics.note; },
       (d) => { if (d.ballots) d.ballots.valid += 1; else d.secondVotes.invalid += 1; },
-      (d) => { if (d.eligibility.estimatedBreakdown) d.eligibility.estimatedBreakdown.underVotingAge += 1; else d.eligibility.estimatedBreakdown = { underVotingAge: 1, nonGermanVotingAgeOrOlder: 0, otherOrTimingDifference: 0 }; },
+      (d) => { d.population.demographics.underVotingAge = -1; },
+      (d) => { d.population.demographics.underVotingAge = d.population.residents + 1; },
+      (d) => {
+        d.population.demographics.underVotingAge = d.eligibility.notEligible + 1;
+        d.population.demographics.nonGermanVotingAgeOrOlder = 0;
+        delete d.eligibility.note;
+      },
     ]) {
       const broken = structuredClone(data);
       corrupt(broken);

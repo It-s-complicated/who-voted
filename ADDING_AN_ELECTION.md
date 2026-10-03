@@ -68,7 +68,7 @@ Record the population basis and dates. If demographic and total-population dates
 
 Preserve differences between population statistics and the electoral roll. Do not adjust official demographic counts to make them fit. The current diagram estimates its non-eligible split proportionally and retains the source counts and discrepancy in annotations; see [the demographic methodology](NONVOTER_BREAKDOWN.md). If the demographic sum exceeds `notEligible`, provide an `eligibility.note` explaining the discrepancy.
 
-The schema permits a null estimated breakdown with an explanation, but the current diagram regression checks require a breakdown, and demographic counts remain required. Missing demographic evidence therefore needs an explicit product/parser change before the election can meet the current checks.
+Demographic counts are required and stored only in `population.demographics`. The page uses these counts to estimate the split and derive the signed discrepancy. Missing demographic evidence needs an explicit product/parser change before the election can meet the current checks.
 
 ## 2. Retain the evidence
 
@@ -142,7 +142,7 @@ valid votes <= ballots.valid × votesPerVoter
 unused votes on valid ballots = ballots.valid × votesPerVoter - valid votes
 
 # Demographic reconciliation:
-otherOrTimingDifference = max(0, notEligible - underVotingAge - nonGermanVotingAgeOrOlder)
+demographicDifference = notEligible - underVotingAge - nonGermanVotingAgeOrOlder
 ```
 
 Use subtraction only when the source definitions support these identities. In particular, confirm whether invalid counts mean votes or ballots, and whether an omitted vote is already counted as invalid. Keep original source counts and explain differences instead of forcing a result to balance.

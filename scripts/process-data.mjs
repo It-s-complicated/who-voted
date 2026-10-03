@@ -426,11 +426,6 @@ function electionData(route, { results, population, resultStatus = 'final' }) {
   const notEligible = residents - eligible;
   // Preserve source counts; the chart estimates its split proportionally.
   const overhang = underVotingAge + nonGermanVotingAgeOrOlder > notEligible;
-  const breakdown = {
-    underVotingAge,
-    nonGermanVotingAgeOrOlder,
-    otherOrTimingDifference: Math.max(0, notEligible - underVotingAge - nonGermanVotingAgeOrOlder),
-  };
   const format = new Intl.NumberFormat('de-DE');
   let electionName = 'Landtagswahl';
   let idCode = 'ltw';
@@ -457,7 +452,6 @@ function electionData(route, { results, population, resultStatus = 'final' }) {
     eligibility: {
       eligible,
       notEligible,
-      estimatedBreakdown: breakdown,
       ...(overhang ? { note: `Die Bevölkerungsstatistik zählt ${format.format(underVotingAge)} Personen unter ${votingAge} Jahren und ${format.format(nonGermanVotingAgeOrOlder)} nichtdeutsche Personen ab ${votingAge} Jahren. Ihre Summe übersteigt die aus Bevölkerung minus Wahlberechtigten berechnete Gruppe um ${format.format(underVotingAge + nonGermanVotingAgeOrOlder - notEligible)} Personen. Bevölkerungsstatistik und Wählerverzeichnis unterscheiden sich in Stichtag, Erhebungsmethode und Revisionsstand.` } : {}),
     },
     turnout: { voters, nonVoters: eligible - voters },

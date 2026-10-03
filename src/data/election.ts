@@ -33,13 +33,6 @@ export const electionSchema = z.object({
   eligibility: z.object({
     eligible: count,
     notEligible: count,
-    estimatedBreakdown: z
-      .object({
-        underVotingAge: count,
-        nonGermanVotingAgeOrOlder: count,
-        otherOrTimingDifference: count,
-      })
-      .nullable(),
     note: text.optional(),
   }),
   turnout: z.object({ voters: count, nonVoters: count }),
@@ -82,20 +75,10 @@ export const electionSchema = z.object({
   check(votes.parties.reduce((sum, party) => sum + party.votes, 0) === votes.valid, "party vote sum");
 
   const demographics = population.demographics;
-  check(demographics.underVotingAge + demographics.nonGermanVotingAgeOrOlder <= population.residents,
-    "demographic population bounds");
+  const demographicTotal = demographics.underVotingAge + demographics.nonGermanVotingAgeOrOlder;
+  check(demographicTotal <= population.residents, "demographic population bounds");
   if (demographics.method === "estimated") check(Boolean(demographics.note), "missing estimation method note");
-  const breakdown = eligibility.estimatedBreakdown;
-  if (breakdown) {
-    const knownSplit = breakdown.underVotingAge + breakdown.nonGermanVotingAgeOrOlder;
-    check(breakdown.otherOrTimingDifference === Math.max(0, eligibility.notEligible - knownSplit), "eligibility residual");
-    check(breakdown.underVotingAge === demographics.underVotingAge, "age count differs from demographics");
-    check(breakdown.nonGermanVotingAgeOrOlder === demographics.nonGermanVotingAgeOrOlder,
-      "citizenship count differs from demographics");
-    if (knownSplit > eligibility.notEligible) check(Boolean(eligibility.note), "missing overhang explanation");
-  } else {
-    check(Boolean(eligibility.note), "missing unavailable split explanation");
-  }
+  if (demographicTotal > eligibility.notEligible) check(Boolean(eligibility.note), "missing overhang explanation");
 
   if (ballots) {
     check(ballots.valid + ballots.invalid === ballots.total, "ballot total");

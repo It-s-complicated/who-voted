@@ -26,12 +26,7 @@
   },
   "eligibility": {
     "eligible": 746307,
-    "notEligible": 260557,
-    "estimatedBreakdown": {
-      "underVotingAge": 152278,
-      "nonGermanVotingAgeOrOlder": 105403,
-      "otherOrTimingDifference": 2876
-    }
+    "notEligible": 260557
   },
   "turnout": {
     "voters": 458113,

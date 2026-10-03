@@ -47,13 +47,12 @@ for (const route of routes) {
     assert.ok(!rects.some((rect) => rect[2].trim().startsWith(`${party.name}:`)), `${route}: ${party.name} belongs in Sonstige`);
   }
   if (data.eligibility.note) assert.ok(html.includes(data.eligibility.note), `${route}: split overhang annotation`);
-  const breakdown = data.eligibility.estimatedBreakdown;
-  assert.ok(breakdown, `${route}: demographic breakdown available`);
-  const total = breakdown.underVotingAge + breakdown.nonGermanVotingAgeOrOlder;
+  const demographics = data.population.demographics;
+  const total = demographics.underVotingAge + demographics.nonGermanVotingAgeOrOlder;
   const scale = node('Einwohner:innen').height / data.population.residents;
   for (const [label, count] of [
-    [`Unter ${data.votingAge}*`, breakdown.underVotingAge],
-    [`Nichtdeutsch, ${data.votingAge}+*`, breakdown.nonGermanVotingAgeOrOlder],
+    [`Unter ${data.votingAge}*`, demographics.underVotingAge],
+    [`Nichtdeutsch, ${data.votingAge}+*`, demographics.nonGermanVotingAgeOrOlder],
   ]) {
     const estimate = data.eligibility.notEligible * count / total;
     assert.ok(Math.abs(node(label).height - estimate * scale) < 0.03, `${route}: proportional demographic estimate`);

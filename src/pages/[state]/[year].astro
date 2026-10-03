@@ -73,12 +73,10 @@ const otherVotes =
 const ballots = data.ballots;
 const votesPerVoter = data.secondVotes.votesPerVoter;
 const multiVote = votesPerVoter > 1;
-const breakdown = data.eligibility.estimatedBreakdown;
-const demographicTotal = breakdown
-  ? breakdown.underVotingAge + breakdown.nonGermanVotingAgeOrOlder
-  : 0;
-const estimatedUnderAge = demographicTotal > 0 && breakdown
-  ? data.eligibility.notEligible * breakdown.underVotingAge / demographicTotal
+const demographics = data.population.demographics;
+const demographicTotal = demographics.underVotingAge + demographics.nonGermanVotingAgeOrOlder;
+const estimatedUnderAge = demographicTotal > 0
+  ? data.eligibility.notEligible * demographics.underVotingAge / demographicTotal
   : 0;
 const estimatedNonGerman = demographicTotal > 0
   ? data.eligibility.notEligible - estimatedUnderAge
@@ -158,12 +156,12 @@ const nodes: DiagramNode[] = [
     color: "#b5b4b4",
     order: 1,
   },
-  ...(breakdown && demographicTotal > 0 ? [
+  ...(demographicTotal > 0 ? [
   {
     id: "underAge",
     label: `Unter ${data.votingAge}*`,
     value: estimatedUnderAge,
-    sourceValue: breakdown.underVotingAge,
+    sourceValue: demographics.underVotingAge,
     color: "#aaa8a8",
     order: 2,
   },
@@ -171,7 +169,7 @@ const nodes: DiagramNode[] = [
     id: "nonGerman",
     label: `Nichtdeutsch, ${data.votingAge}+*`,
     value: estimatedNonGerman,
-    sourceValue: breakdown.nonGermanVotingAgeOrOlder,
+    sourceValue: demographics.nonGermanVotingAgeOrOlder,
     color: "#c8c6c7",
     order: 3,
   },
@@ -261,7 +259,7 @@ const links: DiagramLink[] = [
   },
   { source: "eligible", target: "voters", value: data.turnout.voters },
   { source: "eligible", target: "nonVoters", value: data.turnout.nonVoters },
-  ...(breakdown && demographicTotal > 0 ? [
+  ...(demographicTotal > 0 ? [
   {
     source: "notEligible",
     target: "underAge",
@@ -445,17 +443,13 @@ const tableRows = [
         />
         <figcaption>
           <ul class="caption-points">
-            {breakdown && (
-              <li><strong>* Geschätzte Aufteilung:</strong> Anteile aus Bevölkerungsdaten proportional
-                auf die rechnerisch nicht Wahlberechtigten verteilt. Annahme: Beide Gruppen decken
-                diese vollständig ab.</li>
-            )}
-            {breakdown && (
-              <li><strong>Rundung:</strong> Schätzanteile an allen Einwohner:innen auf ganze Prozent,
-                „ca.“-Zahlen auf Tausender. Bänder nutzen ungerundete Werte; Ausgangszahlen stehen
-                in der Tabelle.</li>
-            )}
-            {breakdown && demographicDifference !== 0 && (
+            <li><strong>* Geschätzte Aufteilung:</strong> Anteile aus Bevölkerungsdaten proportional
+              auf die rechnerisch nicht Wahlberechtigten verteilt. Annahme: Beide Gruppen decken
+              diese vollständig ab.</li>
+            <li><strong>Rundung:</strong> Schätzanteile an allen Einwohner:innen auf ganze Prozent,
+              „ca.“-Zahlen auf Tausender. Bänder nutzen ungerundete Werte; Ausgangszahlen stehen
+              in der Tabelle.</li>
+            {demographicDifference !== 0 && (
               <li><strong>Datenabgleich:</strong> Bevölkerung − Wahlberechtigte − beide Gruppen =
                 {" "}{format.format(demographicDifference)} Personen; keine zusätzliche Gruppe.</li>
             )}

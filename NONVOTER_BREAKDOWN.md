@@ -9,8 +9,10 @@ reference dates, population basis, method and source links.
 - `underVotingAge`: residents below the election's minimum voting age.
 - `nonGermanVotingAgeOrOlder`: foreign residents minus foreign residents below
   that age, avoiding overlap.
-- `otherOrTimingDifference`: the remainder after subtracting those groups from
-  residents minus eligible voters.
+
+Both counts are stored once in `population.demographics`. The page derives the
+signed reconciliation difference by subtracting both groups from residents minus
+eligible voters; no remainder is stored.
 
 The generic importer reads totals and demographic cells from one coherent
 official export. NRW, Schleswig-Holstein and Saarland use [Zensus 2022 table
@@ -64,8 +66,9 @@ misleading positive remainders.
 
 `state-sources.mjs` selects official exports and dates; `population.mjs` rejects
 missing, malformed or duplicate age/citizenship cells. `process-data.mjs` joins
-results and demographics. `validate-election.mjs` requires demographic
-provenance, real calendar dates, explanations for estimates or mixed dates, and
-agreement between demographic counts and displayed sub-bands. `pnpm test`
-exercises both export formats and corrupted datasets, then checks generated
+results and demographics. `src/data/election.ts` requires demographic
+provenance, real calendar dates, demographic population bounds, and explanations
+for estimates, mixed dates or demographic totals exceeding the non-eligible count.
+Diagram regression checks verify proportional sub-bands against the source counts.
+`pnpm test` exercises both export formats and corrupted datasets, then checks generated
 pages and Sankey geometry.
