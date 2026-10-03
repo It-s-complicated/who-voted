@@ -6,7 +6,7 @@ import { stateSources } from './state-sources.mjs';
 import { electionRules } from './election-rules.mjs';
 import { parsePopulationRows } from './population.mjs';
 import { electionSchema } from '../src/data/election.ts';
-import { csvRows, parseCsvResults } from './csv-results.mjs';
+import { parseCsvResults } from './csv-results.mjs';
 
 // A newer election must change the summary without changing historical metadata.
 const historical = structuredClone(states['sachsen-anhalt'].elections);
@@ -224,10 +224,13 @@ for (const [route, invalid, partyVotes] of [
 }
 // Quoting and multiline cells are required by the new official layouts. The
 // relaxed preamble widths must not relax statewide uniqueness or count checks.
-assert.deepEqual(csvRows('\uFEFFa;b\r\n"two\r\nlines";"escaped ""quote"""'), [['a', 'b'], ['two\r\nlines', 'escaped "quote"']]);
-assert.throws(() => csvRows('a;b\n"unterminated;1'), /Quote Not Closed/);
+assert.throws(() => parseCsvResults('sachsen-anhalt/2026', 'a;b\n"unterminated;1'), /Quote Not Closed/);
 assert.throws(() => parseCsvResults('unknown/2026', 'a;b'), /Unsupported CSV election/);
 const st2026 = readFileSync('data/raw/sachsen-anhalt/2026/results.csv', 'utf8');
+assert.deepEqual(
+  parseCsvResults('sachsen-anhalt/2026', '\uFEFF"two\r\nlines";"escaped ""quote"""\r\n\r\n' + st2026),
+  parseCsvResults('sachsen-anhalt/2026', st2026),
+);
 const stRow = st2026.split(/\r?\n/).find((line) => line.startsWith('"E";"06.09.2026";"LAN";"15";"Sachsen-Anhalt";"";'));
 assert.ok(stRow);
 assert.throws(() => parseCsvResults('sachsen-anhalt/2026', `${st2026.trim()}\n${stRow}`), /Unique statewide/);

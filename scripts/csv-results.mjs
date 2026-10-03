@@ -4,14 +4,6 @@ import { parse } from 'csv-parse/sync';
 // CSV is a transport, not a shared election layout. Publishers mix vote
 // categories, previous elections, mail subtotals and aggregation levels. Each
 // parser below names the required selection; see CSV_AVAILABILITY_REVIEW.md.
-// Preambles/table captions have different widths. Keep arrays (duplicate party
-// headings are real), then validate the selected data rows against their header.
-export function csvRows(text, delimiter = ';', relaxQuotes = false) {
-  return parse(text, {
-    delimiter, bom: true, record_delimiter: ['\r\n', '\n', '\r'],
-    skip_empty_lines: true, relax_column_count: true, relax_quotes: relaxQuotes,
-  });
-}
 
 function count(value, label) {
   assert.match(value ?? '', /^\d+$/, `Invalid ${label}`);
@@ -230,7 +222,14 @@ function hamburgResults(data) {
 function officialCsvResults(route, text) {
   // BW/NRW have unescaped quotes in unquoted fields; Hamburg/RLP need strict
   // quoting for multiline cells. Keep these publisher exceptions explicit.
-  const data = csvRows(text, route === 'hamburg/2025' ? ',' : ';', ['baden-wuerttemberg/2026', 'nordrhein-westfalen/2022'].includes(route));
+  // Preambles/table captions have different widths. Keep arrays (duplicate party
+  // headings are real), then validate the selected data rows against their header.
+  const data = parse(text, {
+    delimiter: route === 'hamburg/2025' ? ',' : ';',
+    bom: true, record_delimiter: ['\r\n', '\n', '\r'],
+    skip_empty_lines: true, relax_column_count: true,
+    relax_quotes: ['baden-wuerttemberg/2026', 'nordrhein-westfalen/2022'].includes(route),
+  });
   switch (route) {
     case 'baden-wuerttemberg/2026': return badenWuerttembergResults(data);
     case 'bayern/2023': return bayernResults(data);
@@ -258,7 +257,10 @@ function preliminaryCsvResults(route, text, description) {
   const header = berlin ? 'Adresse' : 'Berechnungsdatum';
   const start = text.indexOf(`${header};`);
   assert.ok(start >= 0, 'Missing result headers');
-  const { headers, rows: data } = table(csvRows(text.slice(start)), header);
+  const { headers, rows: data } = table(parse(text.slice(start), {
+    delimiter: ';', bom: true, record_delimiter: ['\r\n', '\n', '\r'],
+    skip_empty_lines: true, relax_column_count: true,
+  }), header);
   assert.equal(new Set(headers).size, headers.length, 'Unique result headers');
   const rows = data.map((cells) => {
     assert.equal(cells.length, headers.length, 'Result column count');
@@ -279,7 +281,10 @@ function preliminaryCsvResults(route, text, description) {
   assert.equal(value(berlin ? 'AusWbez' : 'Erf. Wahlbezirke'), berlin ? 4114 : 1974, 'Complete count');
   // Berlin's dictionary contains prose with literal, unescaped quotation marks
   // in unquoted fields; retain those characters while reading its P-code rows.
-  const names = Object.fromEntries(csvRows(description, ';', true));
+  const names = Object.fromEntries(parse(description, {
+    delimiter: ';', bom: true, record_delimiter: ['\r\n', '\n', '\r'],
+    skip_empty_lines: true, relax_column_count: true, relax_quotes: true,
+  }));
   const shortNames = { P01: 'CDU', P02: 'SPD', P03: 'GRÜNE', P04: 'Die Linke', P05: 'AfD', P06: 'FDP', P07: 'Tierschutzpartei', P08: 'Die PARTEI', P09: 'Volt', P12: 'Die Urbane.', P13: 'DKP', P14: 'ÖDP', P15: 'Die Heimat', P16: 'Bergpartei', P17: 'SGP', P24: 'BSW', P27: 'PdF' };
   const partyColumns = berlin ? headers.filter((key) => /^P\d+$/.test(key)) : headers.slice(12);
   const parties = partyColumns.flatMap((key) => {
