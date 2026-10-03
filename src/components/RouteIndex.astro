@@ -15,11 +15,10 @@ interface Props {
   title: string;
   description: string;
   links?: Link[];
-  groups?: { label: string; href?: string; links: Link[] }[];
   breadcrumbs?: { label: string; href?: string; home?: boolean }[];
 }
 
-const { title, description, links, groups, breadcrumbs } = Astro.props;
+const { title, description, links, breadcrumbs } = Astro.props;
 const pageTitle = Astro.url.pathname === "/" ? title : `${title} · Wer hat gewählt?`;
 const ogCard = await renderCard("og", { heading: title });
 ---
@@ -55,18 +54,7 @@ const ogCard = await renderCard("og", { heading: title });
         <p>{description}</p>
       </header>
       <slot />
-      {Astro.slots.has("default") ? null : groups ? (
-        <ul>
-          {groups.map(({ label, href, links: yearLinks }) => (
-            <li>
-              <a href={href}>{label}</a>
-              {yearLinks.map(({ href, label }) => (
-                <a class="year" href={href}>{label}</a>
-              ))}
-            </li>
-          ))}
-        </ul>
-      ) : links && links.length > 0 ? (
+      {Astro.slots.has("default") ? null : links && links.length > 0 ? (
         <ul>
           {links.map(({ href, label, note }) => (
             <li><a href={href}>{label}</a>{note && <span>{note}</span>}</li>
@@ -86,6 +74,5 @@ const ogCard = await renderCard("og", { heading: title });
   li { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0.25rem 1.5rem; padding: 1rem 0; border-bottom: 1px solid var(--divider); }
   li a { font-size: 1.5rem; font-weight: 600; padding: 0.25rem 0; }
   li span { color: var(--text-muted); }
-  li a.year { font-size: 1rem; font-weight: 400; }
   .empty { margin-top: 1.5rem; }
 </style>
