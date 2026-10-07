@@ -167,8 +167,8 @@ importers:
   .:
     dependencies:
       '@tanstack/charts':
-        specifier: 0.18.0
-        version: 0.18.0
+        specifier: 1.0.0
+        version: 1.0.0
       astro:
         specifier: ^7.3.6
         version: 7.3.6(@types/node@26.6.4)(yaml@2.9.0)
@@ -972,8 +972,8 @@ packages:
       csstype:
         optional: true
 
-  '@tanstack/charts@0.18.0':
-    resolution: {integrity: sha512-JzJ0nkdpZWPla1FPEo6YY6spMRkkVxvtpAF+zvwATV1DpwHegvW7N55Pyts6Gu+do+RmnCAtnOWIcQAwtNAOaw==}
+  '@tanstack/charts@1.0.0':
+    resolution: {integrity: sha512-4U+zbn5jzQF8MNDsvjMG7TE4Fv68mfIIiFlFmrWiBIHor8zCX+7W8gpyDcT1SYJYvOIZXv3uxbK/IjwGY40Sig==}
     peerDependencies:
       '@angular/core': '>=19'
       '@angular/platform-browser': '>=19'
@@ -2803,7 +2803,7 @@ snapshots:
       - preact
       - react
 
-  '@tanstack/charts@0.18.0':
+  '@tanstack/charts@1.0.0':
     dependencies:
       '@types/d3-force': 3.0.10
       '@types/d3-geo': 3.1.1
@@ -3184,7 +3184,7 @@ snapshots:
 
   d3-geo@3.1.1:
     dependencies:
-      d3-array: 2.12.1
+      d3-array: 3.2.4
 
   d3-hexbin@0.2.2: {}
 
@@ -3207,7 +3207,7 @@ snapshots:
 
   d3-scale@4.0.2:
     dependencies:
-      d3-array: 2.12.1
+      d3-array: 3.2.4
       d3-format: 3.1.2
       d3-interpolate: 3.0.1
       d3-time: 3.1.0
@@ -3229,7 +3229,7 @@ snapshots:
 
   d3-time@3.1.0:
     dependencies:
-      d3-array: 2.12.1
+      d3-array: 3.2.4
 
   d3-timer@3.0.1: {}
 
