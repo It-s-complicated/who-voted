@@ -15,15 +15,15 @@
     "test": "node scripts/check-raw-snapshots.mjs && pnpm data:build && node scripts/check-data.mjs && pnpm check && astro build && node scripts/check-states.mjs && node scripts/check-diagram.mjs"
   },
   "dependencies": {
-    "@tanstack/charts": "1.0.0",
-    "astro": "^7.3.6",
+    "@tanstack/charts": "1.1.0",
+    "astro": "^7.3.8",
     "astro-cards": "^1.0.1",
     "d3-shape": "^3.2.0"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
     "@types/d3-shape": "^3.2.0",
-    "@types/node": "^26.6.4",
+    "@types/node": "^26.6.5",
     "csv-parse": "^7.0.3",
     "typescript": "^6.0.3"
   },
