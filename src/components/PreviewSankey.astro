@@ -1,0 +1,101 @@
+---
+import { colorControls, defaultSettings, rangeControls, renderPreviewSankey } from "./preview-sankey";
+const svg = renderPreviewSankey();
+---
+
+<div class="artwork" aria-hidden="true">
+  <div class="graphic" data-preview-chart set:html={svg} />
+</div>
+
+<details class="tuning-panel" lang="en">
+  <summary>Adjust graphic</summary>
+  <form data-preview-controls>
+    <p class="engine-note">TanStack Sankey layout · live preview</p>
+    {rangeControls.map((control) => (
+      <label class="range-control" for={`tune-${control.key}`}>
+        <span>{control.label}<output for={`tune-${control.key}`} data-output={control.key}>{defaultSettings[control.key]} {control.unit}</output></span>
+        <input id={`tune-${control.key}`} type="range" name={control.key} min={control.min} max={control.max} step={control.step} value={defaultSettings[control.key]} />
+      </label>
+    ))}
+    <fieldset>
+      <legend>Solid colors</legend>
+      <div class="palette">
+        {colorControls.map(({ key, label }) => (
+          <label>
+            <input type="color" name={key} value={defaultSettings[key]} />
+            {label}
+          </label>
+        ))}
+      </div>
+    </fieldset>
+    <p class="render-error" role="alert" data-preview-error></p>
+    <button type="reset">Reset defaults</button>
+  </form>
+</details>
+
+<script>
+  import { colorControls, defaultSettings, rangeControls, renderPreviewSankey } from "./preview-sankey";
+  const form = document.querySelector<HTMLFormElement>("[data-preview-controls]")!;
+  const graphic = document.querySelector<HTMLElement>("[data-preview-chart]")!;
+  const stage = form.closest<HTMLElement>(".stage")!;
+  const error = form.querySelector<HTMLElement>("[data-preview-error]")!;
+
+  function redraw() {
+    const settings = { ...defaultSettings };
+    for (const control of rangeControls) {
+      const input = form.elements.namedItem(control.key) as HTMLInputElement;
+      settings[control.key] = input.valueAsNumber;
+      form.querySelector<HTMLOutputElement>(`[data-output="${control.key}"]`)!.value = `${input.value} ${control.unit}`;
+    }
+    for (const { key } of colorControls) {
+      settings[key] = (form.elements.namedItem(key) as HTMLInputElement).value;
+    }
+
+    try {
+      const svg = renderPreviewSankey(settings);
+      graphic.innerHTML = svg;
+      stage.style.setProperty("--graphic-height", `${settings.height}px`);
+      stage.style.setProperty("--fade-start", `${settings.fadeStart}%`);
+      stage.style.setProperty("--fade-end", `${settings.fadeEnd}%`);
+      stage.style.setProperty("--spot-opacity", String(settings.spotOpacity / 100));
+      stage.style.setProperty("--spot-scale", String(settings.spotSize / 100));
+      error.textContent = "";
+    } catch (cause) {
+      error.textContent = cause instanceof Error ? cause.message : "Could not render the graphic.";
+    }
+  }
+
+  // shortcut: tuning lasts for this page visit; persist it if previews need sharing.
+  form.addEventListener("input", redraw);
+  form.addEventListener("reset", () => requestAnimationFrame(redraw));
+  form.addEventListener("submit", (event) => event.preventDefault());
+  stage.dataset.tuningReady = "true";
+</script>
+
+<style>
+  .artwork { position: absolute; top: 0; left: 50%; width: min(100% - 5rem, 70rem); height: var(--graphic-height, 820px); transform: translateX(-50%); pointer-events: none; }
+  .graphic { width: 100%; height: 100%; overflow: hidden; mask-image: linear-gradient(to bottom, #000 var(--fade-start, 42%), transparent var(--fade-end, 100%)); }
+  .graphic :global(svg) { display: block; width: 100%; height: 100%; }
+  .tuning-panel { position: fixed; z-index: 10; right: 1.25rem; bottom: 1.25rem; width: 17.5rem; max-height: calc(100dvh - 2.5rem); overflow-y: auto; overscroll-behavior: contain; color: var(--ink); background: var(--paper); border: 1px solid var(--ink); box-shadow: 0 4px 20px #1c1b1a20; font-size: 0.78rem; }
+  summary { padding: 0.9rem 1rem; cursor: pointer; font-weight: 600; }
+  form { padding: 0 1rem 1rem; }
+  .engine-note { margin: 0 0 1rem; color: var(--text-muted); font-size: 0.7rem; }
+  input { accent-color: var(--ink); }
+  .range-control { display: block; margin-bottom: 0.8rem; }
+  .range-control > span { display: flex; justify-content: space-between; gap: 0.75rem; margin-bottom: 0.35rem; }
+  output { color: var(--text-muted); font-variant-numeric: tabular-nums; }
+  input[type="range"] { display: block; width: 100%; margin: 0; }
+  fieldset { margin: 1rem 0; padding: 0.75rem 0 0; border: 0; border-top: 1px solid var(--divider); }
+  legend { padding: 0 0.4rem 0 0; font-weight: 600; }
+  .palette { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.5rem; }
+  .palette label { display: grid; gap: 0.35rem; font-size: 0.7rem; }
+  input[type="color"] { width: 100%; height: 2rem; padding: 2px; border: 1px solid var(--divider); background: transparent; cursor: pointer; }
+  button { width: 100%; padding: 0.65rem; color: inherit; background: transparent; border: 1px solid var(--ink); font: inherit; cursor: pointer; }
+  button:hover { background: #ece8df; }
+  .render-error { margin: 0 0 0.75rem; color: #9c2434; line-height: 1.4; }
+  .render-error:empty { display: none; }
+  @media (max-width: 42rem) {
+    .artwork { width: calc(100% - 2.5rem); }
+    .tuning-panel { right: 0.75rem; bottom: 0.75rem; width: min(17.5rem, calc(100% - 1.5rem)); max-height: calc(100dvh - 1.5rem); }
+  }
+</style>
