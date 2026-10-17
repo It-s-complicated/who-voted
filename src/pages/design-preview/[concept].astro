@@ -1,0 +1,164 @@
+---
+import { Font } from "astro:assets";
+import { getCollection } from "astro:content";
+import PreviewSankey from "../../components/PreviewSankey.astro";
+import "../../styles/global.css";
+
+// Keep these visual studies out of the production build.
+export function getStaticPaths() {
+  return import.meta.env.DEV ? [{ params: { concept: "printed" } }] : [];
+}
+
+const entries = await getCollection("elections");
+const elections = entries.map(({ data }) => ({
+  name: data.state.name,
+  href: `/${data.state.slug}/${data.year}/`,
+  date: data.electionDate,
+  year: data.year,
+})).toSorted((a, b) => b.date.localeCompare(a.date) || a.name.localeCompare(b.name, "de-DE"));
+const newestYear = elections[0].year;
+const oldestYear = elections.at(-1)!.year;
+const years = Array.from({ length: newestYear - oldestYear + 1 }, (_, i) => newestYear - i);
+const states = Object.values(Object.groupBy(entries, ({ data }) => data.state.slug))
+  .map((group) => group![0].data.state)
+  .toSorted((a, b) => a.name.localeCompare(b.name, "de-DE"));
+const dateFormat = new Intl.DateTimeFormat("de-DE", { dateStyle: "long", timeZone: "UTC" });
+
+---
+
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Pastel Sankey · Design preview · Wer hat gewählt?</title>
+    <Font cssVariable="--font-display" />
+  </head>
+  <body>
+    <aside class="preview-bar" aria-label="Designvorschau" lang="en">
+      <a class="back" href="/">← Current site</a>
+      <span class="preview-label">Design preview · not published</span>
+    </aside>
+
+    <main>
+      <div class="stage">
+        <PreviewSankey />
+
+        <header class="hero">
+          <h1>Wer hat<br />gewählt?</h1>
+          <p class="intro">Wahlbeteiligung im Verhältnis<br /> zur Bevölkerung.</p>
+          <a class="explore" href="#elections">Die Wahlen entdecken <span aria-hidden="true">↓</span></a>
+        </header>
+
+        <section class="timeline" id="elections" aria-label="Wahlen im Zeitverlauf">
+          {years.map((year) => (
+            <section class="timeline-year" aria-labelledby={`year-${year}`}>
+              <h2 id={`year-${year}`}>{year}</h2>
+              <ul class="year-events">
+                {Object.entries(Object.groupBy(
+                  elections.filter((election) => election.year === year),
+                  (election) => election.date,
+                )).map(([date, sameDay]) => (
+                  <li class="election-date">
+                    <time datetime={date}>{dateFormat.format(new Date(date))}</time>
+                    <div class="election-links">
+                      {sameDay!.map((election) => (
+                        <a href={election.href}>{election.name}</a>
+                      ))}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ))}
+        </section>
+
+        <nav class="states" aria-label="Bundesländer">
+          <h2>Nach Bundesland</h2>
+          <ul>
+            {states.map(({ slug, name }) => (
+              <li><a href={`/${slug}/`}>{name}</a></li>
+            ))}
+          </ul>
+        </nav>
+      </div>
+      <footer class="concept-note" lang="en">
+        <span>Pastel Sankey</span>
+        <p>Background illustration, not election data.</p>
+      </footer>
+    </main>
+  </body>
+</html>
+
+<style>
+  :global(astro-dev-toolbar) { display: none; }
+  body { background: #f8f5ee; }
+  main { width: 100%; margin: 0; padding: 0; }
+  .preview-bar { position: relative; z-index: 2; display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem 2rem; background: var(--paper); border-bottom: 1px solid #dedbd4; font-size: 0.75rem; }
+  .preview-bar a { text-decoration: none; }
+  .back { color: var(--text-muted); white-space: nowrap; }
+  .preview-label { color: var(--text-secondary); font-size: 0.72rem; }
+  .stage { position: relative; overflow: hidden; }
+  .hero, .timeline, .states { position: relative; width: min(100% - 5rem, 70rem); margin: 0 auto; }
+  .hero { min-height: 37rem; padding: 8rem 0 2rem; border: 0; }
+  .hero::before {
+    content: "";
+    position: absolute;
+    inset: 3rem -2.5rem 0;
+    opacity: var(--spot-opacity, 1);
+    background: radial-gradient(ellipse calc(38rem * var(--spot-scale, 1)) calc(25rem * var(--spot-scale, 1)) at 15rem 16rem, #f8f5eefc 0%, #f8f5eef5 34%, #f8f5eec9 58%, #f8f5ee00 100%);
+    pointer-events: none;
+  }
+  .hero > * { position: relative; }
+  h1 { margin: 0; font-size: clamp(4.5rem, 8.2vw, 7.5rem); line-height: 0.96; letter-spacing: -0.045em; }
+  .intro { margin: 1.75rem 0 0; font-size: 1.15rem; line-height: 1.5; color: #4d4b46; }
+  .explore { display: inline-flex; align-items: center; gap: 1.75rem; margin-top: 1.65rem; padding-bottom: 0.35rem; border-bottom: 1px solid var(--ink); text-decoration: none; font-size: 0.88rem; font-weight: 600; }
+  .explore span { font-size: 1.2rem; }
+  .timeline { padding: 2rem 0 3.5rem; border-top: 2px solid var(--ink); }
+  .timeline-year { position: relative; display: grid; grid-template-columns: 7rem minmax(0, 1fr); padding: 0.4rem 0 2.5rem; }
+  .timeline-year:last-child { padding-bottom: 0; }
+  .timeline-year::before { content: ""; position: absolute; left: 7rem; top: 0; bottom: 0; border-left: 1px solid var(--divider); }
+  .timeline-year:last-child::before { bottom: 1.5rem; }
+  .timeline-year h2 { position: relative; grid-column: 1; margin: 0; font-family: var(--font-display); font-size: 2.5rem; font-weight: 620; font-variant-numeric: tabular-nums; line-height: 1; letter-spacing: -0.04em; }
+  .timeline-year h2::after { content: ""; position: absolute; right: -0.35rem; top: 1rem; width: 0.7rem; border-top: 2px solid var(--ink); }
+  .year-events { grid-column: 2; list-style: none; margin: 0; padding: 0 0 0 2rem; }
+  .election-date { position: relative; padding: 0.25rem 0 1.4rem; margin-bottom: 1.4rem; border-bottom: 1px solid var(--table-divider); }
+  .election-date:last-child { margin-bottom: 0; border-bottom: 0; padding-bottom: 0.25rem; }
+  .election-date::before { content: ""; position: absolute; left: -2rem; top: 1rem; width: 0.75rem; border-top: 1px solid var(--divider); }
+  .election-date:first-child::before { content: none; }
+  time { display: block; margin-bottom: 0.45rem; color: var(--text-muted); font-size: 0.75rem; font-weight: 500; font-variant-numeric: tabular-nums; letter-spacing: 0.015em; }
+  .election-links { display: flex; flex-wrap: wrap; gap: 0.2rem 2rem; }
+  .election-links a { display: inline-block; padding: 0.15rem 0; font-size: clamp(1.125rem, 2.3vw, 1.5rem); font-weight: 550; line-height: 1.3; overflow-wrap: anywhere; text-decoration: none; }
+  .election-links a:hover { text-decoration: underline; }
+  .states { border-top: 1px solid var(--divider); padding: 1.5rem 0 3rem; }
+  .states h2 { margin: 0 0 1rem; font-size: 1.125rem; }
+  .states ul { display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; list-style: none; margin: 0; padding: 0; }
+  .states a { display: inline-block; padding: 0.25rem 0; }
+  .concept-note { display: flex; justify-content: space-between; gap: 1rem; padding: 1.25rem max(2.5rem, calc((100% - 70rem) / 2)); border-top: 1px solid #dedbd4; background: var(--paper); font-size: 0.75rem; }
+  .concept-note > span { font-weight: 600; white-space: nowrap; }
+  .concept-note p { margin: 0; color: var(--text-muted); line-height: 1.5; }
+  @media (max-width: 60rem) {
+    .preview-label { display: none; }
+    .hero { min-height: 35rem; }
+  }
+  @media (max-width: 42rem) {
+    .preview-bar { padding: 0.9rem 1rem; }
+    .hero, .timeline, .states { width: calc(100% - 2.5rem); }
+    .hero { min-height: 31rem; padding-top: 6rem; }
+    .hero::before { inset: 2rem -1.25rem 0; background: radial-gradient(ellipse calc(20rem * var(--spot-scale, 1)) calc(18rem * var(--spot-scale, 1)) at 8rem 12rem, #f8f5eefc 0%, #f8f5eef0 44%, #f8f5ee00 100%); }
+    h1 { font-size: clamp(4rem, 17vw, 6rem); }
+    .intro { max-width: 17rem; margin-top: 1.5rem; color: var(--ink); font-size: 1rem; }
+    .timeline { padding: 1.5rem 0 2.75rem; }
+    .timeline-year { grid-template-columns: 4.75rem minmax(0, 1fr); padding-bottom: 1.75rem; }
+    .timeline-year::before { left: 4.75rem; }
+    .timeline-year h2 { font-size: 1.6rem; }
+    .timeline-year h2::after { top: 0.85rem; }
+    .year-events { padding-left: 1.1rem; }
+    .election-date { padding-bottom: 1rem; margin-bottom: 1rem; }
+    .election-date::before { left: -1.1rem; top: 0.85rem; width: 0.55rem; }
+    .election-links { gap: 0.15rem 1rem; }
+    time { font-size: 0.7rem; }
+    .concept-note { flex-direction: column; gap: 0.5rem; padding: 1.1rem 1.25rem; }
+  }
+</style>
