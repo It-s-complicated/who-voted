@@ -4,6 +4,7 @@ import { states } from '../src/data/states.ts';
 
 assert.equal(Object.keys(states).length, 16);
 const home = readFileSync('dist/index.html', 'utf8');
+assert.ok(home.includes('<election-companion'), 'home includes the collection companion');
 const geometry = JSON.parse(readFileSync('src/data/germany-map.json', 'utf8'));
 assert.deepEqual(Object.keys(geometry).sort(), Object.keys(states).sort(), 'map covers every state');
 const timeline = home.split('aria-label="Wahlen im Zeitverlauf"')[1].split('<nav')[0];
@@ -22,6 +23,7 @@ for (const [slug, state] of Object.entries(states)) {
   assert.match(state.latestElection, /^\d{4}-\d{2}-\d{2}$/);
   assert.ok(state.latestElection <= '2026-09-21', `${slug}: completed election`);
   const page = readFileSync(`dist/${slug}/index.html`, 'utf8');
+  assert.ok(page.includes('<election-companion'), `${slug}: state includes the collection companion`);
   assert.ok(page.includes(`/${slug}/${Number(state.latestElection.slice(0, 4))}/`), `${slug}: diagram link`);
   assert.ok(page.includes(String(Number(state.latestElection.slice(0, 4)))), `${slug}: election year`);
   assert.ok(state.years.includes(Number(state.latestElection.slice(0, 4))), `${slug}: latest diagram exists`);
@@ -33,6 +35,7 @@ for (const [slug, state] of Object.entries(states)) {
     assert.equal(data.year, year);
     const diagram = readFileSync(`dist/${slug}/${year}/index.html`, 'utf8');
     assert.ok(diagram.includes('<svg'));
+    assert.ok(diagram.includes(`data-current="${slug}/${year}"`), `${slug}/${year}: correct election collection action`);
     const options = [...diagram.matchAll(/<option value="(\d+)"([^>]*)>/g)];
     assert.deepEqual(options.map((option) => Number(option[1])), state.years.toSorted((a, b) => b - a), `${slug}/${year}: year navigation includes every election`);
     assert.deepEqual(options.filter((option) => /\bselected\b/.test(option[2])).map((option) => Number(option[1])), [year], `${slug}/${year}: current year selected`);

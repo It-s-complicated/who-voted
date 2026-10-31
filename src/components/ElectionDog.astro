@@ -1,0 +1,68 @@
+<svg class="election-dog" viewBox="0 0 240 240" aria-hidden="true" focusable="false">
+  <g class="dog-body">
+    <g class="dog-tail">
+      <path class="fur" d="M163 192 C184 188 193 175 196 164 C198 158 204 159 203 167 C202 186 186 204 164 205 Z" />
+      <path class="patch" d="M196 164 C198 158 204 159 203 167 C203 174 200 180 196 185 L188 179 C192 174 194 169 196 164 Z" />
+    </g>
+    <path class="fur" d="M94 146 C81 163 77 181 79 204 C68 210 68 222 79 225 L163 225 C175 221 169 210 162 205 C165 181 157 162 144 148 Z" />
+    <path class="patch" d="M153 174 C163 184 165 194 162 205 L168 215 C153 220 144 207 145 195 C145 185 148 179 153 174 Z" />
+    <path class="detail" d="M103 185 L101 218 M136 185 L140 218" />
+    <path class="collar" d="M90 148 Q119 161 149 147 L150 159 Q121 173 89 160 Z" />
+    <circle class="tag" cx="119" cy="166" r="4" />
+
+    <g class="dog-head">
+      <g class="dog-ear dog-ear-left">
+        <path class="patch" d="M85 67 C65 63 53 77 52 100 C51 120 45 144 49 168 C51 181 58 192 65 190 L70 187 L74 189 C86 183 90 163 87 145 L96 86 Z" />
+        <path class="ear-detail" d="M64 122 C60 141 59 164 66 174" />
+      </g>
+      <g class="dog-ear dog-ear-right">
+        <path class="patch" d="M151 66 C171 60 187 76 188 99 C188 120 195 140 192 160 C191 175 184 187 177 190 L173 186 L168 188 C156 183 152 164 155 147 L144 87 Z" />
+        <path class="ear-detail" d="M178 121 C183 142 182 160 176 173" />
+      </g>
+      <path class="fur" d="M82 92 C79 69 94 52 115 50 L122 45 L125 51 C148 49 166 66 165 90 L163 120 C161 143 144 157 122 158 C99 158 83 144 82 121 Z" />
+      <path class="patch forehead" d="M85 76 C90 61 101 54 112 52 C106 66 106 80 103 90 C97 93 88 87 85 76 Z" />
+      <path class="detail brow" d="M94 96 Q101 92 107 96 M137 94 Q143 90 149 94" />
+      <g class="dog-eyes">
+        <ellipse class="eye" cx="102" cy="108" rx="3.7" ry="5.2" />
+        <ellipse class="eye" cx="143" cy="106" rx="3.7" ry="5.2" />
+        <circle class="glint" cx="103" cy="106" r="1.1" />
+        <circle class="glint" cx="144" cy="104" r="1.1" />
+      </g>
+      <path class="muzzle" d="M104 123 C109 117 117 118 122 122 C128 117 137 118 142 124 C149 136 138 148 123 148 C107 148 97 135 104 123 Z" />
+      <path class="nose" d="M115 122 Q122 119 130 122 Q130 129 123 132 Q116 130 115 122 Z" />
+      <path class="detail dog-mouth-closed" d="M123 132 L123 138 M113 137 Q123 144 133 136" />
+      <ellipse class="dog-mouth-open" cx="123" cy="140" rx="8" ry="6" />
+      <path class="chin" d="M115 150 Q123 153 131 149" />
+    </g>
+
+    <path class="fur paw" d="M89 215 C90 205 106 205 109 216 L110 229 Q96 233 86 228 Z" />
+    <path class="fur paw" d="M132 216 C134 205 149 206 151 216 L153 228 Q140 233 130 228 Z" />
+    <path class="detail toes" d="M94 222 L94 230 M102 222 L102 230 M138 222 L138 230 M146 222 L146 230" />
+  </g>
+</svg>
+
+<style>
+  .election-dog { display: block; width: 100%; overflow: visible; }
+  .dog-body { transform-origin: 50% 95%; }
+  .fur, .patch, .collar, .tag, .muzzle, .nose {
+    stroke: var(--ink); stroke-width: 2.5; stroke-linejoin: round;
+  }
+  .fur { fill: #fff; }
+  .patch, .eye, .nose, .dog-mouth-open { fill: var(--ink); }
+  .forehead { stroke: none; }
+  .collar { fill: var(--primary); }
+  .tag, .glint { fill: var(--paper); }
+  .muzzle { fill: #fff; stroke-width: 1.6; }
+  .detail, .ear-detail, .chin {
+    fill: none; stroke: var(--ink); stroke-width: 1.8; stroke-linecap: round;
+  }
+  .ear-detail { stroke: #fff; stroke-opacity: 0.35; stroke-width: 1.3; }
+  .chin { stroke-width: 1.2; }
+  .dog-head { transform-origin: 50% 60%; transform: rotate(var(--head-tilt, -4deg)); }
+  .dog-eyes { transform: translate(var(--look-x, 0px), var(--look-y, 0px)); }
+  .dog-head, .dog-eyes { transition: transform 220ms ease-out; }
+  .dog-mouth-open { display: none; }
+  @media (prefers-reduced-motion: reduce) {
+    .dog-head, .dog-eyes { transition: none; }
+  }
+</style>
