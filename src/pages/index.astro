@@ -22,7 +22,7 @@ const dateFormat = new Intl.DateTimeFormat("de-DE", { dateStyle: "long", timeZon
   title="Wer hat gewählt?"
   description="Wahlbeteiligung im Verhältnis zur Bevölkerung. Wähle ein Bundesland und Wahljahr aus."
 >
-  <section class="timeline" aria-label="Wahlen im Zeitverlauf">
+  <section id="wahlen" class="timeline" aria-label="Wahlen im Zeitverlauf">
     {years.map((year) => (
       <section class="timeline-year" aria-labelledby={`year-${year}`}>
         <h2 id={`year-${year}`}>{year}</h2>

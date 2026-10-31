@@ -1,0 +1,312 @@
+---
+import { getCollection } from "astro:content";
+import ElectionDog from "./ElectionDog.astro";
+
+interface Props { current?: string }
+const { current } = Astro.props;
+const catalog = (await getCollection("elections")).map(({ id, data }) => ({
+  id, name: data.state.name, year: data.year,
+}));
+---
+
+<election-companion data-catalog={JSON.stringify(catalog)} data-current={current} hidden>
+  <section class="companion-shelf" aria-label="Wahlen sammeln">
+    <div class="invitation">
+      <p class="kicker">Für deinen nächsten Vergleich</p>
+      <p class="invitation-title">Eine Wahl kommt selten allein.</p>
+      <p class="companion-message" data-message>Du entdeckst die Wahlen. Ich halte sie dir fest.</p>
+      {current ? (
+        <button type="button" class="collect-button" data-add>
+          <span aria-hidden="true">＋</span><span data-add-label>Diese Wahl sammeln</span>
+        </button>
+      ) : <a class="discover-link" href="/#wahlen">Eine Wahl entdecken <span aria-hidden="true">↗</span></a>}
+    </div>
+    <button type="button" class="collection-button" data-open aria-haspopup="dialog" aria-controls="election-collection" aria-label="Wahlsammlung öffnen, 0 Wahlen">
+      <ElectionDog />
+      <span class="collection-label">Sammlung <span class="collection-count" data-count>0</span><span aria-hidden="true">↗</span></span>
+    </button>
+  </section>
+  <p class="sr-only" role="status" aria-live="polite" data-announcement></p>
+  <div class="flight-card" data-flight hidden aria-hidden="true">
+    <span class="flight-kicker">WAHL</span><strong data-flight-year></strong><span data-flight-name></span>
+  </div>
+  <dialog id="election-collection" aria-labelledby="collection-title">
+    <div class="dialog-heading">
+      <div><p class="kicker">Gut aufgehoben</p><h2 id="collection-title" tabindex="-1">Deine Wahlsammlung</h2></div>
+      <button type="button" class="close-button" data-close aria-label="Sammlung schließen">×</button>
+    </div>
+    <p class="dialog-intro">Hier warten deine Fundstücke. Wähle eine Wahl, um sie wieder anzusehen.</p>
+    <p class="empty-collection" data-empty>Noch nichts gefangen. Sammle eine Wahl auf ihrer Ergebnisseite.</p>
+    <ul class="collected-elections" data-list></ul>
+    <p class="prototype-note">Der direkte Vergleich nebeneinander kommt als Nächstes. Du kannst deine Wahlen schon sammeln.</p>
+    <p class="storage-note" data-storage>Nur in diesem Browser gespeichert. Ohne Anmeldung.</p>
+  </dialog>
+</election-companion>
+
+<script>
+  import { parseCollection } from "../data/comparison";
+
+  interface Election { id: string; name: string; year: number }
+  const storageKey = "who-voted:collection:v1";
+  let collection: string[] = [];
+  let memoryOnly = false;
+
+  class ElectionCompanion extends HTMLElement {
+    private catalog: Election[] = [];
+    private allowed = new Set<string>();
+    private controller?: AbortController;
+    private animations: Animation[] = [];
+    private motion = matchMedia("(prefers-reduced-motion: reduce)");
+    private storageNote = "Nur in diesem Browser gespeichert. Ohne Anmeldung.";
+
+    private get dialog() { return this.querySelector<HTMLDialogElement>("dialog")!; }
+    private get flight() { return this.querySelector<HTMLDivElement>("[data-flight]")!; }
+
+    connectedCallback() {
+      if (this.controller) return;
+      this.controller = new AbortController();
+      const { signal } = this.controller;
+      this.catalog = JSON.parse(this.dataset.catalog!);
+      this.allowed = new Set(this.catalog.map(({ id }) => id));
+      collection = collection.filter((id) => this.allowed.has(id));
+      if (!memoryOnly) {
+        try {
+          collection = parseCollection(localStorage.getItem(storageKey), this.allowed);
+        } catch {
+          memoryOnly = true;
+        }
+      }
+      if (memoryOnly) this.storageNote = "Speichern ist gerade nicht möglich. Deine Sammlung bleibt nur während dieser Navigation erhalten.";
+      this.render();
+      this.hidden = false;
+      this.addEventListener("click", this.onClick, { signal });
+      document.addEventListener("pointerover", this.look, { signal });
+      document.addEventListener("focusin", this.look, { signal });
+      window.addEventListener("storage", (event) => {
+        if (memoryOnly || (event.key !== storageKey && event.key !== null)) return;
+        try {
+          collection = parseCollection(event.newValue, this.allowed);
+          this.render();
+        } catch {
+          this.announce("Die gespeicherte Sammlung konnte nicht aktualisiert werden.");
+        }
+      }, { signal });
+      this.motion.addEventListener("change", () => {
+        if (this.motion.matches) {
+          this.stopFlight();
+          this.style.removeProperty("--look-x");
+          this.style.removeProperty("--look-y");
+          this.style.removeProperty("--head-tilt");
+        }
+      }, { signal });
+    }
+
+    disconnectedCallback() {
+      this.controller?.abort();
+      this.controller = undefined;
+      this.stopFlight();
+      if (this.dialog.open) this.dialog.close();
+    }
+
+    private announce(message: string) {
+      this.querySelector<HTMLElement>("[data-announcement]")!.textContent = message;
+    }
+
+    private save() {
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(collection));
+        memoryOnly = false;
+        this.storageNote = "Nur in diesem Browser gespeichert. Ohne Anmeldung.";
+      } catch {
+        memoryOnly = true;
+        this.storageNote = "Speichern ist in diesem Browser nicht möglich. Deine Sammlung bleibt nur während dieser Navigation erhalten.";
+        this.announce(this.storageNote);
+      }
+      this.render();
+    }
+
+    private render() {
+      const list = this.querySelector<HTMLUListElement>("[data-list]")!;
+      const focusedIndex = [...list.children].findIndex((item) => item.contains(document.activeElement));
+      const focusTarget = document.activeElement instanceof HTMLButtonElement ? "button" : "a";
+      list.replaceChildren(...collection.map((id) => {
+        const election = this.catalog.find((entry) => entry.id === id)!;
+        const item = document.createElement("li");
+        const link = document.createElement("a");
+        link.href = `/${election.id}/`;
+        link.textContent = `${election.name} ${election.year}`;
+        const remove = document.createElement("button");
+        remove.type = "button";
+        remove.dataset.remove = id;
+        remove.textContent = "×";
+        remove.setAttribute("aria-label", `${link.textContent} aus der Sammlung entfernen`);
+        item.append(link, remove);
+        return item;
+      }));
+      this.querySelector<HTMLElement>("[data-count]")!.textContent = String(collection.length);
+      this.querySelector<HTMLElement>("[data-open]")!.setAttribute("aria-label", `Wahlsammlung öffnen, ${collection.length} ${collection.length === 1 ? "Wahl" : "Wahlen"}`);
+      this.querySelector<HTMLElement>("[data-empty]")!.hidden = collection.length > 0;
+      this.querySelector<HTMLElement>("[data-storage]")!.textContent = this.storageNote;
+      const add = this.querySelector<HTMLButtonElement>("[data-add]");
+      if (add) {
+        const selected = collection.includes(this.dataset.current!);
+        add.dataset.collected = String(selected);
+        add.setAttribute("aria-label", selected ? "Wahl bereits gesammelt. Sammlung öffnen" : "Diese Wahl sammeln");
+        add.querySelector("[data-add-label]")!.textContent = selected ? "In deiner Sammlung" : "Diese Wahl sammeln";
+        add.firstElementChild!.textContent = selected ? "✓" : "＋";
+      }
+      if (focusedIndex >= 0) {
+        const targets = list.querySelectorAll<HTMLElement>(focusTarget);
+        (targets[Math.min(focusedIndex, targets.length - 1)] ?? this.querySelector<HTMLElement>("h2"))?.focus();
+      }
+    }
+
+    private onClick = (event: MouseEvent) => {
+      const target = event.target as Element;
+      const button = target.closest<HTMLButtonElement>("button");
+      if (button?.hasAttribute("data-open")) {
+        this.dialog.showModal();
+      } else if (button?.hasAttribute("data-close") || target.closest("dialog a")) {
+        this.dialog.close();
+      } else if (button?.dataset.remove) {
+        const election = this.catalog.find(({ id }) => id === button.dataset.remove)!;
+        collection = collection.filter((id) => id !== election.id);
+        this.save();
+        this.announce(`${election.name} ${election.year} aus der Sammlung entfernt.`);
+      } else if (button?.hasAttribute("data-add")) {
+        const election = this.catalog.find(({ id }) => id === this.dataset.current);
+        if (!election) return;
+        if (collection.includes(election.id)) {
+          this.dialog.showModal();
+          return;
+        }
+        collection.push(election.id);
+        this.save();
+        this.querySelector<HTMLElement>("[data-message]")!.textContent = `Hab ich! ${election.name} ${election.year} ist dabei.`;
+        this.announce(`${election.name} ${election.year} zur Sammlung hinzugefügt. ${this.storageNote}`);
+        void this.catchElection(button, election);
+      }
+    };
+
+    private look = (event: Event) => {
+      if (this.motion.matches || this.classList.contains("is-catching") || this.dialog.open) return;
+      const target = (event.target as Element).closest("a, button, select, summary, #election-chart");
+      if (!target) return;
+      const dog = this.querySelector("svg")!.getBoundingClientRect();
+      if (dog.bottom < 0 || dog.top > innerHeight) return;
+      const rect = target.getBoundingClientRect();
+      const x = Math.max(-3, Math.min(3, (rect.left + rect.width / 2 - dog.left - dog.width / 2) / 100));
+      const y = Math.max(-2, Math.min(2, (rect.top + rect.height / 2 - dog.top - dog.height / 2) / 100));
+      this.style.setProperty("--look-x", `${x}px`);
+      this.style.setProperty("--look-y", `${y}px`);
+      this.style.setProperty("--head-tilt", `${x * 1.5}deg`);
+    };
+
+    private stopFlight() {
+      this.animations.forEach((animation) => animation.cancel());
+      this.animations = [];
+      this.flight.hidden = true;
+      this.classList.remove("is-catching");
+    }
+
+    private async catchElection(button: HTMLButtonElement, election: Election) {
+      this.stopFlight();
+      if (this.motion.matches || !Element.prototype.animate) return;
+      const dog = this.querySelector<SVGSVGElement>("svg")!;
+      const source = button.getBoundingClientRect();
+      const destination = dog.getBoundingClientRect();
+      const jump = Math.min(32, Math.max(0, destination.top - 12));
+      const start = { x: source.left + source.width / 2 - 56, y: source.top + source.height / 2 - 39 };
+      const end = { x: destination.left + destination.width * 0.51 - 56, y: destination.top + destination.height * 0.58 - 39 - jump };
+      const arc = Math.max(8, Math.min(start.y, end.y) - 100);
+      this.querySelector<HTMLElement>("[data-flight-year]")!.textContent = String(election.year);
+      this.querySelector<HTMLElement>("[data-flight-name]")!.textContent = election.name;
+      this.flight.hidden = false;
+      this.classList.add("is-catching");
+      const flight = this.flight.animate([
+        { transform: `translate(${start.x}px, ${start.y}px) scale(.6) rotate(-8deg)`, opacity: 1, offset: 0 },
+        { transform: `translate(${start.x + (end.x - start.x) * .4}px, ${arc}px) scale(.85) rotate(-15deg)`, opacity: 1, offset: .32 },
+        { transform: `translate(${end.x}px, ${end.y}px) scale(.22) rotate(12deg)`, opacity: 1, offset: .65 },
+        { transform: `translate(${end.x}px, ${end.y}px) scale(.08) rotate(12deg)`, opacity: 0, offset: .72 },
+        { transform: `translate(${end.x}px, ${end.y}px) scale(.08)`, opacity: 0, offset: 1 },
+      ], { duration: 900, easing: "ease-in-out" });
+      const body = dog.querySelector(".dog-body")!.animate([
+        { transform: "translateY(0)", offset: 0 },
+        { transform: "translateY(5px) scale(1.03, .94)", offset: .15 },
+        { transform: `translateY(-${jump}px) rotate(-4deg)`, offset: .47 },
+        { transform: `translateY(-${jump}px) rotate(3deg)`, offset: .65 },
+        { transform: "translateY(3px) scale(1.02, .97)", offset: .85 },
+        { transform: "translateY(0)", offset: 1 },
+      ], { duration: 900, easing: "ease-in-out" });
+      this.animations = [flight, body];
+      try {
+        await flight.finished;
+      } catch (error) {
+        if (!(error instanceof DOMException && error.name === "AbortError")) console.error("Catch animation failed", error);
+      } finally {
+        if (this.animations.includes(flight)) this.stopFlight();
+      }
+    }
+  }
+
+  customElements.define("election-companion", ElectionCompanion);
+</script>
+
+<style>
+  election-companion { display: block; margin: 1.6rem 0 1.5rem; }
+  election-companion[hidden], [hidden] { display: none !important; }
+  .companion-shelf { display: grid; grid-template-columns: minmax(0, 1fr) 10rem; align-items: end; gap: 1rem; border-bottom: 2px solid var(--ink); }
+  .invitation { padding: 0.9rem 0 1.4rem; }
+  .kicker { margin: 0 0 .45rem; color: var(--primary); font-size: .68rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+  .invitation-title { margin: 0; font: 620 1.6rem/1.15 var(--font-display); letter-spacing: -.02em; }
+  .companion-message { margin: .55rem 0 1rem; color: var(--text-muted); font-size: .88rem; line-height: 1.5; }
+  button { color: var(--ink); font: inherit; cursor: pointer; }
+  .collect-button { display: inline-flex; align-items: center; gap: .65rem; min-height: 44px; padding: .55rem 1rem; border: 1px solid var(--ink); border-radius: 3px; background: var(--surface); font-size: .85rem; font-weight: 650; }
+  .collect-button > span:first-child { color: var(--primary); font-size: 1.2rem; line-height: 1; }
+  .collect-button:hover { background: var(--caption-surface); border-color: var(--primary); }
+  .collect-button[data-collected="true"] { border-color: var(--divider); }
+  .discover-link { display: inline-block; padding: .5rem 0; font-size: .85rem; font-weight: 600; }
+  .collection-button { position: relative; display: block; padding: 0; border: 0; background: none; width: 100%; }
+  .collection-button :global(svg) { width: 9.5rem; margin: 0 auto -.35rem; }
+  .collection-label { display: flex; align-items: center; justify-content: center; gap: .5rem; min-height: 44px; border-top: 2px solid var(--ink); font-size: .78rem; font-weight: 650; }
+  .collection-button:hover .collection-label { color: var(--primary); }
+  .collection-count { display: grid; place-items: center; min-width: 1.5rem; height: 1.5rem; padding: 0 .25rem; border-radius: 50%; background: var(--ink); color: var(--paper); font-size: .72rem; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .flight-card { position: fixed; top: 0; left: 0; z-index: 20; display: grid; align-content: center; gap: 2px; width: 112px; height: 78px; padding: 8px 10px; border: 1.5px solid var(--ink); border-radius: 3px; background: var(--paper); color: var(--ink); pointer-events: none; box-shadow: 3px 4px 0 #1c1b1a14; }
+  .flight-kicker { color: var(--primary); font-size: 8px; letter-spacing: .13em; font-weight: 700; }
+  .flight-card strong { font: 650 25px/1 var(--font-display); }
+  .flight-card > span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 10px; }
+  .is-catching :global(.dog-mouth-open) { display: block; }
+  .is-catching :global(.dog-mouth-closed) { display: none; }
+  .is-catching :global(.dog-ear) { transform-origin: 50% 30%; animation: ears-up 900ms ease-in-out; }
+  .is-catching :global(.dog-tail) { transform-origin: 68% 85%; animation: tail-wag 180ms ease-in-out 5 alternate; }
+  @keyframes ears-up { 0%, 100% { transform: translateY(0); } 45%, 65% { transform: translateY(-9px) rotate(-3deg); } }
+  @keyframes tail-wag { from { transform: rotate(-8deg); } to { transform: rotate(8deg); } }
+  dialog { width: min(100% - 2rem, 34rem); max-height: calc(100dvh - 2rem); padding: 1.5rem; overflow-y: auto; border: 2px solid var(--ink); background: var(--paper); color: var(--ink); }
+  dialog::backdrop { background: #1c1b1a55; }
+  .dialog-heading { display: flex; align-items: start; justify-content: space-between; gap: 1rem; }
+  h2 { margin: 0; font: 620 1.8rem/1.15 var(--font-display); letter-spacing: -.02em; }
+  .close-button { min-width: 44px; min-height: 44px; margin: -.5rem -.5rem 0 0; border: 0; background: none; font-size: 1.8rem; }
+  .dialog-intro, .empty-collection, .prototype-note, .storage-note { font-size: .88rem; line-height: 1.6; color: var(--text-muted); }
+  .empty-collection { padding: 1.4rem 0; border-block: 1px solid var(--divider); }
+  .collected-elections { list-style: none; padding: 0; margin: 1.25rem 0; }
+  .collected-elections :global(li) { display: flex; align-items: center; justify-content: space-between; gap: .5rem; padding: .5rem 0; border-bottom: 1px solid var(--divider); }
+  .collected-elections :global(a) { padding: .55rem 0; font-weight: 650; overflow-wrap: anywhere; }
+  .collected-elections :global(button) { flex-shrink: 0; min-width: 44px; min-height: 44px; border: 0; background: none; color: var(--text-muted); font: 1.4rem var(--font-body); cursor: pointer; }
+  .collected-elections :global(button:hover), .close-button:hover { color: var(--primary); }
+  .prototype-note { padding-top: 1rem; border-top: 1px solid var(--divider); }
+  .storage-note { font-size: .75rem; }
+  @media (max-width: 42rem) {
+    election-companion { margin-top: 1.1rem; }
+    .companion-shelf { grid-template-columns: minmax(0, 1fr) 7.2rem; gap: .5rem; }
+    .invitation-title { font-size: 1.25rem; }
+    .companion-message { font-size: .8rem; }
+    .collection-button :global(svg) { width: 7.2rem; }
+    .collection-label { gap: .35rem; font-size: .72rem; }
+    .collect-button { padding-inline: .7rem; font-size: .78rem; }
+    dialog { padding: 1rem; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .is-catching :global(.dog-ear), .is-catching :global(.dog-tail) { animation: none; }
+  }
+</style>

@@ -43,6 +43,18 @@ Match this level of completeness and clarity where the available data supports i
 
 Politically neutral: explain the data without endorsing parties or telling people how to vote. Use language ordinary readers can understand.
 
+## Playful Election Companion
+
+The site should become more playful through a useful, politically neutral dog
+companion. It observes meaningful interactions and catches elections added to a
+browser-local collection. The character combines a seated spaniel with a peeking
+pose; the initial drawings are directional studies, not approved final artwork.
+
+The first slice is collecting and reopening elections, not yet an analytical
+comparison. Optional historical stories follow only with curated sources. Preserve
+data readability, explicit denominators, keyboard access, and reduced-motion support.
+See [the agreed direction and progress](design/MASCOT.md) for scope and open work.
+
 ## Evidence on Hand
 
 - `public/data/berlin/2023.json`: the reference election dataset and source references.

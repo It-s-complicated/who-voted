@@ -1,0 +1,634 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-29T17:43:01.211650+00:00",
+  "title": "Design System: Who voted?",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Civic Red",
+        "tonalRamp": [
+          "oklch(from #c8102e 15% c h)",
+          "oklch(from #c8102e 26% c h)",
+          "oklch(from #c8102e 38% c h)",
+          "oklch(from #c8102e 49% c h)",
+          "oklch(from #c8102e 61% c h)",
+          "oklch(from #c8102e 72% c h)",
+          "oklch(from #c8102e 84% c h)",
+          "oklch(from #c8102e 95% c h)"
+        ],
+        "canonical": "#c8102e"
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Charcoal Ink",
+        "tonalRamp": [
+          "oklch(from #1c1b1a 15% c h)",
+          "oklch(from #1c1b1a 26% c h)",
+          "oklch(from #1c1b1a 38% c h)",
+          "oklch(from #1c1b1a 49% c h)",
+          "oklch(from #1c1b1a 61% c h)",
+          "oklch(from #1c1b1a 72% c h)",
+          "oklch(from #1c1b1a 84% c h)",
+          "oklch(from #1c1b1a 95% c h)"
+        ],
+        "canonical": "#1c1b1a"
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "Warm Paper",
+        "tonalRamp": [
+          "oklch(from #fdfcfa 15% c h)",
+          "oklch(from #fdfcfa 26% c h)",
+          "oklch(from #fdfcfa 38% c h)",
+          "oklch(from #fdfcfa 49% c h)",
+          "oklch(from #fdfcfa 61% c h)",
+          "oklch(from #fdfcfa 72% c h)",
+          "oklch(from #fdfcfa 84% c h)",
+          "oklch(from #fdfcfa 95% c h)"
+        ],
+        "canonical": "#fdfcfa"
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Surface",
+        "tonalRamp": [
+          "oklch(from #fff 15% c h)",
+          "oklch(from #fff 26% c h)",
+          "oklch(from #fff 38% c h)",
+          "oklch(from #fff 49% c h)",
+          "oklch(from #fff 61% c h)",
+          "oklch(from #fff 72% c h)",
+          "oklch(from #fff 84% c h)",
+          "oklch(from #fff 95% c h)"
+        ],
+        "canonical": "#fff"
+      },
+      "caption-surface": {
+        "role": "neutral",
+        "displayName": "Caption surface",
+        "tonalRamp": [
+          "oklch(from #faf8f5 15% c h)",
+          "oklch(from #faf8f5 26% c h)",
+          "oklch(from #faf8f5 38% c h)",
+          "oklch(from #faf8f5 49% c h)",
+          "oklch(from #faf8f5 61% c h)",
+          "oklch(from #faf8f5 72% c h)",
+          "oklch(from #faf8f5 84% c h)",
+          "oklch(from #faf8f5 95% c h)"
+        ],
+        "canonical": "#faf8f5"
+      },
+      "text-muted": {
+        "role": "neutral",
+        "displayName": "Text muted",
+        "tonalRamp": [
+          "oklch(from #55524d 15% c h)",
+          "oklch(from #55524d 26% c h)",
+          "oklch(from #55524d 38% c h)",
+          "oklch(from #55524d 49% c h)",
+          "oklch(from #55524d 61% c h)",
+          "oklch(from #55524d 72% c h)",
+          "oklch(from #55524d 84% c h)",
+          "oklch(from #55524d 95% c h)"
+        ],
+        "canonical": "#55524d"
+      },
+      "text-secondary": {
+        "role": "neutral",
+        "displayName": "Text secondary",
+        "tonalRamp": [
+          "oklch(from #6b6760 15% c h)",
+          "oklch(from #6b6760 26% c h)",
+          "oklch(from #6b6760 38% c h)",
+          "oklch(from #6b6760 49% c h)",
+          "oklch(from #6b6760 61% c h)",
+          "oklch(from #6b6760 72% c h)",
+          "oklch(from #6b6760 84% c h)",
+          "oklch(from #6b6760 95% c h)"
+        ],
+        "canonical": "#6b6760"
+      },
+      "divider": {
+        "role": "neutral",
+        "displayName": "Divider",
+        "tonalRamp": [
+          "oklch(from #c9c5be 15% c h)",
+          "oklch(from #c9c5be 26% c h)",
+          "oklch(from #c9c5be 38% c h)",
+          "oklch(from #c9c5be 49% c h)",
+          "oklch(from #c9c5be 61% c h)",
+          "oklch(from #c9c5be 72% c h)",
+          "oklch(from #c9c5be 84% c h)",
+          "oklch(from #c9c5be 95% c h)"
+        ],
+        "canonical": "#c9c5be"
+      },
+      "table-divider": {
+        "role": "neutral",
+        "displayName": "Table divider",
+        "tonalRamp": [
+          "oklch(from #e4e1db 15% c h)",
+          "oklch(from #e4e1db 26% c h)",
+          "oklch(from #e4e1db 38% c h)",
+          "oklch(from #e4e1db 49% c h)",
+          "oklch(from #e4e1db 61% c h)",
+          "oklch(from #e4e1db 72% c h)",
+          "oklch(from #e4e1db 84% c h)",
+          "oklch(from #e4e1db 95% c h)"
+        ],
+        "canonical": "#e4e1db"
+      },
+      "callout-line": {
+        "role": "neutral",
+        "displayName": "Callout line",
+        "tonalRamp": [
+          "oklch(from #8f8b84 15% c h)",
+          "oklch(from #8f8b84 26% c h)",
+          "oklch(from #8f8b84 38% c h)",
+          "oklch(from #8f8b84 49% c h)",
+          "oklch(from #8f8b84 61% c h)",
+          "oklch(from #8f8b84 72% c h)",
+          "oklch(from #8f8b84 84% c h)",
+          "oklch(from #8f8b84 95% c h)"
+        ],
+        "canonical": "#8f8b84"
+      },
+      "residents": {
+        "role": "secondary",
+        "displayName": "Residents",
+        "tonalRamp": [
+          "oklch(from #2a3861 15% c h)",
+          "oklch(from #2a3861 26% c h)",
+          "oklch(from #2a3861 38% c h)",
+          "oklch(from #2a3861 49% c h)",
+          "oklch(from #2a3861 61% c h)",
+          "oklch(from #2a3861 72% c h)",
+          "oklch(from #2a3861 84% c h)",
+          "oklch(from #2a3861 95% c h)"
+        ],
+        "canonical": "#2a3861"
+      },
+      "eligible": {
+        "role": "secondary",
+        "displayName": "Eligible",
+        "tonalRamp": [
+          "oklch(from #5b84bb 15% c h)",
+          "oklch(from #5b84bb 26% c h)",
+          "oklch(from #5b84bb 38% c h)",
+          "oklch(from #5b84bb 49% c h)",
+          "oklch(from #5b84bb 61% c h)",
+          "oklch(from #5b84bb 72% c h)",
+          "oklch(from #5b84bb 84% c h)",
+          "oklch(from #5b84bb 95% c h)"
+        ],
+        "canonical": "#5b84bb"
+      },
+      "voters": {
+        "role": "secondary",
+        "displayName": "Voters",
+        "tonalRamp": [
+          "oklch(from #7c9dc9 15% c h)",
+          "oklch(from #7c9dc9 26% c h)",
+          "oklch(from #7c9dc9 38% c h)",
+          "oklch(from #7c9dc9 49% c h)",
+          "oklch(from #7c9dc9 61% c h)",
+          "oklch(from #7c9dc9 72% c h)",
+          "oklch(from #7c9dc9 84% c h)",
+          "oklch(from #7c9dc9 95% c h)"
+        ],
+        "canonical": "#7c9dc9"
+      },
+      "valid-votes": {
+        "role": "secondary",
+        "displayName": "Valid votes",
+        "tonalRamp": [
+          "oklch(from #cad4ed 15% c h)",
+          "oklch(from #cad4ed 26% c h)",
+          "oklch(from #cad4ed 38% c h)",
+          "oklch(from #cad4ed 49% c h)",
+          "oklch(from #cad4ed 61% c h)",
+          "oklch(from #cad4ed 72% c h)",
+          "oklch(from #cad4ed 84% c h)",
+          "oklch(from #cad4ed 95% c h)"
+        ],
+        "canonical": "#cad4ed"
+      },
+      "valid-ballots": {
+        "role": "secondary",
+        "displayName": "Valid Ballots",
+        "tonalRamp": [
+          "oklch(from #b9cbe9 15% c h)",
+          "oklch(from #b9cbe9 26% c h)",
+          "oklch(from #b9cbe9 38% c h)",
+          "oklch(from #b9cbe9 49% c h)",
+          "oklch(from #b9cbe9 61% c h)",
+          "oklch(from #b9cbe9 72% c h)",
+          "oklch(from #b9cbe9 84% c h)",
+          "oklch(from #b9cbe9 95% c h)"
+        ],
+        "canonical": "#b9cbe9"
+      },
+      "no-valid-vote": {
+        "role": "secondary",
+        "displayName": "No valid vote",
+        "tonalRamp": [
+          "oklch(from #d8e2f3 15% c h)",
+          "oklch(from #d8e2f3 26% c h)",
+          "oklch(from #d8e2f3 38% c h)",
+          "oklch(from #d8e2f3 49% c h)",
+          "oklch(from #d8e2f3 61% c h)",
+          "oklch(from #d8e2f3 72% c h)",
+          "oklch(from #d8e2f3 84% c h)",
+          "oklch(from #d8e2f3 95% c h)"
+        ],
+        "canonical": "#d8e2f3"
+      },
+      "no-ballot-or-unused-votes": {
+        "role": "secondary",
+        "displayName": "No Ballot or Unused Votes",
+        "tonalRamp": [
+          "oklch(from #e4ecf8 15% c h)",
+          "oklch(from #e4ecf8 26% c h)",
+          "oklch(from #e4ecf8 38% c h)",
+          "oklch(from #e4ecf8 49% c h)",
+          "oklch(from #e4ecf8 61% c h)",
+          "oklch(from #e4ecf8 72% c h)",
+          "oklch(from #e4ecf8 84% c h)",
+          "oklch(from #e4ecf8 95% c h)"
+        ],
+        "canonical": "#e4ecf8"
+      },
+      "not-eligible": {
+        "role": "neutral",
+        "displayName": "Not eligible",
+        "tonalRamp": [
+          "oklch(from #918e8e 15% c h)",
+          "oklch(from #918e8e 26% c h)",
+          "oklch(from #918e8e 38% c h)",
+          "oklch(from #918e8e 49% c h)",
+          "oklch(from #918e8e 61% c h)",
+          "oklch(from #918e8e 72% c h)",
+          "oklch(from #918e8e 84% c h)",
+          "oklch(from #918e8e 95% c h)"
+        ],
+        "canonical": "#918e8e"
+      },
+      "non-voters": {
+        "role": "neutral",
+        "displayName": "Non voters",
+        "tonalRamp": [
+          "oklch(from #b5b4b4 15% c h)",
+          "oklch(from #b5b4b4 26% c h)",
+          "oklch(from #b5b4b4 38% c h)",
+          "oklch(from #b5b4b4 49% c h)",
+          "oklch(from #b5b4b4 61% c h)",
+          "oklch(from #b5b4b4 72% c h)",
+          "oklch(from #b5b4b4 84% c h)",
+          "oklch(from #b5b4b4 95% c h)"
+        ],
+        "canonical": "#b5b4b4"
+      },
+      "under-age": {
+        "role": "neutral",
+        "displayName": "Under age",
+        "tonalRamp": [
+          "oklch(from #aaa8a8 15% c h)",
+          "oklch(from #aaa8a8 26% c h)",
+          "oklch(from #aaa8a8 38% c h)",
+          "oklch(from #aaa8a8 49% c h)",
+          "oklch(from #aaa8a8 61% c h)",
+          "oklch(from #aaa8a8 72% c h)",
+          "oklch(from #aaa8a8 84% c h)",
+          "oklch(from #aaa8a8 95% c h)"
+        ],
+        "canonical": "#aaa8a8"
+      },
+      "non-german-adults": {
+        "role": "neutral",
+        "displayName": "Non german adults",
+        "tonalRamp": [
+          "oklch(from #c8c6c7 15% c h)",
+          "oklch(from #c8c6c7 26% c h)",
+          "oklch(from #c8c6c7 38% c h)",
+          "oklch(from #c8c6c7 49% c h)",
+          "oklch(from #c8c6c7 61% c h)",
+          "oklch(from #c8c6c7 72% c h)",
+          "oklch(from #c8c6c7 84% c h)",
+          "oklch(from #c8c6c7 95% c h)"
+        ],
+        "canonical": "#c8c6c7"
+      },
+      "party-cdu": {
+        "role": "tertiary",
+        "displayName": "Party cdu",
+        "tonalRamp": [
+          "oklch(from #202831 15% c h)",
+          "oklch(from #202831 26% c h)",
+          "oklch(from #202831 38% c h)",
+          "oklch(from #202831 49% c h)",
+          "oklch(from #202831 61% c h)",
+          "oklch(from #202831 72% c h)",
+          "oklch(from #202831 84% c h)",
+          "oklch(from #202831 95% c h)"
+        ],
+        "canonical": "#202831"
+      },
+      "party-bsw": {
+        "role": "tertiary",
+        "displayName": "BSW",
+        "tonalRamp": [
+          "oklch(from #792351 15% c h)",
+          "oklch(from #792351 26% c h)",
+          "oklch(from #792351 38% c h)",
+          "oklch(from #792351 49% c h)",
+          "oklch(from #792351 61% c h)",
+          "oklch(from #792351 72% c h)",
+          "oklch(from #792351 84% c h)",
+          "oklch(from #792351 95% c h)"
+        ],
+        "canonical": "#792351"
+      },
+      "party-freie-waehler": {
+        "role": "tertiary",
+        "displayName": "FREIE WÄHLER",
+        "tonalRamp": [
+          "oklch(from #d88023 15% c h)",
+          "oklch(from #d88023 26% c h)",
+          "oklch(from #d88023 38% c h)",
+          "oklch(from #d88023 49% c h)",
+          "oklch(from #d88023 61% c h)",
+          "oklch(from #d88023 72% c h)",
+          "oklch(from #d88023 84% c h)",
+          "oklch(from #d88023 95% c h)"
+        ],
+        "canonical": "#d88023"
+      },
+      "party-ssw": {
+        "role": "tertiary",
+        "displayName": "SSW",
+        "tonalRamp": [
+          "oklch(from #246895 15% c h)",
+          "oklch(from #246895 26% c h)",
+          "oklch(from #246895 38% c h)",
+          "oklch(from #246895 49% c h)",
+          "oklch(from #246895 61% c h)",
+          "oklch(from #246895 72% c h)",
+          "oklch(from #246895 84% c h)",
+          "oklch(from #246895 95% c h)"
+        ],
+        "canonical": "#246895"
+      },
+      "party-spd": {
+        "role": "tertiary",
+        "displayName": "Party spd",
+        "tonalRamp": [
+          "oklch(from #e54040 15% c h)",
+          "oklch(from #e54040 26% c h)",
+          "oklch(from #e54040 38% c h)",
+          "oklch(from #e54040 49% c h)",
+          "oklch(from #e54040 61% c h)",
+          "oklch(from #e54040 72% c h)",
+          "oklch(from #e54040 84% c h)",
+          "oklch(from #e54040 95% c h)"
+        ],
+        "canonical": "#e54040"
+      },
+      "party-gruene": {
+        "role": "tertiary",
+        "displayName": "Party gruene",
+        "tonalRamp": [
+          "oklch(from #30a84b 15% c h)",
+          "oklch(from #30a84b 26% c h)",
+          "oklch(from #30a84b 38% c h)",
+          "oklch(from #30a84b 49% c h)",
+          "oklch(from #30a84b 61% c h)",
+          "oklch(from #30a84b 72% c h)",
+          "oklch(from #30a84b 84% c h)",
+          "oklch(from #30a84b 95% c h)"
+        ],
+        "canonical": "#30a84b"
+      },
+      "party-linke": {
+        "role": "tertiary",
+        "displayName": "Party linke",
+        "tonalRamp": [
+          "oklch(from #bd4598 15% c h)",
+          "oklch(from #bd4598 26% c h)",
+          "oklch(from #bd4598 38% c h)",
+          "oklch(from #bd4598 49% c h)",
+          "oklch(from #bd4598 61% c h)",
+          "oklch(from #bd4598 72% c h)",
+          "oklch(from #bd4598 84% c h)",
+          "oklch(from #bd4598 95% c h)"
+        ],
+        "canonical": "#bd4598"
+      },
+      "party-afd": {
+        "role": "tertiary",
+        "displayName": "Party afd",
+        "tonalRamp": [
+          "oklch(from #2996cc 15% c h)",
+          "oklch(from #2996cc 26% c h)",
+          "oklch(from #2996cc 38% c h)",
+          "oklch(from #2996cc 49% c h)",
+          "oklch(from #2996cc 61% c h)",
+          "oklch(from #2996cc 72% c h)",
+          "oklch(from #2996cc 84% c h)",
+          "oklch(from #2996cc 95% c h)"
+        ],
+        "canonical": "#2996cc"
+      },
+      "party-fdp": {
+        "role": "tertiary",
+        "displayName": "Party fdp",
+        "tonalRamp": [
+          "oklch(from #f3d330 15% c h)",
+          "oklch(from #f3d330 26% c h)",
+          "oklch(from #f3d330 38% c h)",
+          "oklch(from #f3d330 49% c h)",
+          "oklch(from #f3d330 61% c h)",
+          "oklch(from #f3d330 72% c h)",
+          "oklch(from #f3d330 84% c h)",
+          "oklch(from #f3d330 95% c h)"
+        ],
+        "canonical": "#f3d330"
+      },
+      "party-biw": {
+        "role": "tertiary",
+        "displayName": "BIW",
+        "tonalRamp": [
+          "oklch(from #005ab0 15% c h)",
+          "oklch(from #005ab0 26% c h)",
+          "oklch(from #005ab0 38% c h)",
+          "oklch(from #005ab0 49% c h)",
+          "oklch(from #005ab0 61% c h)",
+          "oklch(from #005ab0 72% c h)",
+          "oklch(from #005ab0 84% c h)",
+          "oklch(from #005ab0 95% c h)"
+        ],
+        "canonical": "#005ab0"
+      },
+      "party-fallback": {
+        "role": "tertiary",
+        "displayName": "Other Named Party",
+        "tonalRamp": [
+          "oklch(from #76716b 15% c h)",
+          "oklch(from #76716b 26% c h)",
+          "oklch(from #76716b 38% c h)",
+          "oklch(from #76716b 49% c h)",
+          "oklch(from #76716b 61% c h)",
+          "oklch(from #76716b 72% c h)",
+          "oklch(from #76716b 84% c h)",
+          "oklch(from #76716b 95% c h)"
+        ],
+        "canonical": "#76716b"
+      },
+      "party-other": {
+        "role": "tertiary",
+        "displayName": "Party other",
+        "tonalRamp": [
+          "oklch(from #b2b2b2 15% c h)",
+          "oklch(from #b2b2b2 26% c h)",
+          "oklch(from #b2b2b2 38% c h)",
+          "oklch(from #b2b2b2 49% c h)",
+          "oklch(from #b2b2b2 61% c h)",
+          "oklch(from #b2b2b2 72% c h)",
+          "oklch(from #b2b2b2 84% c h)",
+          "oklch(from #b2b2b2 95% c h)"
+        ],
+        "canonical": "#b2b2b2"
+      }
+    },
+    "shadows": [
+      {
+        "name": "chart-popover",
+        "value": "0 6px 18px #1c1b1a26",
+        "purpose": "Lift the chart export menu above the flat page."
+      },
+      {
+        "name": "social-preview-type",
+        "value": "0 2px 12px rgba(28, 27, 26, 0.15)",
+        "purpose": "Separate the social preview title from faint chart bands."
+      }
+    ],
+    "motion": [],
+    "breakpoints": [
+      {
+        "name": "compact-header",
+        "value": "42rem"
+      }
+    ],
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Page headlines."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Reading text and data."
+      },
+      "timeline-year": {
+        "displayName": "Timeline year",
+        "purpose": "Year headings on the home index."
+      },
+      "index-link": {
+        "displayName": "Index link",
+        "purpose": "Prominent election and state links."
+      }
+    }
+  },
+  "components": [
+    {
+      "name": "Year selector",
+      "kind": "input",
+      "refersTo": "year-select",
+      "description": "Native year switcher on election pages.",
+      "html": "<label class=\"ds-year\">Wahljahr<select><option>2026</option><option>2023</option></select></label>",
+      "css": ".ds-year{display:grid;gap:.4rem;min-width:8rem;color:var(--text-muted);font:650 .72rem var(--font-body);letter-spacing:.1em;text-transform:uppercase}.ds-year select{width:100%;padding:.6rem .7rem;color:inherit;background:var(--surface);border:1px solid var(--ink);border-radius:0;font:inherit}.ds-year select:focus-visible{outline:2px solid var(--primary);outline-offset:2px}"
+    },
+    {
+      "name": "Index link row",
+      "kind": "nav",
+      "description": "State and election links separated by editorial rules.",
+      "html": "<div class=\"ds-index-row\"><a href=\"#\">Berlin</a><span>Wahlbeteiligung als Diagramm</span></div>",
+      "css": ".ds-index-row{display:flex;align-items:baseline;flex-wrap:wrap;gap:.25rem 1.5rem;padding:1rem 0;border-bottom:1px solid var(--divider);font-family:var(--font-body)}.ds-index-row a{padding:.25rem 0;color:var(--ink);font-size:1.5rem;font-weight:600;text-decoration-color:var(--primary);text-underline-offset:.18em}.ds-index-row a:hover{color:var(--primary)}.ds-index-row a:focus-visible{outline:2px solid var(--primary);outline-offset:2px}.ds-index-row span{color:var(--text-muted)}"
+    },
+    {
+      "name": "Breadcrumbs",
+      "kind": "nav",
+      "description": "Compact location trail above interior-page headers.",
+      "html": "<nav class=\"ds-breadcrumbs\" aria-label=\"Breadcrumbs\"><a href=\"#\">Startseite</a><span>/</span><a href=\"#\">Berlin</a><span>/</span><span aria-current=\"page\">2023</span></nav>",
+      "css": ".ds-breadcrumbs{display:flex;flex-wrap:wrap;gap:.35rem .7rem;color:var(--text-muted);font:.88rem var(--font-body)}.ds-breadcrumbs a{color:inherit;text-decoration-color:var(--primary);text-underline-offset:.18em}.ds-breadcrumbs a:hover{color:var(--primary)}.ds-breadcrumbs a:focus-visible{outline:2px solid var(--primary);outline-offset:2px}.ds-breadcrumbs span:not([aria-current]){color:var(--callout-line)}"
+    },
+    {
+      "name": "Sankey figure caption",
+      "kind": "custom",
+      "refersTo": "figure-caption",
+      "description": "Warm methodology panel beneath the white chart area.",
+      "html": "<figure class=\"ds-figure\"><div class=\"ds-chart\">Wahlbeteiligung · Diagramm</div><figcaption>Bevölkerungsdaten: Stand und Schätzungen sind zur Grafik erläutert.</figcaption></figure>",
+      "css": ".ds-figure{margin:0;overflow:hidden;background:var(--surface);border:1px solid var(--ink);color:var(--ink);font-family:var(--font-body)}.ds-chart{min-height:8rem;padding:1.1rem}.ds-figure figcaption{padding:.9rem 1.1rem 1rem;color:var(--text-muted);background:var(--caption-surface);border-top:1px solid var(--ink);font-size:.8rem;line-height:1.55}"
+    },
+    {
+      "name": "Chart export menu",
+      "kind": "custom",
+      "refersTo": "chart-menu",
+      "description": "SVG and PNG downloads in the chart context menu.",
+      "html": "<div class=\"ds-chart-menu\" role=\"menu\"><button role=\"menuitem\">SVG herunterladen</button><button role=\"menuitem\">PNG herunterladen</button></div>",
+      "css": ".ds-chart-menu{width:max-content;min-width:12rem;padding:.35rem;color:var(--ink);background:var(--surface);border:1px solid var(--divider);box-shadow:0 6px 18px #1c1b1a26;font:.85rem var(--font-body)}.ds-chart-menu button{display:block;width:100%;padding:.55rem .65rem;color:inherit;background:transparent;border:0;text-align:left;font:inherit;cursor:pointer}.ds-chart-menu button:hover,.ds-chart-menu button:focus-visible{background:var(--caption-surface)}.ds-chart-menu button:focus-visible{outline:2px solid var(--primary);outline-offset:2px}"
+    },
+    {
+      "name": "Data disclosure",
+      "kind": "custom",
+      "refersTo": "data-disclosure",
+      "description": "Native expandable data table with tabular figures.",
+      "html": "<details class=\"ds-data\"><summary>Daten als Tabelle</summary><div><table><thead><tr><th>Gruppe</th><th>Anzahl</th></tr></thead><tbody><tr><th scope=\"row\">Einwohner:innen</th><td>3.850.809</td></tr><tr><th scope=\"row\">Wahlberechtigt</th><td>2.431.776</td></tr></tbody></table></div></details>",
+      "css": ".ds-data{background:var(--surface);border:1px solid var(--ink);color:var(--ink);font-family:var(--font-body)}.ds-data summary{padding:.85rem 1.1rem;cursor:pointer;font-weight:650}.ds-data summary::marker{color:var(--primary)}.ds-data>div{overflow-x:auto;padding:0 1.1rem 1.1rem}.ds-data table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}.ds-data th,.ds-data td{padding:.55rem .65rem;border-bottom:1px solid var(--table-divider);text-align:right}.ds-data th:first-child{text-align:left}.ds-data thead th{color:var(--text-muted);font-size:.72rem;font-weight:650;text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid var(--ink)}.ds-data :focus-visible{outline:2px solid var(--primary);outline-offset:2px}"
+    },
+    {
+      "name": "Source links",
+      "kind": "custom",
+      "refersTo": "source-link",
+      "description": "Muted footer with official source links and editorial top rule.",
+      "html": "<footer class=\"ds-sources\"><p>Quellen: <a href=\"#\">Amtliche Wahldaten</a> und <a href=\"#\">Bevölkerungsdaten</a>.</p></footer>",
+      "css": ".ds-sources{display:grid;gap:.35rem;margin-top:1.5rem;padding-top:.9rem;color:var(--text-muted);font:.82rem/1.5 var(--font-body);border-top:3px solid var(--ink)}.ds-sources p{margin:0}.ds-sources a{color:inherit;text-decoration-color:var(--primary);text-decoration-thickness:1px;text-underline-offset:.18em}.ds-sources a:hover{color:var(--primary)}.ds-sources a:focus-visible{outline:2px solid var(--primary);outline-offset:2px}"
+    },
+    {
+      "name": "Social preview card",
+      "kind": "custom",
+      "description": "Fixed-format sharing image with a Fraunces title over faint chart bands.",
+      "html": "<div class=\"ds-preview\"><div class=\"ds-preview-bands\"><i></i><i></i><i></i></div><div class=\"ds-preview-copy\"><p>Wer hat gewählt?</p><h1>Berlin</h1></div></div>",
+      "css": ".ds-preview{position:relative;display:flex;align-items:center;width:480px;height:252px;overflow:hidden;background:var(--paper);color:var(--ink);font-family:var(--font-display),Georgia,serif}.ds-preview-bands{position:absolute;inset:29px 26px;display:flex;justify-content:space-around;opacity:.35}.ds-preview-bands i{width:19px;height:100%;background:#2a3861}.ds-preview-bands i:nth-child(2){background:#5b84bb}.ds-preview-bands i:nth-child(3){background:#7c9dc9}.ds-preview-copy{position:relative;margin-left:29px;text-shadow:0 2px 12px rgba(28,27,26,.15)}.ds-preview-copy p{margin:0;color:var(--primary);font-size:12px;font-weight:620}.ds-preview-copy h1{margin:7px 0 0;font-size:38px;font-weight:620;line-height:1.02}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Election Ledger",
+    "overview": "An editorial, factual, restrained system: expressive serif headlines sit above precise sans-serif data on warm paper. Strong rules frame the content; the visualization supplies the broad areas of color. Pages and controls are flat, square, and restrained.\n\nThis records the current shared system in `src/styles/global.css`, the index and election pages, `src/components/ElectionChart.astro`, and the social preview card. Global interface colors are CSS custom properties; chart category colors remain literal values in the election page. The metaphor and color names describe the observed design. Political neutrality remains a binding commitment from `PRODUCT.md`.",
+    "keyCharacteristics": [
+      "Fraunces headlines paired with system sans-serif reading and data text.",
+      "Warm paper, white panels, and dark editorial rules.",
+      "Small red interface accents; semantic color in the chart.",
+      "Native controls, rule-led index pages, and horizontally scrollable data presentation."
+    ],
+    "rules": [
+      {
+        "name": "The Data Color Rule",
+        "body": "Preserve category-to-color mappings and keep interface red distinct from the SPD data red.",
+        "section": "colors"
+      }
+    ],
+    "dos": [
+      "**Do** reserve Fraunces for display headlines and use sans-serif for reading, controls, and data.",
+      "**Do** preserve semantic chart colors, explicit labels, and the accompanying data table.",
+      "**Do** retain square borders, warm neutral surfaces, and visible keyboard focus.",
+      "**Do** keep wide diagrams and tables inside their own scroll containers.",
+      "**Do** keep the index, breadcrumb, and election pages within the same editorial column and link treatment."
+    ],
+    "donts": [
+      "**Don't** use party colors as interface action or status colors.",
+      "**Don't** replace native disclosure and select behavior with decorative imitations.",
+      "**Don't** treat synthesized preview color ramps as implemented palette tokens.",
+      "**Don't** apply the chart export popover's shadow to ordinary panels."
+    ]
+  }
+}
