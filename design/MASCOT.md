@@ -10,8 +10,9 @@ and may eventually point out connections between them.
 
 - A mostly white spaniel with long, floppy black ears and a rounded,
   beagle-like muzzle; not a basset's droopy face and not a copy of Snoopy.
-- Combine concept **01**'s seated body/head tilt with concept **03**'s peeking
-  face and paws. Expressions should use ears, gaze, posture, and anticipation.
+- Use a side-facing, articulated standing silhouette with a lively tail and
+  expressive head. Separate legs, ears, head, and tail make the running and
+  airborne poses readable instead of merely moving a seated icon.
 - The first [concept sheet](mascot-concepts.png) ([SVG](mascot-concepts.svg))
   established direction, **not an accepted quality bar**. The user found the
   illustrations lackluster. Do not treat those drawings as finished assets.
@@ -23,9 +24,10 @@ and may eventually point out connections between them.
 
 1. **Attention:** occasional glances toward meaningful hovered or focused
    controls. Do not continuously follow every pointer movement.
-2. **Collection:** adding an election sends a small card with its place/year
-   toward the dog. It anticipates, jumps, catches, and settles. The dog is also
-   the entry point to the collection.
+2. **Collection:** adding an election throws a miniature of its actual chart,
+   labelled with place/year, toward the dog. The dog runs a few steps toward the
+   throw, jumps, catches it at the peak, lands, and returns to rest. The dog is
+   also the entry point to the collection.
 3. **Discovery, later:** optional, contextual stories about historic elections
    or similarities. Use curated sources, not improvised historical claims.
    Stories must be dismissible and infrequent, not hover-triggered interruptions.
@@ -34,7 +36,8 @@ and may eventually point out connections between them.
 
 - Register the addition immediately. Animation is feedback, never a prerequisite
   for storing the election or opening the collection.
-- Anticipation → card arc → airborne catch → settle, without a long celebration.
+- Anticipation → short run → card arc → airborne catch → landing → settle,
+  with the card and muzzle aligned at contact and no long celebration.
 - Do not add the same election twice. A collected election can be removed.
 - Honour reduced motion; the collection remains equally usable without flight,
   jump, or gaze movement. Keyboard users get the same actions and status feedback.
@@ -47,7 +50,7 @@ Build the collection interaction before historical stories or analytical
 comparisons:
 
 - One shared companion on home, state, and election pages.
-- An add button on election pages; a place/year card flies to the dog.
+- An add button on election pages; a miniature of the page's chart flies to the dog.
 - A collection dialog with election links and individual removal.
 - Browser-local persistence of election IDs only. Allowlist IDs against the
   current content collection; never trust stored labels or URLs.
@@ -75,8 +78,8 @@ historical facts should be fabricated to make a demonstration look complete.
 ## Implementation and verification
 
 - `src/components/ElectionCompanion.astro`: shared collection shelf, dialog,
-  persistence, gaze, and cancellable flight/jump choreography.
-- `src/components/ElectionDog.astro`: articulated vector behaviour prototype.
+  persistence, gaze, chart thumbnail, and cancellable run/jump/catch choreography.
+- `src/components/ElectionDog.astro`: articulated standing vector behaviour prototype.
 - `src/data/comparison.ts`: allowlisted stored-ID parser.
 - `scripts/check-comparison.mjs`: malformed input, duplicates, order, stale IDs,
   and untrusted values. Included in `pnpm test`.
@@ -87,10 +90,11 @@ or warnings), production build, all 16 state pages, and 19 election diagrams.
 The built production site also passed a collect/persist smoke check with no
 browser errors. [Production-build screenshot](companion-prototype.png).
 
-Local Chrome checks exercised actual card flight and body movement, duplicate
-prevention, collection links, year navigation with Astro's client router, reload
-persistence, removal and empty state, Escape/focus restoration, keyboard-triggered
-gaze, reduced motion, and widths of 320 and 390 pixels without page overflow.
+Local Chrome checks exercised actual chart flight, running leg movement, an
+airborne catch with the card and muzzle aligned, landing, duplicate prevention,
+collection links, year navigation with Astro's client router, reload persistence,
+removal and empty state, Escape/focus restoration, keyboard-triggered gaze,
+reduced motion, and widths of 320 and 390 pixels without page overflow.
 Simulated blocked reads and quota failures kept the collection usable; write
 failure also preserved selections across in-app navigation and recovered when
 storage became available.

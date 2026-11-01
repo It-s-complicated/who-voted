@@ -79,9 +79,9 @@ and converts them. `pnpm test` also checks demographic parser failures, invalid
 metadata, vote conservation, generated pages and Sankey geometry.
 ## Election companion prototype
 
-A shared spaniel companion collects elections from their results pages. The dog
-catches a place/year card; its collection button opens a keyboard-accessible dialog
-with links and removal. IDs are stored locally in this browser, validated against
+A shared spaniel companion collects elections from their results pages. A miniature
+of the actual chart flies toward the dog, which runs, jumps, and catches it. The
+collection button opens a keyboard-accessible dialog with links and removal. IDs are stored locally in this browser, validated against
 the current election catalog. If storage is unavailable, the collection stays in
 memory during in-app navigation. Reduced motion skips animation and gaze changes.
 This first slice does not yet compare charts side by side or tell historical stories.
