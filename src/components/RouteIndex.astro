@@ -4,6 +4,7 @@ import { Font } from "astro:assets";
 import { renderCard } from "astro-cards/runtime";
 import "../styles/global.css";
 import Breadcrumbs from "./Breadcrumbs.astro";
+import ElectionCompanion from "./ElectionCompanion.astro";
 
 interface Link {
   href: string;
@@ -53,6 +54,7 @@ const ogCard = await renderCard("og", { heading: title });
         <h1>{title}</h1>
         <p>{description}</p>
       </header>
+      <ElectionCompanion />
       <slot />
       {Astro.slots.has("default") ? null : links && links.length > 0 ? (
         <ul>

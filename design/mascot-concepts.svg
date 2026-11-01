@@ -1,0 +1,141 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1080" viewBox="0 0 1600 1080" role="img" aria-labelledby="title description">
+  <title id="title">Who voted? — three original spaniel mascot concepts</title>
+  <desc id="description">Three black-and-white dogs with long floppy ears and rounded, beagle-like faces: a seated companion, an inquisitive three-quarter portrait, and a small dog peeking over a rule. An editorial concept sheet in the site's paper, ink, and red palette.</desc>
+  <defs>
+    <style>
+      .ink { fill: #1c1b1a; }
+      .red { fill: #c8102e; }
+      .muted { fill: #6b6760; }
+      .sans { font-family: 'Liberation Sans', Arial, sans-serif; }
+      .serif { font-family: 'Liberation Serif', Georgia, serif; }
+      .eyebrow { font-size: 13px; font-weight: 700; letter-spacing: 2px; }
+      .name { font-size: 32px; }
+      .copy { font-size: 18px; fill: #55524d; }
+      .fine { font-size: 14px; fill: #6b6760; }
+      .dog { stroke: #1c1b1a; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
+      .white { fill: #fff; }
+      .black { fill: #1c1b1a; }
+      .line { fill: none; }
+    </style>
+
+    <symbol id="companion" viewBox="0 0 360 360">
+      <g class="dog">
+        <path class="white" d="M231 276 C256 273 272 252 278 238 C284 224 296 229 292 244 C288 269 267 289 239 293 Z"/>
+        <path class="black" d="M278 238 C284 224 296 229 292 244 C290 254 285 261 281 266 L269 256 C273 250 276 243 278 238 Z"/>
+        <path class="white" d="M146 174 C120 197 112 231 115 279 C100 290 98 307 108 320 C115 330 139 329 156 327 L225 327 C248 329 259 321 251 306 L237 285 C245 235 226 197 208 180 Z"/>
+        <path class="black" stroke="none" d="M229 224 C244 245 243 270 237 285 L249 304 C223 313 208 288 211 265 C212 248 219 232 229 224 Z"/>
+        <path class="line" d="M150 238 L146 312 M194 239 L201 312"/>
+        <path class="white" d="M137 306 C146 301 158 304 163 311 L165 325 L126 325 C125 316 129 309 137 306 Z"/>
+        <path class="white" d="M194 307 C203 301 218 305 223 314 L224 325 L184 325 C183 317 187 310 194 307 Z"/>
+        <path class="line" stroke-width="2.5" d="M138 318 L138 325 M149 318 L149 325 M197 318 L197 325 M208 318 L208 325"/>
+        <path fill="#c8102e" d="M137 181 C158 194 193 196 215 182 L216 198 C189 211 156 210 134 197 Z"/>
+        <circle cx="178" cy="207" r="7" fill="#fdfcfa" stroke-width="3"/>
+        <g transform="rotate(-7 180 130)">
+          <path class="black" d="M119 76 C91 67 75 91 76 126 C78 155 65 188 71 221 C75 248 88 269 104 264 C126 259 132 233 127 201 L139 105 Z"/>
+          <path class="black" d="M220 73 C249 64 269 84 269 117 C269 146 267 164 273 190 C280 221 267 260 250 264 C233 267 219 245 222 215 L213 110 Z"/>
+          <path class="white" d="M115 100 C115 65 137 47 174 47 C212 46 240 67 240 103 L236 145 C234 174 215 193 180 197 C145 197 120 181 116 151 Z"/>
+          <path class="black" stroke="none" d="M115 102 C115 73 129 56 152 51 C145 69 139 90 140 110 C132 113 123 110 115 102 Z"/>
+          <path class="line" stroke-width="3" d="M146 111 Q154 106 161 110 M199 109 Q207 104 214 108"/>
+          <ellipse class="black" stroke="none" cx="155" cy="127" rx="5.5" ry="8"/>
+          <ellipse class="black" stroke="none" cx="206" cy="124" rx="5.5" ry="8"/>
+          <path class="white" stroke-width="3" d="M154 148 C163 140 174 142 182 148 C191 140 204 141 213 151 C225 167 210 185 183 185 C156 187 140 166 154 148 Z"/>
+          <path class="black" stroke-width="2" d="M172 148 Q183 144 193 148 Q193 156 183 161 Q173 157 172 148 Z"/>
+          <path class="line" stroke-width="3" d="M183 161 L183 169 M167 169 Q182 180 199 167"/>
+          <path fill="none" stroke="#fdfcfa" stroke-opacity="0.45" stroke-width="2.5" d="M92 183 Q86 218 96 237 M252 181 Q262 218 251 237"/>
+        </g>
+      </g>
+    </symbol>
+
+    <symbol id="inquisitive" viewBox="0 0 360 360">
+      <g class="dog" stroke-width="3.5">
+        <path class="black" d="M210 66 C243 65 264 88 260 119 C258 144 267 174 258 202 C253 220 237 231 225 221 C210 209 216 184 209 165 L194 93 Z"/>
+        <path class="white" d="M146 199 C137 226 132 259 125 298 Q181 333 242 298 C225 273 219 242 216 210 Z"/>
+        <path class="black" stroke="none" d="M145 225 C136 244 135 275 125 298 C138 307 150 312 167 313 C174 284 164 250 145 225 Z"/>
+        <path class="line" d="M182 253 Q181 278 175 293"/>
+        <path fill="#c8102e" d="M143 214 Q181 239 223 218 L228 231 Q183 255 138 229 Z"/>
+        <path class="white" d="M120 105 C117 72 137 46 176 44 C215 41 240 64 240 99 L238 127 C259 132 278 143 277 159 C276 181 254 189 236 187 C224 211 198 223 170 216 C140 209 123 183 121 155 Z"/>
+        <path class="black" stroke="none" d="M132 66 C140 52 158 46 176 44 C170 68 165 92 165 113 C154 119 141 110 132 103 Z"/>
+        <path class="black" d="M131 83 C112 70 93 84 86 109 C79 134 88 153 83 184 C78 216 81 253 98 271 C109 283 128 273 136 254 C147 229 139 203 143 174 C147 144 155 103 131 83 Z"/>
+        <path fill="none" stroke="#fdfcfa" stroke-opacity="0.5" stroke-width="2.5" d="M102 171 C97 191 96 225 104 245 M115 206 Q111 237 119 248"/>
+        <path class="line" d="M186 113 Q195 107 203 112 M225 112 Q232 109 236 113"/>
+        <ellipse class="black" stroke="none" cx="198" cy="129" rx="5.5" ry="8"/>
+        <ellipse class="black" stroke="none" cx="231" cy="128" rx="4" ry="6"/>
+        <path class="line" stroke-width="2.5" d="M219 147 C211 157 215 176 233 181"/>
+        <path class="black" stroke-width="2" d="M262 141 Q273 141 278 148 Q278 157 266 160 Q258 153 262 141 Z"/>
+        <path class="line" stroke-width="3" d="M266 161 Q256 174 239 167"/>
+        <path class="line" stroke-width="2.5" d="M222 185 Q234 192 247 185"/>
+        <path class="line" stroke-width="2.5" d="M172 58 Q178 49 187 50"/>
+      </g>
+    </symbol>
+
+    <symbol id="observer" viewBox="0 0 360 360">
+      <g class="dog">
+        <path class="black" d="M120 85 C89 77 69 98 69 129 C69 157 60 183 66 212 C70 235 84 250 98 244 C116 239 120 215 119 190 L134 110 Z"/>
+        <path class="black" d="M234 88 C259 76 281 99 283 128 C286 155 299 179 294 205 C291 230 277 250 261 246 C241 241 239 217 240 191 L225 115 Z"/>
+        <path class="white" d="M116 131 C110 94 132 72 164 68 L173 57 L183 69 C219 65 247 88 246 126 L242 171 C238 204 216 223 182 225 C147 226 123 208 119 177 Z"/>
+        <path class="black" stroke="none" d="M208 74 C230 79 245 98 246 121 L244 153 C230 163 210 152 208 135 C206 115 215 99 208 74 Z"/>
+        <path class="line" stroke-width="3" d="M140 126 Q149 121 157 125"/>
+        <ellipse class="black" stroke="none" cx="151" cy="144" rx="5.5" ry="7.5"/>
+        <ellipse fill="#fff" stroke="none" cx="222" cy="142" rx="7" ry="9"/>
+        <ellipse class="black" stroke="none" cx="220" cy="143" rx="3.5" ry="5.5"/>
+        <path class="white" stroke-width="3" d="M158 165 C166 155 177 155 185 163 C195 154 206 157 214 168 C223 185 207 201 185 201 C161 201 147 182 158 165 Z"/>
+        <path class="black" stroke-width="2" d="M175 163 Q185 159 195 163 Q194 171 185 175 Q176 172 175 163 Z"/>
+        <path class="line" stroke-width="3" d="M185 175 L185 183 M173 183 Q185 191 198 182"/>
+        <path fill="#c8102e" d="M145 215 Q182 231 221 214 L220 228 Q181 244 145 229 Z"/>
+        <path class="white" d="M133 230 C130 217 136 207 147 207 C159 206 169 216 168 229 L166 247 C157 254 140 253 131 246 Z"/>
+        <path class="white" d="M206 231 C204 218 211 208 222 208 C234 208 241 219 240 231 L238 247 C227 254 214 253 204 247 Z"/>
+        <path class="line" stroke-width="2.5" d="M143 237 L143 248 M155 237 L155 249 M217 238 L217 249 M229 237 L229 249"/>
+        <path class="line" stroke-width="4" d="M54 251 L306 251"/>
+      </g>
+    </symbol>
+  </defs>
+
+  <rect width="1600" height="1080" fill="#fdfcfa"/>
+  <g class="sans">
+    <text x="60" y="54" class="eyebrow red">WHO VOTED? / MASCOT STUDIES</text>
+    <text x="1540" y="54" text-anchor="end" class="eyebrow muted">CHARACTER EXPLORATION — 01</text>
+    <text x="58" y="132" class="serif ink" font-size="62">A good nose for the numbers.</text>
+    <text x="61" y="173" class="copy">Three original directions. A white coat, long black ears, and a friendly, curious face.</text>
+    <path d="M60 202 H1540" stroke="#1c1b1a" stroke-width="3"/>
+    <path d="M552 234 V896 M1048 234 V896" stroke="#c9c5be"/>
+
+    <text x="64" y="252" class="eyebrow red">01 / SOFT &amp; FRIENDLY</text>
+    <text x="64" y="297" class="serif ink name">The companion</text>
+    <text x="64" y="326" class="copy">A little head tilt. A very good listener.</text>
+    <use href="#companion" x="97" y="353" width="380" height="380"/>
+    <path d="M64 753 H516" stroke="#c9c5be"/>
+    <text x="64" y="786" class="copy">The warmest, most characterful option.</text>
+    <text x="64" y="813" class="copy">A welcoming face for the landing page.</text>
+    <use href="#companion" x="64" y="839" width="54" height="54"/>
+    <text x="137" y="862" class="fine">Seated silhouette</text>
+    <text x="137" y="882" class="fine">Easy to give more poses later.</text>
+
+    <text x="586" y="252" class="eyebrow red">02 / CURIOUS &amp; EDITORIAL</text>
+    <text x="586" y="297" class="serif ink name">The inquisitive one</text>
+    <text x="586" y="326" class="copy">A spaniel with a nose for the details.</text>
+    <use href="#inquisitive" x="606" y="356" width="390" height="390"/>
+    <path d="M586 753 H1010" stroke="#c9c5be"/>
+    <text x="586" y="786" class="copy">A longer muzzle and a quieter expression.</text>
+    <text x="586" y="813" class="copy">A natural fit beside notes and explainers.</text>
+    <use href="#inquisitive" x="586" y="839" width="54" height="54"/>
+    <text x="659" y="862" class="fine">Three-quarter portrait</text>
+    <text x="659" y="882" class="fine">Less babyish. More observant.</text>
+
+    <text x="1082" y="252" class="eyebrow red">03 / SMALL &amp; PLAYFUL</text>
+    <text x="1082" y="297" class="serif ink name">The little observer</text>
+    <text x="1082" y="326" class="copy">Just ears, eyes, and a little curiosity.</text>
+    <use href="#observer" x="1101" y="385" width="402" height="402"/>
+    <path d="M1082 753 H1536" stroke="#c9c5be"/>
+    <text x="1082" y="786" class="copy">A compact face that peeks over a rule.</text>
+    <text x="1082" y="813" class="copy">A small companion, not the main event.</text>
+    <use href="#observer" x="1082" y="839" width="64" height="64"/>
+    <text x="1165" y="862" class="fine">Compact peeking mark</text>
+    <text x="1165" y="882" class="fine">For a header or a quiet footer cameo.</text>
+
+    <path d="M60 925 H1540" stroke="#1c1b1a" stroke-width="2"/>
+    <text x="62" y="966" class="eyebrow red">ONE SHARED DESIGN LANGUAGE</text>
+    <text x="62" y="999" class="copy">Paper white. Charcoal ink. A tiny red collar. No party symbols, no visual noise around the data.</text>
+    <text x="62" y="1043" class="fine">Original editable SVG artwork • Concept studies, not yet placed on the site</text>
+    <text x="1538" y="1043" text-anchor="end" class="fine">WHO VOTED? / 01—03</text>
+  </g>
+</svg>

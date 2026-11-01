@@ -77,5 +77,19 @@ at `data/raw/<state>/<year>/`, and shared exports at `data/raw/population/`.
 `pnpm data:download <state>/<year>` refreshes sources; `pnpm data:build` validates
 and converts them. `pnpm test` also checks demographic parser failures, invalid
 metadata, vote conservation, generated pages and Sankey geometry.
+## Election companion prototype
+
+A shared spaniel companion collects elections from their results pages. A miniature
+of the actual chart flies toward the dog, which runs, jumps, and catches it. The
+collection button opens a keyboard-accessible dialog with links and removal. IDs are stored locally in this browser, validated against
+the current election catalog. If storage is unavailable, the collection stays in
+memory during in-app navigation. Reduced motion skips animation and gaze changes.
+This first slice does not yet compare charts side by side or tell historical stories.
+The artwork is a behaviour prototype, not approved final character art.
+
+See [the agreed mascot direction and progress](design/MASCOT.md).
+Run `node scripts/check-comparison.mjs` for the storage-input checks; `pnpm test`
+includes them alongside the existing data, type, page, and chart checks.
+
 To add another diagram year, follow [Adding an election](ADDING_AN_ELECTION.md)
 for the required data, official evidence, pipeline changes, and validation.
