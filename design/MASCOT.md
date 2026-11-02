@@ -103,3 +103,13 @@ To repeat the core interaction: open an election, choose **Diese Wahl sammeln**,
 open **Sammlung**, visit a second election, collect it, reopen the dialog, and
 remove entries. Repeat with reduced motion enabled. Storage tests and screenshots
 are verification of this prototype, not acceptance of the final illustration.
+
+### Expressive spaniel refinement
+
+The articulated SVG now has a scruffy forelock, scalloped floppy ears, larger
+asymmetric eyes with double blinks, muzzle freckles, and a dotted neckerchief.
+Hover or keyboard focus on the collection triggers a single play bow and ear
+flop. The catch ends with a satisfied head shake; the scarf and tag trail the
+jump and overshoot on landing. Idle tail wagging comes in bursts rather than a
+uniform pendulum. Offscreen and hidden-tab idle animations pause, and reduced
+motion keeps the dog still. No new dependencies or image downloads are needed.
