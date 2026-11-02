@@ -259,7 +259,7 @@ const catalog = (await getCollection("elections")).map(({ id, data }) => ({
         { transform: `translate(${end.x}px, ${end.y}px) scale(.14) rotate(3deg)`, opacity: 1, offset: .68 },
         { transform: `translate(${end.x}px, ${end.y}px) scale(.06)`, opacity: 0, offset: .73 },
         { transform: `translate(${end.x}px, ${end.y}px) scale(.06)`, opacity: 0, offset: 1 },
-      ], { duration, easing: "cubic-bezier(.2,.75,.25,1)" });
+      ], { duration });
       const actor = dog.querySelector(".dog-actor")!.animate([
         { transform: "translate(0, 0) rotate(0deg)", offset: 0 },
         { transform: "translate(3px, 7px) scale(1.07, .9) rotate(-4deg)", offset: .08 },
