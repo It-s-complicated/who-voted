@@ -31,8 +31,10 @@
 
       <path class="collar" d="M112 105 C124 105 137 112 144 123 L136 137 C128 127 117 122 105 121 Z" />
       <path class="collar-highlight" d="M115 110 C125 111 134 116 139 123" />
-      <circle class="tag" cx="128" cy="132" r="6" />
-      <path class="tag-detail" d="M128 128.5 L128 135.5 M124.5 132 L131.5 132" />
+      <path class="bandana" d="M118 119 Q129 122 138 132 L126 151 L116 128 Z" />
+      <path class="bandana-fold" d="M120 126 Q127 130 132 137" />
+      <circle class="tag" cx="113" cy="126" r="5.5" />
+      <path class="tag-detail" d="M110.5 124.5 Q113 122 115.5 124.5 Q115.5 127 113 129 Q110.5 127 110.5 124.5 Z" />
 
       <g class="dog-head">
         <g class="dog-ear dog-ear-far">
@@ -43,6 +45,8 @@
         <path class="fur head-shape" d="M73 64 C88 49 114 48 132 60 C148 71 152 92 143 111 C135 129 114 139 92 133 C75 129 64 116 62 98 C60 84 64 73 73 64 Z" />
         <path class="patch forehead" d="M78 59 C86 53 97 51 106 53 C102 63 103 74 96 82 C89 87 80 79 78 70 Z" />
         <path class="fur-detail cheek" d="M116 116 C123 116 129 113 133 108" />
+        <ellipse class="blush" cx="105" cy="105" rx="10" ry="5.5" />
+        <path class="blush-tick" d="M99 103 L101 106 M105 102 L107 105" />
 
         <path class="muzzle" d="M70 96 C58 95 46 100 40 110 C33 121 39 134 52 140 C67 146 87 140 96 129 C103 120 98 108 88 102 C82 99 76 97 70 96 Z" />
         <path class="muzzle-shade" d="M55 137 C68 140 83 135 90 127" />
@@ -57,6 +61,8 @@
         <path class="nose" d="M39 109 C44 105 52 106 56 111 C57 117 51 122 45 121 C40 119 37 115 39 109 Z" />
         <path class="nose-glint" d="M42 110 Q46 108 49 110" />
         <path class="detail dog-mouth-closed" d="M49 121 L50 125 M50 125 Q61 133 75 124" />
+        <path class="tongue dog-tongue-rest" d="M59 130 C63 127 70 127 72 130 C73 137 69 143 64 142 C59 141 58 135 59 130 Z" />
+        <path class="tongue-detail dog-tongue-rest" d="M66 133 L66 139" />
         <g class="dog-mouth-open">
           <path class="mouth-cavity" d="M49 121 C59 125 69 124 79 119 C80 131 71 140 60 138 C52 136 48 130 49 121 Z" />
           <path class="tongue" d="M57 135 C62 130 70 130 74 133 C70 138 62 140 57 135 Z" />
@@ -84,11 +90,13 @@
   .fur, .fur-far, .patch, .collar, .tag, .muzzle, .nose {
     stroke: var(--ink); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;
   }
-  .fur, .muzzle { fill: #fffefb; }
-  .fur-far { fill: #eeeae3; }
+  .fur, .muzzle { fill: #fff9ee; }
+  .fur-far { fill: #eee4d7; }
   .patch, .eye, .nose, .mouth-cavity { fill: var(--ink); }
   .back-patch, .forehead, .tail-tip { stroke: none; }
   .collar { fill: var(--primary); }
+  .bandana { fill: #f4bd4f; stroke: var(--ink); stroke-width: 1.8; stroke-linejoin: round; }
+  .bandana-fold { fill: none; stroke: #9c6720; stroke-width: 1.2; stroke-linecap: round; }
   .tag { fill: var(--paper); stroke-width: 1.8; }
   .muzzle { stroke-width: 2; }
   .muzzle-shade, .fur-detail, .detail, .collar-highlight, .tag-detail, .nose-glint {
@@ -99,16 +107,43 @@
   .toes { stroke-width: 1.25; }
   .fur-detail, .muzzle-shade { stroke: #b9b2a8; stroke-width: 1.35; }
   .collar-highlight { stroke: #fff; stroke-opacity: .45; stroke-width: 1.2; }
-  .tag-detail { stroke-width: 1; }
+  .tag-detail { fill: var(--primary); stroke: none; }
   .nose-glint { stroke: #fff; stroke-opacity: .65; stroke-width: 1.3; }
+  .blush { fill: #f2a99f; opacity: .72; }
+  .blush-tick { fill: none; stroke: #cc776f; stroke-width: 1; stroke-linecap: round; }
   .ear-detail { fill: none; stroke: #fff; stroke-opacity: .22; stroke-width: 1.5; stroke-linecap: round; }
   .ear-detail-soft { stroke-opacity: .12; }
   .glint { fill: var(--paper); }
   .dog-eyes { transform: translate(var(--look-x, 0px), var(--look-y, 0px)); }
   .dog-head, .dog-eyes { transition: transform 220ms ease-out; }
   .dog-mouth-open { opacity: 0; }
-  .tongue { fill: #e7787d; }
+  .tongue { fill: #ef8791; stroke: var(--ink); stroke-width: 1.25; stroke-linejoin: round; }
+  .tongue-detail { fill: none; stroke: #bd5968; stroke-width: 1; stroke-linecap: round; }
+  :global(.is-catching) .dog-tongue-rest { opacity: 0; }
+  .dog-body { animation: dog-breathe 2.8s ease-in-out infinite; }
+  .dog-tail { animation: tail-wag 1.15s ease-in-out infinite; }
+  .dog-ear-near { animation: ear-dream 3.2s ease-in-out infinite; }
+  .dog-head { animation: head-hello 4.2s ease-in-out infinite; }
+  @keyframes dog-breathe {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-1.5px) scale(1.008, 1.015); }
+  }
+  @keyframes tail-wag {
+    0%, 100% { transform: rotate(-8deg); }
+    50% { transform: rotate(12deg); }
+  }
+  @keyframes ear-dream {
+    0%, 82%, 100% { transform: rotate(0deg); }
+    90% { transform: rotate(5deg); }
+    95% { transform: rotate(-3deg); }
+  }
+  @keyframes head-hello {
+    0%, 72%, 100% { transform: rotate(var(--head-tilt, -2deg)); }
+    82% { transform: rotate(-6deg) translateY(-1px); }
+    91% { transform: rotate(1deg); }
+  }
   @media (prefers-reduced-motion: reduce) {
     .dog-head, .dog-eyes { transition: none; }
+    .dog-body, .dog-tail, .dog-ear-near, .dog-head { animation: none; }
   }
 </style>
