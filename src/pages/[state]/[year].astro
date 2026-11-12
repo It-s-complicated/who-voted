@@ -4,6 +4,7 @@ import { Font } from "astro:assets";
 import "../../styles/global.css";
 import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import ElectionChart from "../../components/ElectionChart.astro";
+import ElectionCompanion from "../../components/ElectionCompanion.astro";
 import type { DiagramNode, DiagramLink } from "../../data/chart";
 import { renderCard } from "astro-cards/runtime";
 import { getCollection } from "astro:content";
@@ -426,6 +427,8 @@ const tableRows = [
           </select>
         </label>
       </header>
+
+      <ElectionCompanion current={`${state.slug}/${data.year}`} />
 
       <section class="status" aria-label="Datenstatus">
         <strong>{resultStatusLabels[data.resultStatus]}</strong>
