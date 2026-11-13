@@ -229,19 +229,20 @@ Source links inherit muted footer text with red 1px underlines, offset by 0.18em
 
 ## Playful companion (behaviour prototype)
 
-A side-facing black-and-white spaniel adds character through gaze, articulated
-running legs, and an airborne catch when an election joins the collection. A
-miniature of the actual chart follows a throwing arc; the dog runs toward it,
-jumps, catches it at the peak, and lands. The shared in-flow shelf keeps its
-artwork out of the chart, including on mobile. A native modal dialog opens the
-collection; reduced motion omits gaze and catch animation without changing actions.
-The small red collar uses the interface accent, not a party colour.
+A side-standing black-and-white spaniel lives on the collection shelf, standing
+on the **Sammlung** button. Its single seamless ink outline, flat paper-white
+fills, and few bold black markings follow the site's ink-and-paper palette; the
+slim collar uses the interface red, not a party colour. When an election joins
+the collection, a miniature of the actual chart is thrown on an arc; the dog
+runs, jumps, catches it at the top of its jump, carries it home, and tosses it
+into the count, which ticks up as the card lands. The shelf keeps the dog out of
+the chart, including on mobile, and does not clip it, so the dog may leap just
+past the shelf's top edge. A native modal dialog opens the collection; reduced
+motion keeps the dog still without changing actions.
 
 This is a more playful direction alongside the editorial data system, not a
-redesign of the data marks. Character artwork is still a prototype. The user
-rejected the first concept sheet as a final quality bar; refine the selected mix
-of seated and peeking poses rather than treating that sheet as approved art.
-See [MASCOT.md](design/MASCOT.md) for the interaction brief and progress.
+redesign of the data marks. Character artwork still awaits the user's review.
+See [MASCOT.md](design/MASCOT.md) for the character, rig, choreography, and progress.
 
 ## Do's and Don'ts
 

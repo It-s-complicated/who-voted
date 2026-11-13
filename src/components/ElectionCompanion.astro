@@ -23,8 +23,7 @@ const catalog = (await getCollection("elections")).map(({ id, data }) => ({
     </div>
     <button type="button" class="collection-button" data-open aria-haspopup="dialog" aria-controls="election-collection" aria-label="Wahlsammlung öffnen, 0 Wahlen">
       <ElectionDog />
-      <span class="catch-burst" aria-hidden="true"><i>✦</i><i>★</i><i>✦</i></span>
-      <span class="collection-label">Sammlung <span class="collection-count" data-count>0</span><span aria-hidden="true">↗</span></span>
+      <span class="collection-label">Sammlung <span class="count-slot"><span class="collection-count" data-count>0</span><span class="count-burst" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span></span><span aria-hidden="true">↗</span></span>
     </button>
   </section>
   <p class="sr-only" role="status" aria-live="polite" data-announcement></p>
@@ -47,6 +46,7 @@ const catalog = (await getCollection("elections")).map(({ id, data }) => ({
 
 <script>
   import { parseCollection } from "../data/comparison";
+  import { DogRig, Springs, TIMING, VIEWBOX, biteAt, choreography, headAngle } from "../lib/companion-dog";
 
   interface Election { id: string; name: string; year: number }
   const storageKey = "who-voted:collection:v1";
@@ -57,7 +57,9 @@ const catalog = (await getCollection("elections")).map(({ id, data }) => ({
     private catalog: Election[] = [];
     private allowed = new Set<string>();
     private controller?: AbortController;
-    private animations: Animation[] = [];
+    private frame = 0;
+    private heldCount?: number;
+    private rig?: DogRig;
     private observer?: IntersectionObserver;
     private inView = false;
     private motion = matchMedia("(prefers-reduced-motion: reduce)");
@@ -82,6 +84,7 @@ const catalog = (await getCollection("elections")).map(({ id, data }) => ({
       }
       if (memoryOnly) this.storageNote = "Speichern ist gerade nicht möglich. Deine Sammlung bleibt nur während dieser Navigation erhalten.";
       this.render();
+      this.rig = new DogRig(this.querySelector<SVGSVGElement>(".election-dog")!);
       this.hidden = false;
       this.observer = new IntersectionObserver(([entry]) => {
         this.inView = entry.isIntersecting;
@@ -161,7 +164,7 @@ const catalog = (await getCollection("elections")).map(({ id, data }) => ({
         item.append(link, remove);
         return item;
       }));
-      this.querySelector<HTMLElement>("[data-count]")!.textContent = String(collection.length);
+      this.querySelector<HTMLElement>("[data-count]")!.textContent = String(this.heldCount ?? collection.length);
       this.querySelector<HTMLElement>("[data-open]")!.setAttribute("aria-label", `Wahlsammlung öffnen, ${collection.length} ${collection.length === 1 ? "Wahl" : "Wahlen"}`);
       this.querySelector<HTMLElement>("[data-empty]")!.hidden = collection.length > 0;
       this.querySelector<HTMLElement>("[data-storage]")!.textContent = this.storageNote;
@@ -198,56 +201,66 @@ const catalog = (await getCollection("elections")).map(({ id, data }) => ({
           this.dialog.showModal();
           return;
         }
+        const previousCount = collection.length;
         collection.push(election.id);
         this.save();
         this.querySelector<HTMLElement>("[data-message]")!.textContent = `Hab ich! ${election.name} ${election.year} ist dabei.`;
         this.announce(`${election.name} ${election.year} zur Sammlung hinzugefügt. ${this.storageNote}`);
-        void this.catchElection(button, election);
+        this.catchElection(button, election, previousCount);
       }
     };
 
+    /** Glance toward meaningful controls; the head tilts up or down, the eyes follow. */
     private look = (event: Event) => {
       if (this.motion.matches || this.classList.contains("is-catching") || this.dialog.open) return;
       const target = (event.target as Element).closest("a, button, select, summary, #election-chart");
       if (!target) return;
-      const dog = this.querySelector("svg")!.getBoundingClientRect();
+      const dog = this.querySelector(".election-dog")!.getBoundingClientRect();
       if (dog.bottom < 0 || dog.top > innerHeight) return;
       const rect = target.getBoundingClientRect();
-      const x = Math.max(-3, Math.min(3, (rect.left + rect.width / 2 - dog.left - dog.width / 2) / 100));
-      const y = Math.max(-2, Math.min(2, (rect.top + rect.height / 2 - dog.top - dog.height / 2) / 100));
-      this.style.setProperty("--look-x", `${x}px`);
-      this.style.setProperty("--look-y", `${y}px`);
-      this.style.setProperty("--head-tilt", `${x * 1.5}deg`);
+      const dx = rect.left + rect.width / 2 - (dog.left + dog.width * .2);
+      const dy = rect.top + rect.height / 2 - (dog.top + dog.height * .35);
+      const clamp = (value: number, limit: number) => Math.max(-limit, Math.min(limit, value));
+      this.style.setProperty("--look-x", `${clamp(dx / 120, 1.6)}px`);
+      this.style.setProperty("--look-y", `${clamp(dy / 120, 1.4)}px`);
+      this.style.setProperty("--head-tilt", `${clamp(-dy / 22, 9)}deg`);
     };
 
     private stopFlight() {
-      this.animations.forEach((animation) => animation.cancel());
-      this.animations = [];
+      if (this.frame) cancelAnimationFrame(this.frame);
+      this.frame = 0;
+      this.rig?.reset();
       this.flight.hidden = true;
-      this.classList.remove("is-catching");
+      this.classList.remove("is-catching", "is-popping");
+      if (this.heldCount !== undefined) {
+        this.heldCount = undefined;
+        this.querySelector<HTMLElement>("[data-count]")!.textContent = String(collection.length);
+      }
     }
 
-    private async catchElection(button: HTMLButtonElement, election: Election) {
+    /**
+     * The card follows a true parabola to where the dog's bite point will be at
+     * the top of its jump, rides in the mouth on the way home, and is tossed into
+     * the count badge. The addition is already stored; this is only feedback.
+     */
+    private catchElection(button: HTMLButtonElement, election: Election, previousCount: number) {
       this.stopFlight();
-      if (this.motion.matches || !Element.prototype.animate) return;
-      const dog = this.querySelector<SVGSVGElement>("svg")!;
-      const source = button.getBoundingClientRect();
-      const destination = dog.getBoundingClientRect();
-      const duration = 2200;
-      const run = Math.min(48, destination.width * .25);
-      const jump = Math.min(54, destination.height * .43);
+      if (this.motion.matches || !this.rig) return;
+      const svg = this.querySelector<SVGSVGElement>(".election-dog")!;
+      const host = this.getBoundingClientRect();
+      const relative = (rect: DOMRect): [number, number] => [rect.left + rect.width / 2 - host.left, rect.top + rect.height / 2 - host.top];
+      const svgRect = svg.getBoundingClientRect();
+      const unit = svgRect.width / VIEWBOX.width;
+      const toPage = ([x, y]: readonly [number, number]): [number, number] => [
+        svgRect.left - host.left + (x - VIEWBOX.x) * unit,
+        svgRect.top - host.top + (y - VIEWBOX.y) * unit,
+      ];
+      const source = relative(button.getBoundingClientRect());
+      const badge = relative(this.querySelector<HTMLElement>("[data-count]")!.getBoundingClientRect());
+      const caught = toPage(biteAt(choreography(TIMING.catch)));
       const card = { width: 132, height: 112 };
-      const mouth = {
-        x: destination.left + destination.width * (62 / 290) - run - 4,
-        y: destination.top + destination.height * (97 / 175) - jump,
-      };
-      const start = {
-        x: source.left + source.width / 2 - card.width / 2,
-        y: source.top + source.height / 2 - card.height / 2,
-      };
-      const end = { x: mouth.x - card.width / 2, y: mouth.y - card.height / 2 };
-      const dx = end.x - start.x;
-      const arc = Math.max(8, Math.min(start.y, end.y) - Math.min(110, Math.abs(dx) * .42 + 48));
+      const held = Math.max(.16, Math.min(.3, svgRect.width * .2 / card.width));
+      const lip = 2 * unit;
 
       this.querySelector<HTMLElement>("[data-flight-year]")!.textContent = String(election.year);
       this.querySelector<HTMLElement>("[data-flight-name]")!.textContent = election.name;
@@ -264,122 +277,58 @@ const catalog = (await getCollection("elections")).map(({ id, data }) => ({
         thumbnail.hidden = true;
       }
 
-      this.flight.hidden = false;
+      // Top-centre of the card, its scale, rotation and opacity.
+      const place = (x: number, y: number, scale: number, rotate: number, opacity = 1) => {
+        this.flight.style.transform = `translate(${x - card.width / 2}px, ${y}px) rotate(${rotate}deg) scale(${scale})`;
+        this.flight.style.opacity = String(opacity);
+      };
+      const start: [number, number] = [source[0], source[1] - card.height * .45];
+      const flightTime = TIMING.catch - TIMING.launch;
+      const arc = Math.max(70, Math.abs(caught[0] - start[0]) * .3);
+      const springs = new Springs(choreography);
+      let release: { x: number; y: number; scale: number; rotate: number } | undefined;
+
+      this.heldCount = previousCount;
+      this.querySelector<HTMLElement>("[data-count]")!.textContent = String(previousCount);
+      this.flight.hidden = true;
       this.classList.add("is-catching");
-      const flight = this.flight.animate([
-        { transform: `translate(${start.x}px, ${start.y + 4}px) scale(.58) rotate(-12deg)`, opacity: 0, offset: 0 },
-        { transform: `translate(${start.x + dx * .06}px, ${start.y - 15}px) scale(.82) rotate(-14deg)`, opacity: 1, offset: .07 },
-        { transform: `translate(${start.x + dx * .43}px, ${arc}px) scale(1.04) rotate(10deg)`, opacity: 1, offset: .38 },
-        { transform: `translate(${end.x}px, ${end.y}px) scale(.4) rotate(-7deg)`, opacity: 1, offset: .63 },
-        { transform: `translate(${end.x}px, ${end.y}px) scale(.14) rotate(3deg)`, opacity: 1, offset: .68 },
-        { transform: `translate(${end.x}px, ${end.y}px) scale(.06)`, opacity: 0, offset: .73 },
-        { transform: `translate(${end.x}px, ${end.y}px) scale(.06)`, opacity: 0, offset: 1 },
-      ], { duration });
-      const actor = dog.querySelector(".dog-actor")!.animate([
-        { transform: "translate(0, 0) rotate(0deg)", offset: 0 },
-        { transform: "translate(3px, 7px) scale(1.07, .9) rotate(-4deg)", offset: .08 },
-        { transform: "translate(-2px, -5px) scale(.98, 1.04) rotate(2deg)", offset: .13 },
-        { transform: `translate(-${run * .55}px, 0) rotate(-2deg)`, offset: .25 },
-        { transform: `translate(-${run}px, 0) rotate(1deg)`, offset: .35 },
-        { transform: `translate(-${run}px, 6px) scale(1.06, .91) rotate(-5deg)`, offset: .43 },
-        { transform: `translate(-${run + 4}px, -${jump}px) scale(.98, 1.03) rotate(6deg)`, offset: .58 },
-        { transform: `translate(-${run + 4}px, -${jump}px) rotate(4deg)`, offset: .67 },
-        { transform: `translate(-${run}px, 0) rotate(-3deg)`, offset: .77 },
-        { transform: `translate(-${run}px, 7px) scale(1.09, .88) rotate(-2deg)`, offset: .82 },
-        { transform: `translate(-${run}px, -4px) scale(.98, 1.03) rotate(1deg)`, offset: .87 },
-        { transform: `translate(-${run * .55}px, 0) rotate(-2deg)`, offset: .94 },
-        { transform: "translate(0, 0) rotate(0deg)", offset: 1 },
-      ], { duration });
-      const head = dog.querySelector(".dog-head")!.animate([
-        { transform: "rotate(-5deg)", offset: 0 },
-        { transform: "rotate(10deg) translateY(2px)", offset: .1 },
-        { transform: "rotate(-4deg)", offset: .34 },
-        { transform: "rotate(20deg) translateY(-2px)", offset: .53 },
-        { transform: "rotate(23deg)", offset: .66 },
-        { transform: "rotate(-9deg) translateY(2px)", offset: .8 },
-        { transform: "rotate(3deg)", offset: .85 },
-        { transform: "rotate(-12deg) translateY(-2px)", offset: .9 },
-        { transform: "rotate(7deg)", offset: .94 },
-        { transform: "rotate(-4deg)", offset: .97 },
-        { transform: "rotate(var(--head-tilt, -2deg))", offset: 1 },
-      ], { duration });
-      const shadow = dog.querySelector(".dog-shadow")!.animate([
-        { transform: "translateX(0) scale(1)", opacity: .11, offset: 0 },
-        { transform: `translateX(-${run * .8}px) scale(.85)`, opacity: .09, offset: .4 },
-        { transform: `translateX(-${run}px) scale(.42)`, opacity: .04, offset: .62 },
-        { transform: `translateX(-${run}px) scale(1.14)`, opacity: .15, offset: .8 },
-        { transform: `translateX(-${run}px) scale(1)`, opacity: .11, offset: .87 },
-        { transform: "translateX(0) scale(1)", opacity: .11, offset: 1 },
-      ], { duration });
-      const openMouth = dog.querySelector(".dog-mouth-open")!.animate([
-        { opacity: 0, offset: 0 }, { opacity: 0, offset: .43 },
-        { opacity: 1, offset: .48 }, { opacity: 1, offset: .69 },
-        { opacity: 0, offset: .76 }, { opacity: 0, offset: 1 },
-      ], { duration });
-      const closedMouth = dog.querySelector(".dog-mouth-closed")!.animate([
-        { opacity: 1, offset: 0 }, { opacity: 1, offset: .43 },
-        { opacity: 0, offset: .48 }, { opacity: 0, offset: .69 },
-        { opacity: 1, offset: .76 }, { opacity: 1, offset: 1 },
-      ], { duration });
-      const legs = [...dog.querySelectorAll(".dog-leg")].map((leg, index) => {
-        const direction = index % 2 === 0 ? 1 : -1;
-        const tuck = leg.classList.contains("dog-front-near") || leg.classList.contains("dog-front-far") ? -38 : 42;
-        return leg.animate([
-          { transform: "rotate(0deg)", offset: 0 },
-          { transform: `rotate(${18 * direction}deg)`, offset: .08 },
-          { transform: `rotate(${-42 * direction}deg)`, offset: .16 },
-          { transform: `rotate(${42 * direction}deg)`, offset: .24 },
-          { transform: `rotate(${-38 * direction}deg)`, offset: .32 },
-          { transform: `rotate(${28 * direction}deg)`, offset: .4 },
-          { transform: `rotate(${tuck * 1.2}deg)`, offset: .54 },
-          { transform: `rotate(${tuck * 1.2}deg)`, offset: .67 },
-          { transform: `rotate(${-22 * direction}deg)`, offset: .77 },
-          { transform: `rotate(${12 * direction}deg)`, offset: .83 },
-          { transform: "rotate(0deg)", offset: .88 },
-          { transform: `rotate(${28 * direction}deg)`, offset: .95 },
-          { transform: "rotate(0deg)", offset: 1 },
-        ], { duration });
-      });
-      const ears = [...dog.querySelectorAll(".dog-ear")].map((ear, index) => ear.animate([
-        { transform: "rotate(0deg)", offset: 0 },
-        { transform: `rotate(${index ? -14 : 11}deg)`, offset: .25 },
-        { transform: `rotate(${index ? 22 : -16}deg)`, offset: .43 },
-        { transform: `rotate(${index ? -32 : 24}deg)`, offset: .62 },
-        { transform: `rotate(${index ? 15 : -11}deg)`, offset: .79 },
-        { transform: "rotate(0deg)", offset: 1 },
-      ], { duration }));
-      const tail = dog.querySelector(".dog-tail")!.animate([
-        { transform: "rotate(0deg)", offset: 0 },
-        { transform: "rotate(-20deg)", offset: .1 },
-        { transform: "rotate(20deg)", offset: .2 },
-        { transform: "rotate(-20deg)", offset: .3 },
-        { transform: "rotate(20deg)", offset: .4 },
-        { transform: "rotate(-18deg)", offset: .52 },
-        { transform: "rotate(17deg)", offset: .64 },
-        { transform: "rotate(-12deg)", offset: .76 },
-        { transform: "rotate(10deg)", offset: .88 },
-        { transform: "rotate(0deg)", offset: 1 },
-      ], { duration });
-      // Fabric and tag lag behind the jump, then overshoot as the paws land.
-      const accessories = [...dog.querySelectorAll(".dog-scarf, .dog-tag")].map((part, index) => part.animate([
-        { transform: "rotate(0deg)", offset: 0 },
-        { transform: `rotate(${index ? 18 : -12}deg)`, offset: .16 },
-        { transform: "rotate(-25deg)", offset: .43 },
-        { transform: `rotate(${index ? 38 : 48}deg)`, offset: .6 },
-        { transform: "rotate(15deg)", offset: .73 },
-        { transform: "rotate(-32deg)", offset: .82 },
-        { transform: "rotate(18deg)", offset: .89 },
-        { transform: "rotate(-8deg)", offset: .95 },
-        { transform: "rotate(0deg)", offset: 1 },
-      ], { duration, easing: "ease-in-out" }));
-      this.animations = [flight, actor, head, shadow, openMouth, closedMouth, tail, ...legs, ...ears, ...accessories];
-      try {
-        await flight.finished;
-      } catch (error) {
-        if (!(error instanceof DOMException && error.name === "AbortError")) console.error("Catch animation failed", error);
-      } finally {
-        if (this.animations.includes(flight)) this.stopFlight();
-      }
+      const began = performance.now();
+      const tick = (now: number) => {
+        const t = now - began;
+        const pose = choreography(t);
+        const secondary = springs.advance(t);
+        this.rig!.apply(pose, secondary);
+        if (t >= TIMING.launch && t < TIMING.catch) {
+          const u = (t - TIMING.launch) / flightTime;
+          const x = start[0] + (caught[0] - start[0]) * u;
+          const y = start[1] + (caught[1] + lip - start[1]) * u - arc * 4 * u * (1 - u);
+          const scale = .92 + (held - .92) * (1 - (1 - u) ** 2);
+          this.flight.hidden = false;
+          place(x, y, scale, -14 + 30 * u - 16 * u * u, Math.min(1, u * 9));
+        } else if (t >= TIMING.catch && t < TIMING.release) {
+          const [x, y] = toPage(biteAt(pose));
+          release = { x, y: y + lip, scale: held, rotate: -headAngle(pose) * .35 + secondary.card };
+          place(release.x, release.y, release.scale, release.rotate);
+        } else if (t >= TIMING.release && t < TIMING.pop && release) {
+          // Tossed with a flick of the head: up a little, then down into the badge.
+          const u = (t - TIMING.release) / (TIMING.pop - TIMING.release);
+          const x = release.x + (badge[0] - release.x) * u;
+          const y = release.y + (badge[1] - release.y) * u * u - 34 * unit * u * (1 - u);
+          place(x, y, release.scale * (1 - .75 * u ** 2), release.rotate + 200 * u, 1 - u ** 4);
+        } else if (t >= TIMING.pop && !this.flight.hidden) {
+          this.flight.hidden = true;
+          this.heldCount = undefined;
+          this.querySelector<HTMLElement>("[data-count]")!.textContent = String(collection.length);
+          this.classList.add("is-popping");
+        }
+        if (t >= TIMING.end) {
+          this.frame = 0;
+          this.stopFlight();
+          return;
+        }
+        this.frame = requestAnimationFrame(tick);
+      };
+      this.frame = requestAnimationFrame(tick);
     }
   }
 
@@ -387,10 +336,10 @@ const catalog = (await getCollection("elections")).map(({ id, data }) => ({
 </script>
 
 <style>
-  election-companion { display: block; margin: 1.6rem 0 1.5rem; }
+  election-companion { position: relative; display: block; margin: 1.6rem 0 1.5rem; }
   election-companion[hidden], [hidden] { display: none !important; }
-  .companion-shelf { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) 12rem; align-items: end; gap: 1rem; overflow: hidden; border: 1.5px solid var(--ink); border-radius: 22px; background: #fff3d6; box-shadow: 4px 5px 0 #1c1b1a12; }
-  .companion-shelf::before { content: ""; position: absolute; width: 11rem; height: 11rem; right: -4rem; top: -6rem; border: 1.5px dashed #d99b2b66; border-radius: 50%; pointer-events: none; }
+  /* Not clipped: the dog may leap past the shelf's top edge to make a catch. */
+  .companion-shelf { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) 12rem; align-items: end; gap: 1rem; border: 1.5px solid var(--ink); border-radius: 22px; background: #fff3d6 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='49' fill='none' stroke='%23d99b2b' stroke-opacity='.4' stroke-width='1.2' stroke-dasharray='4 3'/%3E%3C/svg%3E") no-repeat right -4rem top -6rem / 11rem 11rem; box-shadow: 4px 5px 0 #1c1b1a12; }
   .invitation { position: relative; z-index: 1; padding: 1.25rem 0 1.45rem 1.5rem; }
   .kicker { margin: 0 0 .45rem; color: var(--primary); font-size: .68rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
   .invitation-title { margin: 0; font: 620 1.6rem/1.15 var(--font-display); letter-spacing: -.02em; }
@@ -404,23 +353,24 @@ const catalog = (await getCollection("elections")).map(({ id, data }) => ({
   .collect-button[data-collected="true"] { border-color: var(--ink); box-shadow: 2px 2px 0 #1c1b1a55; }
   .discover-link { display: inline-block; padding: .5rem 0; font-size: .85rem; font-weight: 600; }
   .collection-button { position: relative; display: block; padding: .4rem .65rem .75rem 0; border: 0; background: none; width: 100%; }
-  .collection-button :global(svg) { width: 12rem; margin: 0 auto -.15rem; transition: transform 220ms cubic-bezier(.2,.8,.3,1.3); }
+  .collection-button :global(.election-dog) { position: relative; z-index: 1; width: 12rem; margin: 0 auto -.35rem; }
   .collection-label { position: relative; display: flex; align-items: center; justify-content: center; gap: .5rem; min-height: 44px; border: 1.5px solid var(--ink); border-radius: 999px; background: var(--surface); box-shadow: 2px 3px 0 #1c1b1a20; font-size: .78rem; font-weight: 650; transition: transform 160ms ease; }
   .collection-button:hover .collection-label { color: var(--primary); transform: rotate(1deg); }
   .collection-count { display: grid; place-items: center; min-width: 1.5rem; height: 1.5rem; padding: 0 .25rem; border-radius: 50%; background: var(--primary); color: var(--paper); font-size: .72rem; }
-  .catch-burst { position: absolute; z-index: 3; left: 30%; top: 32%; width: 1px; height: 1px; pointer-events: none; }
-  .catch-burst i { --pop-x: -35px; --pop-y: -34px; position: absolute; color: var(--primary); font: normal 700 1.35rem/1 var(--font-body); opacity: 0; }
-  .catch-burst i:nth-child(2) { --pop-x: 15px; --pop-y: -48px; color: #bd7716; font-size: 1.05rem; }
-  .catch-burst i:nth-child(3) { --pop-x: 42px; --pop-y: -16px; color: #4c7c59; font-size: 1rem; }
-  .is-catching .catch-burst i { animation: catch-pop 2.2s ease-out both; }
-  @keyframes catch-pop {
-    0%, 63% { transform: translate(0, 8px) rotate(0deg) scale(.2); opacity: 0; }
-    69% { opacity: 1; }
-    80% { transform: translate(var(--pop-x), var(--pop-y)) rotate(24deg) scale(1.15); opacity: 1; }
-    91%, 100% { transform: translate(var(--pop-x), var(--pop-y)) rotate(40deg) scale(.7); opacity: 0; }
+  .count-slot { position: relative; display: inline-grid; }
+  .count-burst { position: absolute; inset: 50% auto auto 50%; pointer-events: none; }
+  .count-burst i { position: absolute; left: -1px; top: -4px; width: 2px; height: 8px; border-radius: 1px; background: var(--primary); opacity: 0; rotate: calc(var(--i) * 72deg - 36deg); }
+  .count-burst i:nth-child(1) { --i: 0; } .count-burst i:nth-child(2) { --i: 1; } .count-burst i:nth-child(3) { --i: 2; }
+  .count-burst i:nth-child(4) { --i: 3; background: #d99b2b; } .count-burst i:nth-child(5) { --i: 4; }
+  .is-popping .collection-count { animation: count-pop 380ms cubic-bezier(.3,1.6,.5,1); }
+  .is-popping .count-burst i { animation: count-burst 420ms ease-out both; }
+  @keyframes count-pop { 0% { scale: .7; } 45% { scale: 1.4; } 100% { scale: 1; } }
+  @keyframes count-burst {
+    from { opacity: 1; transform: translateY(-9px) scaleY(.4); }
+    to { opacity: 0; transform: translateY(-19px) scaleY(1); }
   }
   .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-  .flight-card { position: fixed; top: 0; left: 0; z-index: 20; display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 5px; width: 132px; height: 112px; padding: 7px; border: 2px solid var(--ink); border-radius: 10px; background: var(--surface); color: var(--ink); pointer-events: none; box-shadow: 4px 5px 0 #1c1b1a26; transform-origin: center; }
+  .flight-card { position: absolute; top: 0; left: 0; z-index: 20; display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 5px; width: 132px; height: 112px; padding: 7px; border: 2px solid var(--ink); border-radius: 10px; background: var(--surface); color: var(--ink); pointer-events: none; box-shadow: 4px 5px 0 #1c1b1a26; transform-origin: 50% 0; will-change: transform; }
   .flight-heading { display: flex; align-items: baseline; gap: 5px; min-width: 0; line-height: 1; }
   .flight-card strong { flex-shrink: 0; color: var(--primary); font: 650 16px/1 var(--font-display); }
   .flight-heading > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 8px; font-weight: 650; }
@@ -447,13 +397,13 @@ const catalog = (await getCollection("elections")).map(({ id, data }) => ({
     .invitation-title { font-size: 1.25rem; }
     .companion-message { font-size: .8rem; }
     .collection-button { padding: .35rem .4rem .6rem 0; }
-    .collection-button :global(svg) { width: 8.5rem; }
+    .collection-button :global(.election-dog) { width: 8.5rem; }
     .collection-label { gap: .35rem; font-size: .72rem; }
     .collect-button { padding-inline: .7rem; font-size: .78rem; }
     dialog { padding: 1rem; }
   }
   @media (prefers-reduced-motion: reduce) {
-    .collect-button, .collect-button > span:first-child, .collection-button :global(svg), .collection-label { transition: none; }
-    .collect-button:hover, .collect-button:active, .collection-button:hover :global(svg), .collection-button:hover .collection-label { transform: none; }
+    .collect-button, .collect-button > span:first-child, .collection-label { transition: none; }
+    .collect-button:hover, .collect-button:active, .collection-button:hover .collection-label { transform: none; }
   }
 </style>

@@ -1,215 +1,80 @@
-<svg class="election-dog" viewBox="20 35 290 175" aria-hidden="true" focusable="false">
-  <ellipse class="dog-shadow" cx="170" cy="198" rx="83" ry="5" />
+---
+import { dogMarkup, VIEWBOX } from "../lib/companion-dog";
 
-  <g class="dog-actor">
-    <g class="dog-body">
-      <g class="dog-tail">
-        <path class="fur" d="M224 132 C245 133 258 117 265 98 C270 83 277 73 287 71 C294 70 297 77 291 85 C282 97 281 111 271 125 C260 141 245 149 227 148 Z" />
-        <path class="patch tail-tip" d="M265 98 C270 83 277 73 287 71 C294 70 297 77 291 85 C285 94 282 103 279 112 L265 108 Z" />
-        <path class="fur-detail" d="M238 139 C254 134 265 122 271 108" />
-      </g>
+const { x, y, width, height } = VIEWBOX;
+---
 
-      <g class="dog-leg dog-leg-far dog-hind-far">
-        <path class="fur-far" d="M207 139 C217 138 224 145 222 155 L216 178 C222 181 223 187 219 190 C214 193 201 193 197 190 C194 186 198 182 203 179 L198 155 C196 147 199 141 207 139 Z" />
-      </g>
-      <g class="dog-leg dog-leg-far dog-front-far">
-        <path class="fur-far" d="M137 133 C146 133 151 140 149 149 L143 179 C149 182 149 188 145 191 C139 194 127 193 124 190 C121 186 125 182 130 179 L129 148 C128 140 131 134 137 133 Z" />
-      </g>
+<svg class="election-dog" viewBox={`${x} ${y} ${width} ${height}`} aria-hidden="true" focusable="false" set:html={dogMarkup()} />
 
-      <path class="fur torso" d="M117 105 C141 91 179 89 209 97 C231 103 242 119 238 139 C234 157 218 165 193 162 L145 158 C126 156 111 144 108 127 C106 117 109 110 117 105 Z" />
-      <path class="patch back-patch" d="M165 94 C183 91 207 96 221 104 C231 110 236 119 236 129 C225 135 211 131 201 122 C191 112 179 108 166 108 C159 104 159 97 165 94 Z" />
-      <path class="fur-detail body-detail" d="M151 151 C169 156 190 157 204 153" />
-
-      <g class="dog-leg dog-leg-near dog-hind-near">
-        <path class="fur" d="M203 138 C216 137 225 144 222 156 C220 164 214 169 211 175 L215 184 C222 185 225 190 221 194 C216 198 198 198 194 193 C192 189 196 185 201 182 L194 160 C190 150 194 141 203 138 Z" />
-        <path class="detail toes" d="M202 188 L201 194 M210 188 L211 194" />
-      </g>
-      <g class="dog-leg dog-leg-near dog-front-near">
-        <path class="fur" d="M126 133 C137 131 146 138 145 150 L139 180 C145 182 149 187 145 192 C140 197 122 196 117 192 C115 188 119 184 124 181 L119 151 C117 143 119 136 126 133 Z" />
-        <path class="detail toes" d="M125 187 L124 193 M133 187 L134 193" />
-      </g>
-
-      <path class="collar" d="M112 105 C124 105 137 112 144 123 L136 137 C128 127 117 122 105 121 Z" />
-      <path class="collar-highlight" d="M115 110 C125 111 134 116 139 123" />
-      <g class="dog-scarf">
-      <path class="bandana" d="M118 119 Q129 122 138 132 L133 157 L123 149 L116 128 Z" />
-      <path class="bandana-fold" d="M120 126 Q127 130 132 137" />
-      <path class="bandana-dot" d="M125 134 l2 2 M129 142 l2 2" />
-      </g>
-      <g class="dog-tag">
-      <circle class="tag" cx="113" cy="126" r="5.5" />
-      <path class="tag-detail" d="M110.5 124.5 Q113 122 115.5 124.5 Q115.5 127 113 129 Q110.5 127 110.5 124.5 Z" />
-
-      </g>
-      <g class="dog-head">
-        <g class="dog-ear dog-ear-far">
-          <path class="patch" d="M77 60 C60 54 48 67 50 84 C52 98 48 111 55 126 L60 121 Q61 137 70 132 L72 126 Q82 129 82 116 C83 105 73 88 78 77 Z" />
-          <path class="ear-detail" d="M62 75 C60 91 70 106 68 118" />
-        </g>
-
-        <path class="fur head-shape" d="M73 64 C77 56 84 53 90 52 L85 44 Q98 43 105 51 L106 42 Q117 45 120 54 Q128 55 132 60 C148 71 152 92 143 111 C135 129 114 139 92 133 C75 129 64 116 62 98 C60 84 64 73 73 64 Z" />
-        <path class="patch forehead" d="M78 59 C86 53 97 51 106 53 C102 63 103 74 96 82 C89 87 80 79 78 70 Z" />
-        <path class="detail whiskers" d="M84 113 l1 0 M89 117 l1 0 M81 119 l1 0" />
-        <path class="fur-detail cheek" d="M116 116 C123 116 129 113 133 108" />
-        <ellipse class="blush" cx="105" cy="105" rx="10" ry="5.5" />
-        <path class="blush-tick" d="M99 103 L101 106 M105 102 L107 105" />
-
-        <path class="muzzle" d="M70 96 C58 95 46 100 40 110 C33 121 39 134 52 140 C67 146 87 140 96 129 C103 120 98 108 88 102 C82 99 76 97 70 96 Z" />
-        <path class="muzzle-shade" d="M55 137 C68 140 83 135 90 127" />
-
-        <g class="dog-eye-sockets">
-          <g class="dog-blink">
-            <ellipse class="eye-white" cx="75" cy="85" rx="7" ry="9" />
-            <path class="eye-patch" d="M92 77 Q99 65 112 71 Q121 76 118 90 Q115 102 103 99 Q91 96 92 77 Z" />
-            <ellipse class="eye-white" cx="105" cy="84" rx="9" ry="12" />
-            <g class="dog-eyes">
-              <ellipse class="eye" cx="73" cy="86" rx="3.8" ry="5.5" />
-              <ellipse class="eye" cx="102" cy="86" rx="5" ry="7" />
-              <circle class="glint" cx="103.5" cy="83" r="2" />
-              <circle class="glint" cx="74" cy="84" r="1.3" />
-              <circle class="glint" cx="100" cy="89" r=".8" />
-            </g>
-          </g>
-        </g>
-        <path class="detail brow" d="M97 65 Q105 60 112 65 M68 71 Q74 67 79 71" />
-
-        <path class="nose" d="M39 109 C44 105 52 106 56 111 C57 117 51 122 45 121 C40 119 37 115 39 109 Z" />
-        <path class="nose-glint" d="M42 110 Q46 108 49 110" />
-        <path class="detail dog-mouth-closed" d="M49 121 L50 125 M50 125 Q61 133 75 124" />
-        <g class="dog-pant">
-        <path class="tongue dog-tongue-rest" d="M59 130 C63 127 70 127 72 130 C73 137 69 143 64 142 C59 141 58 135 59 130 Z" />
-        <path class="tongue-detail dog-tongue-rest" d="M66 133 L66 139" />
-        </g>
-        <g class="dog-mouth-open">
-          <path class="mouth-cavity" d="M49 121 C59 125 69 124 79 119 C80 131 71 140 60 138 C52 136 48 130 49 121 Z" />
-          <path class="tongue" d="M57 135 C62 130 70 130 74 133 C70 138 62 140 57 135 Z" />
-        </g>
-
-        <g class="dog-ear dog-ear-near">
-          <path class="patch" d="M128 59 C148 55 162 74 157 94 C154 107 162 124 151 140 L146 135 Q145 153 133 151 L133 144 Q122 151 117 141 C112 132 119 119 121 107 C124 89 115 76 128 59 Z" />
-          <path class="ear-detail" d="M140 75 C145 93 136 119 132 132" />
-          <path class="ear-detail ear-detail-soft" d="M148 91 C146 106 144 119 139 128" />
-        </g>
-      </g>
-    </g>
-  </g>
-</svg>
-
-<style>
-  .election-dog { display: block; width: 100%; overflow: visible; }
-  .dog-shadow { fill: var(--ink); opacity: .11; transform-origin: center; }
-  .dog-actor, .dog-body, .dog-head, .dog-leg, .dog-ear, .dog-tail { transform-box: fill-box; }
-  .dog-actor { transform-origin: 55% 100%; }
-  .dog-body { transform-origin: 50% 92%; }
-  .dog-head { transform-origin: 68% 72%; transform: rotate(var(--head-tilt, -2deg)); }
-  .dog-leg { transform-origin: 50% 10%; }
-  .dog-ear { transform-origin: 50% 8%; }
-  .dog-tail { transform-origin: 12% 82%; }
-  .fur, .fur-far, .patch, .collar, .tag, .muzzle, .nose {
-    stroke: var(--ink); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;
+<style is:global>
+  /* The SVG's contents come from set:html, so these rules are global and scoped by class. */
+  .election-dog {
+    --fur: #fffdf7; --fur-far: #e8dfd2; --line: var(--ink);
+    display: block; width: 100%; height: auto; overflow: visible;
   }
-  .fur, .muzzle { fill: #fff9ee; }
-  .fur-far { fill: #eee4d7; }
-  .patch, .eye, .nose, .mouth-cavity { fill: var(--ink); }
-  .back-patch, .forehead, .tail-tip { stroke: none; }
-  .collar { fill: var(--primary); }
-  .bandana { fill: #f4bd4f; stroke: var(--ink); stroke-width: 1.8; stroke-linejoin: round; }
-  .bandana-fold { fill: none; stroke: #9c6720; stroke-width: 1.2; stroke-linecap: round; }
-  .tag { fill: var(--paper); stroke-width: 1.8; }
-  .muzzle { stroke-width: 2; }
-  .muzzle-shade, .fur-detail, .detail, .collar-highlight, .tag-detail, .nose-glint {
-    fill: none; stroke-linecap: round; stroke-linejoin: round;
+  .election-dog g, .election-dog use, .election-dog path, .election-dog ellipse { transform-box: view-box; }
+  .election-dog .pass.outline { fill: var(--line); stroke: var(--line); stroke-width: 4.4; stroke-linejoin: round; }
+  .election-dog .pass.fill { fill: var(--fur); stroke: none; }
+  .election-dog .pass.fill.far { fill: var(--fur-far); }
+  .election-dog .mouth-inside { display: none; }
+  .election-dog.is-mouth-open .pass.fill .mouth-inside { display: inline; fill: #4a2b2e; }
+  .election-dog .mouth-inside [data-bone="jaw"] { fill: #ec8c92; }
+  .election-dog.is-mouth-open .smile { display: none; }
+  .election-dog .ear { fill: var(--line); stroke: var(--line); stroke-width: 2.2; stroke-linejoin: round; }
+  .election-dog .patch, .election-dog .eye, .election-dog .nose { fill: var(--line); }
+  .election-dog .fur-line { fill: none; stroke: #c9bfb1; stroke-width: 1.3; stroke-linecap: round; }
+  .election-dog .collar { fill: var(--primary); stroke: var(--line); stroke-width: 1.6; stroke-linejoin: round; }
+  .election-dog .collar-highlight { fill: none; stroke: #fff; stroke-opacity: .45; stroke-width: 1.1; stroke-linecap: round; }
+  .election-dog .tag { fill: #e3a73c; stroke: var(--line); stroke-width: 1.5; }
+  .election-dog .tag-ring { stroke: var(--line); stroke-width: 1.5; }
+  .election-dog .glint { fill: #fff; }
+  .election-dog .brow, .election-dog .smile { fill: none; stroke: var(--line); stroke-width: 1.7; stroke-linecap: round; }
+  .election-dog .eyes-happy { display: none; fill: none; stroke: var(--line); stroke-width: 2.4; stroke-linecap: round; }
+  .election-dog.is-happy .eyes-open { display: none; }
+  .election-dog.is-happy .eyes-happy { display: inline; }
+  .election-dog .blush { fill: #f19a92; opacity: .5; }
+  .election-dog .nose-glint { fill: none; stroke: #fff; stroke-opacity: .7; stroke-width: 1.2; stroke-linecap: round; }
+  .election-dog .dog-shadow { fill: var(--ink); opacity: .12; }
+  .election-dog .bite { fill: none; }
+
+  /* Idle life. Pivots are in drawing units (see PIVOT in companion-dog.ts). */
+  .election-dog .idle-root { transform-origin: 126px 140px; animation: dog-breathe 3.6s ease-in-out infinite; }
+  .election-dog .idle-head { transform-origin: 92px 72px; rotate: var(--head-tilt, 0deg); transition: rotate 260ms ease-out; animation: dog-glance 9.4s ease-in-out infinite; }
+  .election-dog .dog-eyes { transform-origin: 56px 47px; translate: var(--look-x, 0px) var(--look-y, 0px); transition: translate 200ms ease-out; animation: dog-blink 5.8s linear infinite; }
+  .election-dog .idle-tail { transform-origin: 162px 82px; animation: dog-wag 4.2s ease-in-out infinite; }
+  .election-dog .idle-ear { transform-origin: 83px 38px; animation: dog-ear 7.3s ease-in-out infinite; }
+  .election-dog .idle-frontNear { transform-origin: 101px 96px; transition: transform 240ms cubic-bezier(.3,.7,.3,1.3); }
+  .election-dog .idle-frontNearKnee { transform-origin: 100px 119px; transition: transform 240ms ease-out; }
+
+  /* Greeting: hovering or focusing the collection offers a paw. */
+  .collection-button:is(:hover, :focus-visible) .election-dog .idle-frontNear { transform: rotate(72deg); }
+  .collection-button:is(:hover, :focus-visible) .election-dog .idle-frontNearKnee { transform: rotate(-38deg); }
+  .collection-button:is(:hover, :focus-visible) .election-dog .idle-head { animation: dog-greet 1.2s ease-in-out infinite; }
+  .collection-button:is(:hover, :focus-visible) .election-dog .idle-tail,
+  election-companion:has([data-add][data-collected="false"]:is(:hover, :focus-visible)) .election-dog .idle-tail { animation: dog-eager 300ms ease-in-out infinite alternate; }
+  /* Pointing at the collect button: ready for the throw. */
+  election-companion:has([data-add][data-collected="false"]:is(:hover, :focus-visible)) .election-dog .idle-root { animation: dog-ready 700ms ease-out both; }
+
+  .is-catching .election-dog :is(.idle-root, .idle-head, .idle-tail, .idle-ear, .idle-frontNear, .idle-frontNearKnee) { animation: none; transform: none; rotate: none; transition: none; }
+  .is-catching .election-dog .dog-eyes { translate: none; }
+  .is-resting .election-dog * { animation-play-state: paused !important; }
+
+  @keyframes dog-breathe { 50% { transform: scale(1.008, 1.016); } }
+  @keyframes dog-blink { 0%, 46%, 49%, 92%, 95%, 98%, 100% { transform: none; } 47.5%, 93.5%, 96.5% { transform: scaleY(.12); } }
+  @keyframes dog-glance { 0%, 62%, 82%, 100% { transform: none; } 67%, 77% { transform: rotate(9deg); } }
+  @keyframes dog-greet { 0%, 100% { transform: rotate(6deg); } 50% { transform: rotate(11deg); } }
+  @keyframes dog-wag {
+    0%, 30%, 100% { transform: rotate(0deg); }
+    4%, 12%, 20% { transform: rotate(16deg); }
+    8%, 16%, 24% { transform: rotate(-10deg); }
+    60% { transform: rotate(5deg); }
   }
-  .detail, .tag-detail { stroke: var(--ink); stroke-width: 1.5; }
-  .brow { stroke-width: 1.7; }
-  .toes { stroke-width: 1.25; }
-  .fur-detail, .muzzle-shade { stroke: #b9b2a8; stroke-width: 1.35; }
-  .collar-highlight { stroke: #fff; stroke-opacity: .45; stroke-width: 1.2; }
-  .tag-detail { fill: var(--primary); stroke: none; }
-  .nose-glint { stroke: #fff; stroke-opacity: .65; stroke-width: 1.3; }
-  .blush { fill: #f2a99f; opacity: .72; }
-  .blush-tick { fill: none; stroke: #cc776f; stroke-width: 1; stroke-linecap: round; }
-  .ear-detail { fill: none; stroke: #fff; stroke-opacity: .22; stroke-width: 1.5; stroke-linecap: round; }
-  .ear-detail-soft { stroke-opacity: .12; }
-  .eye-white { fill: #fffdf8; stroke: var(--ink); stroke-width: 1.4; }
-  .eye-patch { fill: #c9beb0; }
-  .whiskers { stroke-width: 2.4; }
-  .bandana-dot { stroke: #fff9ee; stroke-width: 2; stroke-linecap: round; }
-  .dog-blink, .dog-pant, .dog-scarf, .dog-tag { transform-box: fill-box; }
-  .dog-blink { transform-origin: center; animation: double-blink 6.7s linear infinite; }
-  .dog-pant { transform-origin: top; animation: happy-pant 1.4s ease-in-out infinite; }
-  .dog-scarf, .dog-tag { transform-origin: 25% 0%; }
-  .dog-scarf { animation: scarf-drift 2.8s ease-in-out infinite; }
-  .dog-tag { animation: tag-swing 2.8s ease-in-out infinite; }
-  .glint { fill: var(--paper); }
-  .dog-eyes { transform: translate(var(--look-x, 0px), var(--look-y, 0px)); }
-  .dog-head, .dog-eyes { transition: transform 220ms ease-out; }
-  .dog-mouth-open { opacity: 0; }
-  .tongue { fill: #ef8791; stroke: var(--ink); stroke-width: 1.25; stroke-linejoin: round; }
-  .tongue-detail { fill: none; stroke: #bd5968; stroke-width: 1; stroke-linecap: round; }
-  :global(.is-catching) .dog-tongue-rest { opacity: 0; }
-  .dog-body { animation: dog-breathe 3.4s ease-in-out infinite; }
-  .dog-tail { animation: tail-wag 2.8s ease-in-out infinite; }
-  .dog-ear-near { animation: ear-dream 6.7s ease-in-out infinite; }
-  .dog-head { animation: head-hello 6.7s ease-in-out infinite; }
-  /* A greeting is a short performance, not a permanently bouncing button. */
-  :global(.collection-button:is(:hover, :focus-visible)) .dog-body { animation: play-bow 900ms cubic-bezier(.22,.7,.3,1) both; }
-  :global(.collection-button:is(:hover, :focus-visible)) .dog-tail { animation: eager-wag 240ms ease-in-out 4 alternate; }
-  :global(.collection-button:is(:hover, :focus-visible)) .dog-ear { animation: greeting-flop 900ms ease-out; }
-  :global(.is-catching) .dog-body,
-  :global(.is-catching) .dog-head,
-  :global(.is-catching) .dog-ear,
-  :global(.is-catching) .dog-tail,
-  :global(.is-catching) .dog-scarf,
-  :global(.is-catching) .dog-tag { animation: none !important; }
-  :global(.is-catching) .dog-blink { animation: none; }
-  :global(.is-resting) :is(.dog-body, .dog-head, .dog-tail, .dog-ear, .dog-blink, .dog-pant, .dog-scarf, .dog-tag) { animation-play-state: paused; }
-  @keyframes dog-breathe {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.006, 1.018); }
-  }
-  @keyframes tail-wag {
-    0%, 48%, 100% { transform: rotate(-7deg); }
-    8%, 24%, 40% { transform: rotate(18deg); }
-    16%, 32% { transform: rotate(-15deg); }
-    65%, 82% { transform: rotate(-3deg); }
-  }
-  @keyframes eager-wag { from { transform: rotate(-20deg); } to { transform: rotate(26deg); } }
-  @keyframes ear-dream {
-    0%, 72%, 100% { transform: rotate(0deg); }
-    79% { transform: rotate(11deg); }
-    84% { transform: rotate(-7deg); }
-    89% { transform: rotate(3deg); }
-  }
-  @keyframes head-hello {
-    0%, 66%, 100% { transform: rotate(var(--head-tilt, -2deg)); }
-    75%, 82% { transform: rotate(-10deg) translateY(-2px); }
-    90% { transform: rotate(3deg); }
-  }
-  @keyframes double-blink {
-    0%, 40%, 44%, 48%, 100% { transform: scaleY(1); }
-    42%, 46% { transform: scaleY(.08); }
-  }
-  @keyframes happy-pant {
-    0%, 65%, 100% { transform: scaleY(1) rotate(-4deg); }
-    30% { transform: scaleY(1.2) rotate(3deg); }
-  }
-  @keyframes scarf-drift { 0%, 100% { transform: rotate(-4deg); } 50% { transform: rotate(6deg); } }
-  @keyframes tag-swing { 0%, 100% { transform: rotate(8deg); } 50% { transform: rotate(-9deg); } }
-  @keyframes play-bow {
-    0%, 100% { transform: none; }
-    30%, 48% { transform: translateY(4px) rotate(-7deg) scale(1.04, .91); }
-    68% { transform: translateY(-5px) rotate(2deg) scale(.98, 1.04); }
-    84% { transform: translateY(1px) scale(1.02, .98); }
-  }
-  @keyframes greeting-flop {
-    0%, 100% { transform: rotate(0); }
-    35% { transform: rotate(-14deg); }
-    65% { transform: rotate(20deg); }
-    82% { transform: rotate(-8deg); }
-  }
+  @keyframes dog-eager { from { transform: rotate(-14deg); } to { transform: rotate(20deg); } }
+  @keyframes dog-ear { 0%, 80%, 100% { transform: none; } 84% { transform: rotate(-9deg); } 88% { transform: rotate(4deg); } 92% { transform: rotate(-2deg); } }
+  @keyframes dog-ready { to { transform: scale(1.04, .94); } }
+
   @media (prefers-reduced-motion: reduce) {
-    .dog-head, .dog-eyes { transition: none; }
-    .election-dog * { animation: none !important; }
+    .election-dog *, .election-dog { animation: none !important; transition: none !important; }
+    .collection-button:is(:hover, :focus-visible) .election-dog :is(.idle-frontNear, .idle-frontNearKnee) { transform: none; }
   }
 </style>
