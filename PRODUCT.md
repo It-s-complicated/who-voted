@@ -48,8 +48,8 @@ Politically neutral: explain the data without endorsing parties or telling peopl
 The site should become more playful through a useful, politically neutral dog
 companion. It observes meaningful interactions and catches elections added to a
 browser-local collection. The side-facing, articulated spaniel runs toward a
-miniature chart, jumps to catch it, and lands; the initial drawings were
-directional studies, not approved final artwork.
+miniature chart, jumps to catch it, lands, and carries it to a basket that shows
+the collection; the artwork still awaits the user's review.
 
 The first slice is collecting and reopening elections, not yet an analytical
 comparison. Optional historical stories follow only with curated sources. Preserve

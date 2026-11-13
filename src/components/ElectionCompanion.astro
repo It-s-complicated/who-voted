@@ -23,7 +23,6 @@ const catalog = (await getCollection("elections")).map(({ id, data }) => ({
     </div>
     <button type="button" class="collection-button" data-open aria-haspopup="dialog" aria-controls="election-collection" aria-label="Wahlsammlung öffnen, 0 Wahlen">
       <ElectionDog />
-      <span class="catch-burst" aria-hidden="true"><i>✦</i><i>★</i><i>✦</i></span>
       <span class="collection-label">Sammlung <span class="collection-count" data-count>0</span><span aria-hidden="true">↗</span></span>
     </button>
   </section>
@@ -58,6 +57,8 @@ const catalog = (await getCollection("elections")).map(({ id, data }) => ({
     private allowed = new Set<string>();
     private controller?: AbortController;
     private animations: Animation[] = [];
+    private frame = 0;
+    private carrying = 0;
     private observer?: IntersectionObserver;
     private inView = false;
     private motion = matchMedia("(prefers-reduced-motion: reduce)");
@@ -162,6 +163,7 @@ const catalog = (await getCollection("elections")).map(({ id, data }) => ({
         return item;
       }));
       this.querySelector<HTMLElement>("[data-count]")!.textContent = String(collection.length);
+      this.renderStack();
       this.querySelector<HTMLElement>("[data-open]")!.setAttribute("aria-label", `Wahlsammlung öffnen, ${collection.length} ${collection.length === 1 ? "Wahl" : "Wahlen"}`);
       this.querySelector<HTMLElement>("[data-empty]")!.hidden = collection.length > 0;
       this.querySelector<HTMLElement>("[data-storage]")!.textContent = this.storageNote;
@@ -209,46 +211,35 @@ const catalog = (await getCollection("elections")).map(({ id, data }) => ({
     private look = (event: Event) => {
       if (this.motion.matches || this.classList.contains("is-catching") || this.dialog.open) return;
       const target = (event.target as Element).closest("a, button, select, summary, #election-chart");
-      if (!target) return;
-      const dog = this.querySelector("svg")!.getBoundingClientRect();
+      if (!target || target.closest(".collection-button")) return;
+      const dog = this.querySelector(".election-dog")!.getBoundingClientRect();
       if (dog.bottom < 0 || dog.top > innerHeight) return;
       const rect = target.getBoundingClientRect();
-      const x = Math.max(-3, Math.min(3, (rect.left + rect.width / 2 - dog.left - dog.width / 2) / 100));
-      const y = Math.max(-2, Math.min(2, (rect.top + rect.height / 2 - dog.top - dog.height / 2) / 100));
+      const x = clamp((rect.left + rect.width / 2 - dog.left - dog.width * .2) / 120, -2.5, 2.5);
+      const y = clamp((rect.top + rect.height / 2 - dog.top - dog.height * .4) / 120, -2, 2);
       this.style.setProperty("--look-x", `${x}px`);
       this.style.setProperty("--look-y", `${y}px`);
-      this.style.setProperty("--head-tilt", `${x * 1.5}deg`);
+      // The dog faces left: a positive turn lifts its nose toward things above it.
+      this.style.setProperty("--head-tilt", `${clamp(-y * 3, -5, 6)}deg`);
     };
 
+    /** Cards shown in the basket. One card stays out while the dog is still carrying it. */
+    private renderStack() {
+      const shown = Math.min(3, Math.max(0, collection.length - this.carrying));
+      this.querySelectorAll(".stack-card").forEach((card, index) => card.classList.toggle("is-filled", index < shown));
+    }
+
     private stopFlight() {
+      cancelAnimationFrame(this.frame);
       this.animations.forEach((animation) => animation.cancel());
       this.animations = [];
       this.flight.hidden = true;
       this.classList.remove("is-catching");
+      this.carrying = 0;
+      this.renderStack();
     }
 
-    private async catchElection(button: HTMLButtonElement, election: Election) {
-      this.stopFlight();
-      if (this.motion.matches || !Element.prototype.animate) return;
-      const dog = this.querySelector<SVGSVGElement>("svg")!;
-      const source = button.getBoundingClientRect();
-      const destination = dog.getBoundingClientRect();
-      const duration = 2200;
-      const run = Math.min(48, destination.width * .25);
-      const jump = Math.min(54, destination.height * .43);
-      const card = { width: 132, height: 112 };
-      const mouth = {
-        x: destination.left + destination.width * (62 / 290) - run - 4,
-        y: destination.top + destination.height * (97 / 175) - jump,
-      };
-      const start = {
-        x: source.left + source.width / 2 - card.width / 2,
-        y: source.top + source.height / 2 - card.height / 2,
-      };
-      const end = { x: mouth.x - card.width / 2, y: mouth.y - card.height / 2 };
-      const dx = end.x - start.x;
-      const arc = Math.max(8, Math.min(start.y, end.y) - Math.min(110, Math.abs(dx) * .42 + 48));
-
+    private prepareCard(election: Election) {
       this.querySelector<HTMLElement>("[data-flight-year]")!.textContent = String(election.year);
       this.querySelector<HTMLElement>("[data-flight-name]")!.textContent = election.name;
       const chart = document.querySelector<SVGSVGElement>("#election-chart")?.cloneNode(true) as SVGSVGElement | undefined;
@@ -257,131 +248,220 @@ const catalog = (await getCollection("elections")).map(({ id, data }) => ({
         chart.removeAttribute("id");
         chart.removeAttribute("data-filename");
         chart.setAttribute("aria-hidden", "true");
+        chart.querySelectorAll("title, desc").forEach((node) => node.remove());
         thumbnail.replaceChildren(chart);
         thumbnail.hidden = false;
       } else {
         thumbnail.replaceChildren();
         thumbnail.hidden = true;
       }
+    }
 
+    private async catchElection(button: HTMLButtonElement, election: Election) {
+      this.stopFlight();
+      if (this.motion.matches || !Element.prototype.animate) return;
+      const svg = this.querySelector<SVGSVGElement>(".election-dog")!;
+      const head = svg.querySelector<SVGGElement>(".dog-head")!;
+      const screen = svg.getScreenCTM();
+      if (!screen) return;
+      this.prepareCard(election);
+      this.carrying = 1;
+      this.renderStack();
       this.flight.hidden = false;
       this.classList.add("is-catching");
-      const flight = this.flight.animate([
-        { transform: `translate(${start.x}px, ${start.y + 4}px) scale(.58) rotate(-12deg)`, opacity: 0, offset: 0 },
-        { transform: `translate(${start.x + dx * .06}px, ${start.y - 15}px) scale(.82) rotate(-14deg)`, opacity: 1, offset: .07 },
-        { transform: `translate(${start.x + dx * .43}px, ${arc}px) scale(1.04) rotate(10deg)`, opacity: 1, offset: .38 },
-        { transform: `translate(${end.x}px, ${end.y}px) scale(.4) rotate(-7deg)`, opacity: 1, offset: .63 },
-        { transform: `translate(${end.x}px, ${end.y}px) scale(.14) rotate(3deg)`, opacity: 1, offset: .68 },
-        { transform: `translate(${end.x}px, ${end.y}px) scale(.06)`, opacity: 0, offset: .73 },
-        { transform: `translate(${end.x}px, ${end.y}px) scale(.06)`, opacity: 0, offset: 1 },
-      ], { duration });
-      const actor = dog.querySelector(".dog-actor")!.animate([
-        { transform: "translate(0, 0) rotate(0deg)", offset: 0 },
-        { transform: "translate(3px, 7px) scale(1.07, .9) rotate(-4deg)", offset: .08 },
-        { transform: "translate(-2px, -5px) scale(.98, 1.04) rotate(2deg)", offset: .13 },
-        { transform: `translate(-${run * .55}px, 0) rotate(-2deg)`, offset: .25 },
-        { transform: `translate(-${run}px, 0) rotate(1deg)`, offset: .35 },
-        { transform: `translate(-${run}px, 6px) scale(1.06, .91) rotate(-5deg)`, offset: .43 },
-        { transform: `translate(-${run + 4}px, -${jump}px) scale(.98, 1.03) rotate(6deg)`, offset: .58 },
-        { transform: `translate(-${run + 4}px, -${jump}px) rotate(4deg)`, offset: .67 },
-        { transform: `translate(-${run}px, 0) rotate(-3deg)`, offset: .77 },
-        { transform: `translate(-${run}px, 7px) scale(1.09, .88) rotate(-2deg)`, offset: .82 },
-        { transform: `translate(-${run}px, -4px) scale(.98, 1.03) rotate(1deg)`, offset: .87 },
-        { transform: `translate(-${run * .55}px, 0) rotate(-2deg)`, offset: .94 },
-        { transform: "translate(0, 0) rotate(0deg)", offset: 1 },
-      ], { duration });
-      const head = dog.querySelector(".dog-head")!.animate([
-        { transform: "rotate(-5deg)", offset: 0 },
-        { transform: "rotate(10deg) translateY(2px)", offset: .1 },
-        { transform: "rotate(-4deg)", offset: .34 },
-        { transform: "rotate(20deg) translateY(-2px)", offset: .53 },
-        { transform: "rotate(23deg)", offset: .66 },
-        { transform: "rotate(-9deg) translateY(2px)", offset: .8 },
-        { transform: "rotate(3deg)", offset: .85 },
-        { transform: "rotate(-12deg) translateY(-2px)", offset: .9 },
-        { transform: "rotate(7deg)", offset: .94 },
-        { transform: "rotate(-4deg)", offset: .97 },
-        { transform: "rotate(var(--head-tilt, -2deg))", offset: 1 },
-      ], { duration });
-      const shadow = dog.querySelector(".dog-shadow")!.animate([
-        { transform: "translateX(0) scale(1)", opacity: .11, offset: 0 },
-        { transform: `translateX(-${run * .8}px) scale(.85)`, opacity: .09, offset: .4 },
-        { transform: `translateX(-${run}px) scale(.42)`, opacity: .04, offset: .62 },
-        { transform: `translateX(-${run}px) scale(1.14)`, opacity: .15, offset: .8 },
-        { transform: `translateX(-${run}px) scale(1)`, opacity: .11, offset: .87 },
-        { transform: "translateX(0) scale(1)", opacity: .11, offset: 1 },
-      ], { duration });
-      const openMouth = dog.querySelector(".dog-mouth-open")!.animate([
-        { opacity: 0, offset: 0 }, { opacity: 0, offset: .43 },
-        { opacity: 1, offset: .48 }, { opacity: 1, offset: .69 },
-        { opacity: 0, offset: .76 }, { opacity: 0, offset: 1 },
-      ], { duration });
-      const closedMouth = dog.querySelector(".dog-mouth-closed")!.animate([
-        { opacity: 1, offset: 0 }, { opacity: 1, offset: .43 },
-        { opacity: 0, offset: .48 }, { opacity: 0, offset: .69 },
-        { opacity: 1, offset: .76 }, { opacity: 1, offset: 1 },
-      ], { duration });
-      const legs = [...dog.querySelectorAll(".dog-leg")].map((leg, index) => {
-        const direction = index % 2 === 0 ? 1 : -1;
-        const tuck = leg.classList.contains("dog-front-near") || leg.classList.contains("dog-front-far") ? -38 : 42;
-        return leg.animate([
-          { transform: "rotate(0deg)", offset: 0 },
-          { transform: `rotate(${18 * direction}deg)`, offset: .08 },
-          { transform: `rotate(${-42 * direction}deg)`, offset: .16 },
-          { transform: `rotate(${42 * direction}deg)`, offset: .24 },
-          { transform: `rotate(${-38 * direction}deg)`, offset: .32 },
-          { transform: `rotate(${28 * direction}deg)`, offset: .4 },
-          { transform: `rotate(${tuck * 1.2}deg)`, offset: .54 },
-          { transform: `rotate(${tuck * 1.2}deg)`, offset: .67 },
-          { transform: `rotate(${-22 * direction}deg)`, offset: .77 },
-          { transform: `rotate(${12 * direction}deg)`, offset: .83 },
-          { transform: "rotate(0deg)", offset: .88 },
-          { transform: `rotate(${28 * direction}deg)`, offset: .95 },
-          { transform: "rotate(0deg)", offset: 1 },
-        ], { duration });
-      });
-      const ears = [...dog.querySelectorAll(".dog-ear")].map((ear, index) => ear.animate([
-        { transform: "rotate(0deg)", offset: 0 },
-        { transform: `rotate(${index ? -14 : 11}deg)`, offset: .25 },
-        { transform: `rotate(${index ? 22 : -16}deg)`, offset: .43 },
-        { transform: `rotate(${index ? -32 : 24}deg)`, offset: .62 },
-        { transform: `rotate(${index ? 15 : -11}deg)`, offset: .79 },
-        { transform: "rotate(0deg)", offset: 1 },
-      ], { duration }));
-      const tail = dog.querySelector(".dog-tail")!.animate([
-        { transform: "rotate(0deg)", offset: 0 },
-        { transform: "rotate(-20deg)", offset: .1 },
-        { transform: "rotate(20deg)", offset: .2 },
-        { transform: "rotate(-20deg)", offset: .3 },
-        { transform: "rotate(20deg)", offset: .4 },
-        { transform: "rotate(-18deg)", offset: .52 },
-        { transform: "rotate(17deg)", offset: .64 },
-        { transform: "rotate(-12deg)", offset: .76 },
-        { transform: "rotate(10deg)", offset: .88 },
-        { transform: "rotate(0deg)", offset: 1 },
-      ], { duration });
-      // Fabric and tag lag behind the jump, then overshoot as the paws land.
-      const accessories = [...dog.querySelectorAll(".dog-scarf, .dog-tag")].map((part, index) => part.animate([
-        { transform: "rotate(0deg)", offset: 0 },
-        { transform: `rotate(${index ? 18 : -12}deg)`, offset: .16 },
-        { transform: "rotate(-25deg)", offset: .43 },
-        { transform: `rotate(${index ? 38 : 48}deg)`, offset: .6 },
-        { transform: "rotate(15deg)", offset: .73 },
-        { transform: "rotate(-32deg)", offset: .82 },
-        { transform: "rotate(18deg)", offset: .89 },
-        { transform: "rotate(-8deg)", offset: .95 },
-        { transform: "rotate(0deg)", offset: 1 },
-      ], { duration, easing: "ease-in-out" }));
-      this.animations = [flight, actor, head, shadow, openMouth, closedMouth, tail, ...legs, ...ears, ...accessories];
+
+      // One clock for everything: milliseconds on a 2.8 s timeline, drawing units for distances.
+      const T = 2800, RUN = 38, JUMP = 36, CATCH = 1100, DROP = 2340, LANDED_IN_BASKET = 2420;
+      const t0 = document.timeline.currentTime as number;
+      const track = (frames: [number, string, string?][], property = "transform") =>
+        frames.map(([ms, value, easing]) => ({ offset: ms / T, [property]: value, ...(easing ? { easing } : {}) }));
+      const play = (selector: string, keyframes: Keyframe[], timing: KeyframeAnimationOptions = {}) => {
+        svg.querySelectorAll(selector).forEach((element) => {
+          const animation = element.animate(keyframes, { duration: T, ...timing });
+          animation.startTime = t0; // delays are part of the timing, so every part shares one clock
+          this.animations.push(animation);
+        });
+      };
+      const pose = (x: number, y: number, facing: number, turn: number) =>
+        `translate(${x}px, ${y}px) scale(${facing}, 1) rotate(${turn}deg)`;
+      const out = "cubic-bezier(.2,.7,.4,1)", fall = "cubic-bezier(.5,0,.8,.6)", step = "ease-in-out";
+      const R = RUN, J = JUMP, L = RUN + 8;
+
+      // Whole dog: anticipation, run, jump, catch, land, turn, trot home, turn back.
+      const actor = track([
+        [0, pose(0, 0, 1, 0), step], [160, pose(3, 0, 1, -2), "ease-in"],
+        [700, pose(-R, 0, 1, 0)], [820, pose(-R - 2, 0, 1, -3), out],
+        [CATCH, pose(-R - 6, -J, 1, 5)], [1200, pose(-R - 7, -J + 3, 1, -1), fall],
+        [1380, pose(-L, 0, 1, -5), out], [1480, pose(-L, 0, 1, 0)],
+        // Turning is a little spin-hop, so the mirrored frames read as a turn, not a flicker.
+        [1520, pose(-L, 0, 1, 0), out], [1590, pose(-L, -7, 0, 0), "ease-in"], [1660, pose(-L, 0, -1, 0)],
+        [2160, pose(0, 0, -1, 0)], [2440, pose(0, 0, -1, 0), out],
+        [2510, pose(0, -6, 0, 0), "ease-in"], [2580, pose(0, 0, 1, 0)], [T, pose(0, 0, 1, 0)],
+      ]);
+      play(".dog-actor", actor);
+      const squash = (y: number, sx: number, sy: number) => `translateY(${y}px) scale(${sx}, ${sy})`;
+      play(".dog-breath", track([
+        [0, squash(0, 1, 1)], [140, squash(1, 1.05, .92)], [240, squash(-1, .97, 1.04)],
+        [370, squash(-3, 1, 1)], [480, squash(0, 1.02, .98)], [590, squash(-3, 1, 1)], [700, squash(0, 1, 1)],
+        [820, squash(1, 1.08, .88), out], [920, squash(-1, .94, 1.08)], [CATCH, squash(0, 1, 1)],
+        [1380, squash(0, 1, 1), out], [1430, squash(1, 1.1, .86)], [1520, squash(-1, .97, 1.04)], [1600, squash(0, 1, 1)],
+        [1720, squash(-2, 1, 1)], [1785, squash(0, 1, 1)], [1850, squash(-2, 1, 1)], [1910, squash(0, 1, 1)],
+        [1975, squash(-2, 1, 1)], [2040, squash(0, 1, 1)], [2100, squash(-2, 1, 1)], [2160, squash(0, 1, 1)],
+        [2280, squash(1, 1.03, .96)], [2440, squash(0, 1, 1)],
+        [2600, squash(1, 1.04, .95)], [2700, squash(-1, .99, 1.02)], [T, squash(0, 1, 1)],
+      ]));
+      play(".dog-shadow", track([
+          [0, "translateX(0) scale(1)"], [160, "translateX(3px) scale(1)"], [700, `translateX(-${R}px) scale(1)`],
+          [820, `translateX(-${R + 2}px) scale(1.05)`, out], [CATCH, `translateX(-${R + 6}px) scale(.5)`],
+          [1200, `translateX(-${R + 7}px) scale(.52)`, fall], [1380, `translateX(-${L}px) scale(1.1)`],
+          [1480, `translateX(-${L}px) scale(1)`], [1660, `translateX(-${L}px) scale(1)`],
+          [2160, "translateX(0) scale(1)"], [T, "translateX(0) scale(1)"],
+      ]));
+      play(".dog-shadow", track([[0, ".13"], [820, ".13", out], [CATCH, ".06"], [1200, ".06", fall], [1380, ".16"], [1520, ".13"], [T, ".13"]], "opacity"));
+
+      // Gallop out (two strides), leap, then a trot home on diagonal pairs.
+      const gait = (amplitude: number, phase: 1 | -1) => [
+        { transform: "rotate(0deg)" }, { transform: `rotate(${amplitude * phase}deg)` },
+        { transform: `rotate(${-amplitude * phase}deg)` }, { transform: "rotate(0deg)" },
+      ];
+      const legs = { frontNear: ".dog-front-near", frontFar: ".dog-front-far", hindNear: ".dog-hind-near", hindFar: ".dog-hind-far" };
+      const gallop = { duration: 220, iterations: 2, delay: 260, easing: step };
+      play(legs.frontNear, gait(30, 1), gallop);
+      play(legs.frontFar, gait(26, 1), { ...gallop, delay: 290 });
+      play(legs.hindNear, gait(28, -1), { ...gallop, delay: 300 });
+      play(legs.hindFar, gait(24, -1), { ...gallop, delay: 270 });
+      const leap = (frames: [number, number][]) => frames.map(([ms, angle]) => ({ offset: (ms - 700) / 780, transform: `rotate(${angle}deg)` }));
+      const leapTiming = { duration: 780, delay: 700, easing: "linear" };
+      const front = leap([[700, 0], [820, -12], [920, 48], [CATCH, 28], [1280, 18], [1380, -6], [1480, 0]]);
+      const hind = leap([[700, 0], [820, 10], [920, -52], [CATCH, 22], [1280, 8], [1380, 2], [1480, 0]]);
+      play(`${legs.frontNear}, ${legs.frontFar}`, front, leapTiming);
+      play(`${legs.hindNear}, ${legs.hindFar}`, hind, leapTiming);
+      const trot = { duration: 250, iterations: 2, delay: 1660, easing: step };
+      play(`${legs.frontNear}, ${legs.hindFar}`, gait(20, 1), trot);
+      play(`${legs.frontFar}, ${legs.hindNear}`, gait(20, -1), trot);
+
+      play(".dog-head", track([
+        [0, "rotate(0deg)"], [150, "rotate(8deg)"], [260, "rotate(4deg)"], [700, "rotate(2deg)"],
+        [820, "rotate(-4deg)", out], [980, "rotate(16deg)"], [CATCH, "rotate(9deg)"], [1180, "rotate(3deg)"],
+        [1380, "rotate(-8deg)"], [1480, "rotate(4deg)"], [1560, "rotate(0deg)"], [2160, "rotate(0deg)", step],
+        [2300, "rotate(-20deg)"], [DROP + 60, "rotate(-21deg)", out], [2500, "rotate(4deg)"],
+        [2640, "rotate(10deg) translateY(-1px)", step], [T, "rotate(0deg)"],
+      ]));
+      // Soft parts lag behind the body and overshoot when it stops.
+      play(".dog-ear-near", track([
+        [0, "rotate(0deg)"], [140, "rotate(-4deg)"], [260, "rotate(6deg)"], [480, "rotate(-8deg)"], [700, "rotate(6deg)"],
+        [820, "rotate(10deg)"], [960, "rotate(-22deg)"], [1160, "rotate(-36deg)"], [1380, "rotate(16deg)"],
+        [1460, "rotate(-10deg)"], [1540, "rotate(5deg)"], [1620, "rotate(0deg)"], [1900, "rotate(-6deg)"],
+        [2160, "rotate(0deg)"], [2300, "rotate(14deg)"], [DROP + 80, "rotate(10deg)"], [2500, "rotate(-8deg)"],
+        [2620, "rotate(4deg)"], [T, "rotate(0deg)"],
+      ], "transform"), { easing: "linear" });
+      play(".dog-ear-far", track([
+        [0, "rotate(0deg)"], [820, "rotate(4deg)"], [960, "rotate(-12deg)"], [1160, "rotate(-22deg)"],
+        [1380, "rotate(10deg)"], [1460, "rotate(-5deg)"], [1620, "rotate(0deg)"], [2300, "rotate(8deg)"],
+        [2500, "rotate(-4deg)"], [T, "rotate(0deg)"],
+      ]));
+      play(".dog-tag", track([
+        [0, "rotate(0deg)"], [700, "rotate(-12deg)"], [960, "rotate(-28deg)"], [1160, "rotate(18deg)"],
+        [1380, "rotate(-26deg)"], [1460, "rotate(20deg)"], [1540, "rotate(-10deg)"], [1640, "rotate(4deg)"],
+        [2160, "rotate(-8deg)"], [2300, "rotate(16deg)"], [2440, "rotate(-8deg)"], [2560, "rotate(4deg)"], [T, "rotate(0deg)"],
+      ]));
+      play(".dog-tail", [{ transform: "rotate(-14deg)" }, { transform: "rotate(18deg)" }], { duration: 175, iterations: 16, direction: "alternate", easing: step });
+      // Swap drawings (open/closed mouth, open/happy eyes) during the given windows.
+      const during = (ranges: [number, number][], on = "1", off = "0") => {
+        const frames: [number, string][] = [[0, off]];
+        for (const [from, to] of ranges) frames.push([from, off], [from + 30, on], [to - 30, on], [to, off]);
+        frames.push([T, off]);
+        return track(frames, "opacity");
+      };
+      const show = (ranges: [number, number][]) => during(ranges);
+      const hide = (ranges: [number, number][]) => during(ranges, "0", "1");
+      play(".dog-mouth-open", show([[930, CATCH + 10], [DROP - 20, DROP + 110]]));
+      play(".dog-mouth-closed", hide([[930, CATCH + 10], [DROP - 20, DROP + 110]]));
+      play(".dog-eyes-happy", show([[2470, T]]));
+      play(".dog-eyes-open", hide([[2470, T]]));
+      play(".dog-eyes", track([[0, "translate(0, 0)"], [150, "translate(-1px, -2px)"], [CATCH, "translate(-1px, -2px)"], [1220, "translate(0, 0)"], [T, "translate(0, 0)"]]));
+      play(".dog-basket", track([
+        [0, "scale(1, 1)"], [LANDED_IN_BASKET, "scale(1, 1)"], [LANDED_IN_BASKET + 50, "scale(1.07, .88)"],
+        [LANDED_IN_BASKET + 130, "scale(.97, 1.05)"], [LANDED_IN_BASKET + 210, "scale(1, 1)"], [T, "scale(1, 1)"],
+      ]));
+
+      // The card is one object for the whole trip. Each frame it is placed from the dog's
+      // live transform (on the actor's clock), so the chart meets the muzzle exactly and stays in the mouth.
+      // Geometry is read live, so scrolling mid-throw cannot detach the card from the dog.
+      const origin = () => {
+        const source = button.getBoundingClientRect();
+        return { x: source.left + source.width / 2, y: source.top + source.height / 2 };
+      };
+      const inDrawing = (x: number, y: number) => new DOMPoint(x, y).matrixTransform(svg.getScreenCTM() ?? screen);
+      const start = origin();
+      const unit = screen.a;
+      const card = { width: 132, height: 112 };
+      const held = (30 * unit) / card.width;
+      const inBasket = (20 * unit) / card.width;
+      let last = { x: start.x, y: start.y, angle: 0 };
+      const mouth = () => {
+        const matrix = head.getScreenCTM();
+        if (!matrix) return last;
+        const point = new DOMPoint(21, 97).matrixTransform(matrix);
+        // atan2(-c, d) is the head's rotation whether or not the dog is mirrored.
+        return (last = { x: point.x, y: point.y, angle: Math.atan2(-matrix.c, matrix.d) * 180 / Math.PI });
+      };
+      const lift = clamp(70 + Math.abs(inDrawing(21 - RUN - 6, 97 - JUMP).x - start.x) * .18, 80, 170);
+      let dropFrom: { x: number; y: number; angle: number } | undefined;
+      const place = (x: number, y: number, scale: number, angle: number, opacity: number) => {
+        this.flight.style.transform = `translate(${x - card.width / 2}px, ${y - card.height / 2}px) rotate(${angle}deg) scale(${scale})`;
+        this.flight.style.opacity = String(opacity);
+      };
+      const [master] = this.animations;
+      const tick = () => {
+        const t = Number(master.currentTime ?? T);
+        if (t < CATCH) {
+          const u = Math.max(0, t / CATCH);
+          const target = mouth();
+          const from = origin();
+          const peak = inDrawing(21 - RUN - 6, 97 - JUMP);
+          const control = { x: (from.x + peak.x) / 2, y: Math.max(8, Math.min(from.y, peak.y) - lift) };
+          const x = (1 - u) ** 2 * from.x + 2 * u * (1 - u) * control.x + u ** 2 * target.x;
+          const y = (1 - u) ** 2 * from.y + 2 * u * (1 - u) * control.y + u ** 2 * target.y;
+          const grow = u < .45 ? .5 + .5 * Math.sin((u / .45) * Math.PI / 2) : 1 - (1 - held) * ((u - .45) / .55) ** 1.6;
+          const spin = u < .5 ? -12 + 40 * u : 8 + (target.angle - 6 - 8) * ((u - .5) / .5);
+          place(x, y, grow, spin, Math.min(1, t / 80));
+        } else if (t < DROP) {
+          const { x, y, angle } = mouth();
+          place(x, y, held, angle - 6, 1);
+          dropFrom = { x, y, angle: angle - 6 };
+        } else if (t < LANDED_IN_BASKET + 40 && dropFrom) {
+          const u = (t - DROP) / (LANDED_IN_BASKET + 40 - DROP);
+          const basket = inDrawing(212, 112);
+          const x = dropFrom.x + (basket.x - dropFrom.x) * u;
+          const y = dropFrom.y + (basket.y - dropFrom.y) * u * u - 10 * unit * Math.sin(u * Math.PI);
+          place(x, y, held + (inBasket - held) * u, dropFrom.angle * (1 - u) + 4 * u, u < .75 ? 1 : (1 - u) * 4);
+          if (t >= LANDED_IN_BASKET && this.carrying) {
+            this.carrying = 0;
+            this.renderStack();
+          }
+        } else {
+          this.flight.hidden = true;
+          if (this.carrying) {
+            this.carrying = 0;
+            this.renderStack();
+          }
+        }
+        if (t < T) this.frame = requestAnimationFrame(tick);
+      };
+      tick();
+
       try {
-        await flight.finished;
+        await master.finished;
       } catch (error) {
         if (!(error instanceof DOMException && error.name === "AbortError")) console.error("Catch animation failed", error);
       } finally {
-        if (this.animations.includes(flight)) this.stopFlight();
+        if (this.animations.includes(master)) this.stopFlight();
       }
     }
   }
+
+  const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 
   customElements.define("election-companion", ElectionCompanion);
 </script>
@@ -389,8 +469,7 @@ const catalog = (await getCollection("elections")).map(({ id, data }) => ({
 <style>
   election-companion { display: block; margin: 1.6rem 0 1.5rem; }
   election-companion[hidden], [hidden] { display: none !important; }
-  .companion-shelf { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) 12rem; align-items: end; gap: 1rem; overflow: hidden; border: 1.5px solid var(--ink); border-radius: 22px; background: #fff3d6; box-shadow: 4px 5px 0 #1c1b1a12; }
-  .companion-shelf::before { content: ""; position: absolute; width: 11rem; height: 11rem; right: -4rem; top: -6rem; border: 1.5px dashed #d99b2b66; border-radius: 50%; pointer-events: none; }
+  .companion-shelf { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) 13.5rem; align-items: end; gap: 1rem; border: 1.5px solid var(--ink); border-radius: 22px; background: #fff3d6; box-shadow: 4px 5px 0 #1c1b1a12; }
   .invitation { position: relative; z-index: 1; padding: 1.25rem 0 1.45rem 1.5rem; }
   .kicker { margin: 0 0 .45rem; color: var(--primary); font-size: .68rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
   .invitation-title { margin: 0; font: 620 1.6rem/1.15 var(--font-display); letter-spacing: -.02em; }
@@ -399,28 +478,19 @@ const catalog = (await getCollection("elections")).map(({ id, data }) => ({
   .collect-button { display: inline-flex; align-items: center; gap: .65rem; min-height: 44px; padding: .55rem 1rem; border: 1.5px solid var(--ink); border-radius: 999px; background: var(--surface); box-shadow: 3px 3px 0 var(--ink); font-size: .85rem; font-weight: 650; transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease; }
   .collect-button > span:first-child { display: grid; place-items: center; width: 1.35rem; height: 1.35rem; border-radius: 50%; background: #ffe1e5; color: var(--primary); font-size: 1.2rem; line-height: 1; transition: transform 180ms ease; }
   .collect-button:hover { background: #fffaf1; border-color: var(--ink); box-shadow: 1px 1px 0 var(--ink); transform: translate(2px, 2px) rotate(-1deg); }
-  .collect-button:hover > span:first-child { transform: rotate(90deg) scale(1.08); }
+  .collect-button:not([data-collected="true"]):hover > span:first-child { transform: rotate(90deg) scale(1.08); }
   .collect-button:active { box-shadow: none; transform: translate(3px, 3px); }
   .collect-button[data-collected="true"] { border-color: var(--ink); box-shadow: 2px 2px 0 #1c1b1a55; }
   .discover-link { display: inline-block; padding: .5rem 0; font-size: .85rem; font-weight: 600; }
-  .collection-button { position: relative; display: block; padding: .4rem .65rem .75rem 0; border: 0; background: none; width: 100%; }
-  .collection-button :global(svg) { width: 12rem; margin: 0 auto -.15rem; transition: transform 220ms cubic-bezier(.2,.8,.3,1.3); }
-  .collection-label { position: relative; display: flex; align-items: center; justify-content: center; gap: .5rem; min-height: 44px; border: 1.5px solid var(--ink); border-radius: 999px; background: var(--surface); box-shadow: 2px 3px 0 #1c1b1a20; font-size: .78rem; font-weight: 650; transition: transform 160ms ease; }
-  .collection-button:hover .collection-label { color: var(--primary); transform: rotate(1deg); }
+  /* Above the invitation, so the dog runs in front of the text rather than under it. */
+  .collection-button { position: relative; z-index: 2; display: block; width: 100%; padding: 1.1rem .9rem .8rem 0; border: 0; background: none; }
+  /* The pill is the dog's ledge: paws and basket stand on its top edge. */
+  .collection-button :global(.election-dog) { margin-bottom: -1px; }
+  .collection-label { position: relative; display: flex; align-items: center; justify-content: center; gap: .5rem; min-height: 44px; border: 1.5px solid var(--ink); border-radius: 999px; background: var(--surface); box-shadow: 2px 3px 0 #1c1b1a20; font-size: .78rem; font-weight: 650; transition: color 160ms ease, box-shadow 160ms ease; }
+  .collection-button:hover .collection-label { color: var(--primary); box-shadow: 3px 4px 0 #1c1b1a33; }
   .collection-count { display: grid; place-items: center; min-width: 1.5rem; height: 1.5rem; padding: 0 .25rem; border-radius: 50%; background: var(--primary); color: var(--paper); font-size: .72rem; }
-  .catch-burst { position: absolute; z-index: 3; left: 30%; top: 32%; width: 1px; height: 1px; pointer-events: none; }
-  .catch-burst i { --pop-x: -35px; --pop-y: -34px; position: absolute; color: var(--primary); font: normal 700 1.35rem/1 var(--font-body); opacity: 0; }
-  .catch-burst i:nth-child(2) { --pop-x: 15px; --pop-y: -48px; color: #bd7716; font-size: 1.05rem; }
-  .catch-burst i:nth-child(3) { --pop-x: 42px; --pop-y: -16px; color: #4c7c59; font-size: 1rem; }
-  .is-catching .catch-burst i { animation: catch-pop 2.2s ease-out both; }
-  @keyframes catch-pop {
-    0%, 63% { transform: translate(0, 8px) rotate(0deg) scale(.2); opacity: 0; }
-    69% { opacity: 1; }
-    80% { transform: translate(var(--pop-x), var(--pop-y)) rotate(24deg) scale(1.15); opacity: 1; }
-    91%, 100% { transform: translate(var(--pop-x), var(--pop-y)) rotate(40deg) scale(.7); opacity: 0; }
-  }
   .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-  .flight-card { position: fixed; top: 0; left: 0; z-index: 20; display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 5px; width: 132px; height: 112px; padding: 7px; border: 2px solid var(--ink); border-radius: 10px; background: var(--surface); color: var(--ink); pointer-events: none; box-shadow: 4px 5px 0 #1c1b1a26; transform-origin: center; }
+  .flight-card { position: fixed; top: 0; left: 0; z-index: 20; display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 5px; width: 132px; height: 112px; padding: 7px; border: 2px solid var(--ink); border-radius: 10px; background: var(--surface); color: var(--ink); pointer-events: none; box-shadow: 4px 5px 0 #1c1b1a26; transform-origin: center; will-change: transform, opacity; }
   .flight-heading { display: flex; align-items: baseline; gap: 5px; min-width: 0; line-height: 1; }
   .flight-card strong { flex-shrink: 0; color: var(--primary); font: 650 16px/1 var(--font-display); }
   .flight-heading > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 8px; font-weight: 650; }
@@ -442,18 +512,17 @@ const catalog = (await getCollection("elections")).map(({ id, data }) => ({
   .storage-note { font-size: .75rem; }
   @media (max-width: 42rem) {
     election-companion { margin-top: 1.1rem; }
-    .companion-shelf { grid-template-columns: minmax(0, 1fr) 8.5rem; gap: .35rem; border-radius: 17px; }
+    .companion-shelf { grid-template-columns: minmax(0, 1fr) 9.5rem; gap: .35rem; border-radius: 17px; }
     .invitation { padding: 1rem 0 1.2rem .9rem; }
     .invitation-title { font-size: 1.25rem; }
     .companion-message { font-size: .8rem; }
-    .collection-button { padding: .35rem .4rem .6rem 0; }
-    .collection-button :global(svg) { width: 8.5rem; }
+    .collection-button { padding: .9rem .5rem .6rem 0; }
     .collection-label { gap: .35rem; font-size: .72rem; }
     .collect-button { padding-inline: .7rem; font-size: .78rem; }
     dialog { padding: 1rem; }
   }
   @media (prefers-reduced-motion: reduce) {
-    .collect-button, .collect-button > span:first-child, .collection-button :global(svg), .collection-label { transition: none; }
-    .collect-button:hover, .collect-button:active, .collection-button:hover :global(svg), .collection-button:hover .collection-label { transform: none; }
+    .collect-button, .collect-button > span:first-child, .collection-label { transition: none; }
+    .collect-button:hover, .collect-button:active, .collect-button:hover > span:first-child { transform: none; }
   }
 </style>
